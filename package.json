@@ -1,0 +1,24 @@
+{
+  "name": "nottobad-records",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "NotToBAD Records — independent record label. Dark luxury chrome, 3D scroll experience.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "smoke": "node scripts/smoke-test.mjs"
+  },
+  "dependencies": {
+    "three": "^0.177.0",
+    "gsap": "^3.13.0",
+    "lenis": "^1.3.0",
+    "@fontsource/unbounded": "^5.2.0",
+    "@fontsource/space-grotesk": "^5.2.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.0",
+    "playwright-core": "^1.53.0"
+  }
+}
