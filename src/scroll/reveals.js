@@ -24,25 +24,36 @@ export function initReveals() {
   });
 
   mm.add('(prefers-reduced-motion: reduce)', () => {
-    // Opacity only — no movement, no split text, no parallax, no counters.
-    document.querySelectorAll('[data-reveal]').forEach((el) => {
-      gsap.from(el, {
-        autoAlpha: 0,
-        duration: 0.5,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 82%',
-          once: true,
-        },
-      });
-    });
+    // Nothing hides [data-reveal] in CSS, so content is already visible.
+    // Honoring the preference means no motion and no fades at all.
   });
 
   return mm;
 }
 
 /* ------------------------------------------------------------------ */
+
+/**
+ * background-clip: text on a parent doesn't reach into SplitText's child
+ * divs, which leaves the headline transparent. Re-apply the chrome gradient
+ * per character, sized to the full headline and offset per glyph so the
+ * sweep stays continuous across the split.
+ */
+function applyChromeGradient(headline, chars) {
+  if (!headline.classList.contains('chrome-text')) return;
+  const bounds = headline.getBoundingClientRect();
+  if (!bounds.width) return;
+  chars.forEach((ch) => {
+    const r = ch.getBoundingClientRect();
+    ch.style.backgroundImage = 'var(--grad-chrome)';
+    ch.style.backgroundSize = `${bounds.width}px 100%`;
+    ch.style.backgroundPosition = `${bounds.left - r.left}px 0`;
+    ch.style.webkitBackgroundClip = 'text';
+    ch.style.backgroundClip = 'text';
+    ch.style.webkitTextFillColor = 'transparent';
+    ch.style.color = 'transparent';
+  });
+}
 
 function initHero() {
   const hero = document.getElementById('hero');
@@ -51,8 +62,10 @@ function initHero() {
   const headline = hero.querySelector('h1');
   if (headline) {
     try {
-      const split = new SplitText(headline, { type: 'chars' });
+      // words wrappers keep line-breaks between words, not mid-word
+      const split = new SplitText(headline, { type: 'words,chars' });
       if (split.chars && split.chars.length) {
+        applyChromeGradient(headline, split.chars);
         gsap.from(split.chars, {
           y: 60,
           autoAlpha: 0,

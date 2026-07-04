@@ -78,8 +78,7 @@ function renderGallery() {
       (tile, i) => `
         <figure class="gallery-tile tile-${tile.variant}" data-reveal
           data-reveal-delay="${(i * 0.06).toFixed(2)}" data-parallax="${esc(tile.parallax)}">
-          <!-- image slot: point src at real photography when it exists -->
-          <img src="" alt="" loading="lazy" hidden />
+          <!-- image slot: add <img src="…" alt="…"> here for real photography -->
           <figcaption>${esc(tile.caption)}</figcaption>
         </figure>`
     )

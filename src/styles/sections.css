@@ -62,6 +62,18 @@ main > section {
   padding-block: clamp(6rem, 16vh, 9rem) clamp(5rem, 14vh, 8rem);
 }
 
+/* soft scrim so the headline stays readable over the bright disc on
+   small screens, while the 3D still shows through around the edges */
+@media (max-width: 899px) {
+  .hero-inner {
+    background: radial-gradient(
+      ellipse 120% 60% at 40% 42%,
+      rgba(5, 5, 6, 0.55),
+      transparent 72%
+    );
+  }
+}
+
 .hero .eyebrow {
   margin-bottom: 1.5rem;
 }
@@ -70,6 +82,10 @@ main > section {
   font-size: var(--fs-hero);
   font-weight: 900;
   margin-bottom: 1.75rem;
+  /* keeps the chrome glyphs legible when the bright vinyl passes behind;
+     drop-shadow follows the gradient fill, whereas text-shadow would
+     bleed through the transparent background-clip fill */
+  filter: drop-shadow(0 4px 22px rgba(5, 5, 6, 0.85));
 }
 
 .hero-sub {
@@ -77,6 +93,7 @@ main > section {
   max-width: 42ch;
   font-size: clamp(1rem, 1.4vw, 1.1875rem);
   margin-bottom: 2.5rem;
+  text-shadow: 0 2px 16px rgba(5, 5, 6, 0.9);
 }
 
 .hero-ctas {

@@ -441,8 +441,9 @@ body.menu-open {
   border: 1px solid var(--line);
   overflow: hidden;
   background:
-    radial-gradient(ellipse 90% 80% at var(--tile-x, 30%) var(--tile-y, 20%), rgba(139, 139, 150, 0.22), transparent 60%),
-    linear-gradient(var(--tile-angle, 150deg), #101014, #050507 75%);
+    radial-gradient(ellipse 90% 80% at var(--tile-x, 30%) var(--tile-y, 20%), rgba(160, 160, 172, 0.34), transparent 62%),
+    linear-gradient(var(--tile-angle, 150deg), rgba(201, 162, 39, 0.05), transparent 40%),
+    linear-gradient(var(--tile-angle, 150deg), #16161c, #060608 78%);
   transition: border-color var(--speed) var(--ease-lux);
 }
 
