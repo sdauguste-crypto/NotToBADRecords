@@ -1,0 +1,56 @@
+/* ------------------------------------------------------------------
+   NotToBAD Records — design tokens
+   DARK LUXURY / CHROME. Gold is scarce. Chrome is liquid.
+------------------------------------------------------------------- */
+:root {
+  /* surfaces */
+  --bg-0: #050506;
+  --bg-1: #0b0b0e;
+  --bg-2: #141419;
+
+  /* ink */
+  --ink-hi: #f4f4f6;
+  --ink-mid: #a8a8b3;
+  --ink-low: #5c5c66;
+
+  /* chrome */
+  --chrome-hi: #e8e8ec;
+  --chrome-lo: #8b8b96;
+
+  /* gold — scarce by decree */
+  --gold: #c9a227;
+  --gold-hi: #f0d67a;
+
+  /* lines + light */
+  --line: rgba(232, 232, 236, 0.12);
+  --glow-gold: 0 0 24px rgba(201, 162, 39, 0.35);
+
+  /* gradients */
+  --grad-chrome: linear-gradient(115deg, #6e6e78 0%, #f4f4f6 30%, #9a9aa4 50%, #ffffff 62%, #70707a 100%);
+  --grad-gold: linear-gradient(115deg, #8a6d1c, #f0d67a 45%, #c9a227 70%, #7a5f15);
+
+  /* type */
+  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --font-body: "Space Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --fs-hero: clamp(2.75rem, 8vw, 7.5rem);
+  --fs-h2: clamp(2rem, 4.5vw, 3.5rem);
+  --fs-body: 1.0625rem;
+  --lh-body: 1.7;
+  --ls-display: 0.02em;
+  --ls-meta: 0.14em;
+
+  /* layout */
+  --container: 1200px;
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+  --section-pad: clamp(6rem, 14vh, 12rem);
+
+  /* surfaces (translucent panels over the WebGL scene) */
+  --panel: rgba(6, 6, 8, 0.55);
+  --panel-blur: 12px;
+  --radius: 4px;
+  --radius-lg: 8px;
+
+  /* motion */
+  --ease-lux: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --speed: 0.35s;
+}

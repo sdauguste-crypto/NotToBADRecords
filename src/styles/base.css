@@ -1,0 +1,222 @@
+/* ------------------------------------------------------------------
+   NotToBAD Records — base: reset, layers, typography, overlays
+------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100svh;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ink-hi);
+  background-color: var(--bg-0);
+  /* subtle radial glow so flat black never reads dead */
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% -10%, rgba(139, 139, 150, 0.1), transparent 60%),
+    radial-gradient(ellipse 60% 45% at 85% 110%, rgba(201, 162, 39, 0.05), transparent 65%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* no-WebGL fallback: art-directed static chrome glow, no canvas needed */
+html.no-webgl body {
+  background-image:
+    radial-gradient(ellipse 70% 50% at 50% 12%, rgba(232, 232, 236, 0.14), transparent 60%),
+    radial-gradient(ellipse 45% 35% at 78% 45%, rgba(139, 139, 150, 0.1), transparent 65%),
+    radial-gradient(ellipse 55% 40% at 18% 85%, rgba(201, 162, 39, 0.07), transparent 60%),
+    linear-gradient(180deg, #08080a 0%, #050506 45%, #070708 100%);
+}
+
+html.no-webgl #scene {
+  display: none;
+}
+
+/* ---------------------------------------------------------------
+   Fixed layers: canvas (0) < grain (1) < main (2) < nav (10)
+---------------------------------------------------------------- */
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 140px 140px;
+  opacity: 0.05;
+}
+
+/* vignette rides on the same fixed layer */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 90% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+  /* counteract the grain opacity so the vignette stays readable */
+  opacity: 1;
+}
+
+main {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+
+/* ---------------------------------------------------------------
+   Typography
+---------------------------------------------------------------- */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-display);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+p {
+  max-width: 65ch;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+::selection {
+  background: var(--gold);
+  color: #050506;
+}
+
+/* chrome liquid-metal display text */
+.chrome-text {
+  background: var(--grad-chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* meta / eyebrow label style */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-meta);
+  color: var(--ink-mid);
+}
+
+/* ---------------------------------------------------------------
+   Accessibility
+---------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.65rem 1.25rem;
+  background: var(--bg-1);
+  color: var(--ink-hi);
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  letter-spacing: var(--ls-meta);
+  text-transform: uppercase;
+  transform: translateY(-200%);
+  transition: transform var(--speed) var(--ease-lux);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* translucent content panel over the 3D scene */
+.panel {
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(var(--panel-blur));
+  backdrop-filter: blur(var(--panel-blur));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+/* thin luxury scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-0);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-2);
+  border-radius: 999px;
+  border: 2px solid var(--bg-0);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-low);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
