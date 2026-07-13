@@ -47,6 +47,7 @@
 }
 
 @theme inline {
+  --font-sans: "Cinzel Decorative", serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -127,5 +128,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Cinzel Decorative", serif;
   }
 }
