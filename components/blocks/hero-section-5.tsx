@@ -2,7 +2,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { InfiniteSlider } from '@/components/ui/infinite-slider'
+import { Marquee } from '@/components/magicui/marquee'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 import { cn } from '@/lib/utils'
 import { Menu, X, ChevronRight } from 'lucide-react'
@@ -59,10 +59,9 @@ export function HeroSection() {
                                 <p className="text-end text-sm">Powering the best teams</p>
                             </div>
                             <div className="relative py-6 md:w-[calc(100%-11rem)]">
-                                <InfiniteSlider
-                                    speedOnHover={20}
-                                    speed={40}
-                                    gap={112}>
+                                <Marquee
+                                    pauseOnHover
+                                    className="p-0 [--duration:25s] [--gap:7rem]">
                                     <div className="flex">
                                         <img
                                             className="mx-auto h-5 w-fit dark:invert"
@@ -137,7 +136,7 @@ export function HeroSection() {
                                             width="auto"
                                         />
                                     </div>
-                                </InfiniteSlider>
+                                </Marquee>
 
                                 <div className="bg-linear-to-r from-background absolute inset-y-0 left-0 w-20"></div>
                                 <div className="bg-linear-to-l from-background absolute inset-y-0 right-0 w-20"></div>
