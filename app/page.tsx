@@ -36,15 +36,6 @@ export default function Home() {
             "repeating-linear-gradient(0deg, #000 0 1px, transparent 1px 3px)",
         }}
       />
-      {/* analog grit — scratched-film texture over the CRT scanlines */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-50 opacity-[0.035] mix-blend-screen"
-        style={{
-          backgroundImage: "url('/textures/grunge-scratches.webp')",
-          backgroundSize: "620px auto",
-        }}
-      />
     </>
   );
 }

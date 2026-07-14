@@ -3,8 +3,6 @@
  *
  *  - assets-inbox/cloudy-sky-dawn.jpg  -> public/textures/sunset-clouds.webp
  *      photographic clouds blended into the stage-A sky dome
- *  - assets-inbox/c515e304... .jpg     -> public/textures/grunge-scratches.webp
- *      global analog-grit overlay (paired with the CRT scanlines)
  *  - assets-inbox/867924570... .jpg    -> public/textures/diamond-plate.webp
  *      CARGO BAY product-card backdrop
  *
@@ -21,13 +19,6 @@ const jobs = [
     out: "public/textures/sunset-clouds.webp",
     resize: { width: 2048, height: 1024, fit: "cover" },
     quality: 80,
-  },
-  {
-    src: "assets-inbox/c515e304d3bdb445d869a6646893e653.jpg",
-    out: "public/textures/grunge-scratches.webp",
-    resize: { width: 700, fit: "inside" },
-    quality: 50,
-    grayscale: true,
   },
   {
     src: "assets-inbox/867924570e56c92bbf754e71b0d0a5b1.jpg",

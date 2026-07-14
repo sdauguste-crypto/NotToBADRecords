@@ -45,12 +45,26 @@ function VideoCard({ video, featured = false }: VideoCardProps) {
           aria-label={`Play video: ${video.title}`}
           className="scanlines absolute inset-0 flex cursor-pointer items-center justify-center rounded-[inherit] bg-gradient-to-br from-void-panel via-void-panel to-sunset-magenta/20"
         >
-          {/* real YouTube thumbnail, tinted into the synthwave palette;
+          {/* real YouTube thumbnail, tinted into the synthwave palette.
+              maxresdefault (1280px) first; YouTube serves a 120px gray
+              placeholder when a video lacks it, so fall back to hqdefault.
               eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
+            src={`https://i.ytimg.com/vi/${video.youtubeId}/maxresdefault.jpg`}
             alt=""
             loading="lazy"
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              if (img.naturalWidth <= 120 && !img.src.includes("hqdefault")) {
+                img.src = `https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`;
+              }
+            }}
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (!img.src.includes("hqdefault")) {
+                img.src = `https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`;
+              }
+            }}
             className="absolute inset-0 h-full w-full rounded-[inherit] object-cover opacity-80 transition-opacity duration-300 group-hover:opacity-95"
           />
           <span
