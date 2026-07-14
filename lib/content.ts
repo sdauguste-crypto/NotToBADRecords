@@ -8,7 +8,12 @@ export type Release = {
   year: number;
   /** Seed for the procedural CoverArt generator. */
   seed: number;
+  /** Share link to the track/album on Spotify (opens in a new tab). */
+  spotifyUrl?: string;
+  /** Spotify iframe embed URL (https://open.spotify.com/embed/track/...). */
   spotifyEmbedUrl?: string;
+  /** Share link to the song on Apple Music. */
+  appleMusicUrl?: string;
   tags: string[];
 };
 
@@ -58,54 +63,40 @@ export type Social = {
 
 export const releases: Release[] = [
   {
-    id: "rel-chrome-hearts",
-    title: "CHROME HEARTS EP",
-    artist: "VELVET STATIC",
-    year: 2026,
-    seed: 11,
-    spotifyEmbedUrl: "https://open.spotify.com/embed/album/4aawyAB9vmqN3uQ7FjRGTy",
-    tags: ["synthwave", "ep", "new"],
-  },
-  {
-    id: "rel-midnight-alloy",
-    title: "MIDNIGHT ALLOY",
-    artist: "JULES QUARTER",
-    year: 2026,
-    seed: 42,
-    tags: ["darkwave", "single"],
-  },
-  {
-    id: "rel-gilded",
-    title: "GILDED",
-    artist: "OKTAVE",
-    year: 2025,
-    seed: 77,
-    spotifyEmbedUrl: "https://open.spotify.com/embed/album/4aawyAB9vmqN3uQ7FjRGTy",
-    tags: ["retrowave", "lp"],
-  },
-  {
-    id: "rel-neon-mirage",
-    title: "NEON MIRAGE",
-    artist: "VELVET STATIC",
-    year: 2025,
+    id: "rel-the-princess",
+    title: "THE PRINCESS",
+    artist: "SIMON AUGUSTE",
+    year: 2023,
     seed: 23,
-    tags: ["synthwave", "single"],
+    spotifyUrl:
+      "https://open.spotify.com/track/4CVEdSUd9WpRT1LZmr9H5z?si=f012a578ce8b4a23",
+    spotifyEmbedUrl: "https://open.spotify.com/embed/track/4CVEdSUd9WpRT1LZmr9H5z",
+    appleMusicUrl: "https://music.apple.com/us/song/the-princess/1701777152",
+    tags: ["hip-hop", "art-pop", "single"],
   },
   {
-    id: "rel-satellite-heart",
-    title: "SATELLITE HEART",
-    artist: "LUNA VOSS",
-    year: 2025,
-    seed: 58,
-    tags: ["dreamwave", "ep"],
+    id: "rel-rockin-with-my",
+    title: "ROCKIN WITH MY",
+    artist: "SIMON AUGUSTE",
+    year: 2021,
+    seed: 11,
+    spotifyUrl:
+      "https://open.spotify.com/track/5QumA0MbEQsLboWwjkWxIR?si=8e5ce7281eae4e45",
+    spotifyEmbedUrl: "https://open.spotify.com/embed/track/5QumA0MbEQsLboWwjkWxIR",
+    appleMusicUrl: "https://music.apple.com/us/song/rockin-with-my/1569082054",
+    tags: ["hip-hop", "grunge", "single"],
   },
   {
-    id: "rel-no-bad-days-2",
-    title: "NO BAD DAYS VOL. II",
-    artist: "VARIOUS",
-    year: 2024,
-    seed: 96,
-    tags: ["compilation", "label"],
+    id: "rel-no-lights",
+    title: "NO LIGHTS",
+    artist: "SIMON AUGUSTE",
+    year: 2016,
+    seed: 77,
+    spotifyUrl:
+      "https://open.spotify.com/track/2ocnBN4eVcaW4Rv1GEkapD?si=5c284a96ac2441d1",
+    spotifyEmbedUrl: "https://open.spotify.com/embed/track/2ocnBN4eVcaW4Rv1GEkapD",
+    appleMusicUrl: "https://music.apple.com/us/song/no-lights-can-i/1577344766",
+    tags: ["hip-hop", "electro-pop", "single"],
   },
 ];
 

@@ -53,9 +53,9 @@ export function NowPlaying() {
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6 flex flex-wrap items-center gap-4">
             <a
-              href="https://open.spotify.com"
+              href={release.spotifyUrl ?? "https://open.spotify.com"}
               target="_blank"
               rel="noreferrer"
               className="inline-block"
@@ -68,6 +68,16 @@ export function NowPlaying() {
                 PLAY ON SPOTIFY
               </ShimmerButton>
             </a>
+            {release.appleMusicUrl ? (
+              <a
+                href={release.appleMusicUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-sunset-gold/40 px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold transition-colors hover:border-sunset-gold hover:bg-sunset-gold/10"
+              >
+                APPLE MUSIC
+              </a>
+            ) : null}
           </div>
         </div>
       </div>

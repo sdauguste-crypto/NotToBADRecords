@@ -29,9 +29,28 @@ export function ReleaseCard({ release }: ReleaseCardProps) {
           </span>
         ))}
       </div>
-      <p className="mt-3 text-xs font-bold uppercase tracking-[0.25em] text-sunset-gold opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        STREAM ▸
-      </p>
+      <div className="mt-3 flex gap-4 text-xs font-bold uppercase tracking-[0.25em]">
+        {release.spotifyUrl ? (
+          <a
+            href={release.spotifyUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sunset-gold opacity-0 transition-opacity duration-300 hover:underline group-hover:opacity-100"
+          >
+            SPOTIFY ▸
+          </a>
+        ) : null}
+        {release.appleMusicUrl ? (
+          <a
+            href={release.appleMusicUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sunset-pink opacity-0 transition-opacity duration-300 hover:underline group-hover:opacity-100"
+          >
+            APPLE ▸
+          </a>
+        ) : null}
+      </div>
     </article>
   );
 }
