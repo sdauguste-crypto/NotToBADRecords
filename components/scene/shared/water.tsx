@@ -33,6 +33,8 @@ uniform float uTime;
 uniform float uBlendAB;
 uniform float uBlendBC;
 uniform float uGrid;
+uniform float uMapReady;
+uniform sampler2D uNormalMap;
 varying vec3 vWorld;
 #include <fog_pars_fragment>
 
@@ -53,10 +55,27 @@ void main() {
           + vnoise(p * 0.42 + vec2(-uTime * 0.05, uTime * 0.08)) * 0.35;
   color += n * 0.15 * MAGENTA;
 
-  // Gold sun streak toward the horizon (stage A only).
-  float streak = exp(-pow(vWorld.x / (1.5 + n * 1.2), 2.0))
+  // Photo-derived ripple normals, two scales scrolling against each other
+  // (mirrored wrap hides the photo's seams). uMapReady gates until loaded.
+  vec2 rip = (texture2D(uNormalMap, p * 0.045 + vec2(uTime * 0.010, uTime * 0.014)).xy * 2.0 - 1.0)
+           + (texture2D(uNormalMap, p * 0.11  + vec2(-uTime * 0.016, uTime * 0.008)).xy * 2.0 - 1.0) * 0.6;
+  rip *= uMapReady;
+  color += rip.y * 0.05 * mix(MAGENTA, PINK, uBlendAB);
+
+  // Gold sun streak toward the horizon (stage A only), wobbled by ripples.
+  float streak = exp(-pow((vWorld.x + rip.x * 2.2) / (1.5 + n * 1.2), 2.0))
                * (1.0 - smoothstep(-110.0, 10.0, vWorld.z));
   color += streak * mix(GOLD, PINK, 0.4) * (1.0 - uBlendAB);
+
+  // Specular glints off the ripple normals — gold under the sun, pink
+  // under the city neon.
+  vec3 N = normalize(vec3(rip.x * 0.8, 1.0, rip.y * 0.8));
+  vec3 V = normalize(cameraPosition - vWorld);
+  vec3 L = normalize(vec3(0.12, 0.3, -1.0));
+  float spec = pow(max(dot(N, normalize(L + V)), 0.0), 90.0);
+  // fade glints near the camera so foreground sparkle doesn't fight the UI
+  spec *= 1.0 - smoothstep(-30.0, -6.0, vWorld.z);
+  color += spec * mix(mix(GOLD, PINK, 0.4), PINK, uBlendAB) * 0.9 * uMapReady;
 
   // Pink shore glow band (stage B).
   color += exp(-pow((vWorld.z + 62.0) / 8.0, 2.0)) * PINK * 0.35 * uBlendAB;
@@ -83,24 +102,34 @@ export default function Water({
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  const material = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        transparent: true,
-        depthWrite: false,
-        fog: true,
-        uniforms: {
-          ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
-          uTime: shared.uTime,
-          uBlendAB: shared.uBlendAB,
-          uBlendBC: shared.uBlendBC,
-          uGrid: { value: TIERS[tier].waterGrid ? 1 : 0 },
-        },
-        vertexShader: VERTEX,
-        fragmentShader: FRAGMENT,
-      }),
-    [shared, tier],
-  );
+  const material = useMemo(() => {
+    const uMapReady = { value: 0 };
+    const normalMap = new THREE.TextureLoader().load(
+      '/textures/water-normal.webp',
+      () => {
+        uMapReady.value = 1;
+      },
+    );
+    normalMap.wrapS = THREE.MirroredRepeatWrapping;
+    normalMap.wrapT = THREE.MirroredRepeatWrapping;
+    normalMap.colorSpace = THREE.NoColorSpace;
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      fog: true,
+      uniforms: {
+        ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
+        uTime: shared.uTime,
+        uBlendAB: shared.uBlendAB,
+        uBlendBC: shared.uBlendBC,
+        uGrid: { value: TIERS[tier].waterGrid ? 1 : 0 },
+        uMapReady,
+        uNormalMap: { value: normalMap },
+      },
+      vertexShader: VERTEX,
+      fragmentShader: FRAGMENT,
+    });
+  }, [shared, tier]);
 
   useFrame(() => {
     const mesh = meshRef.current;
