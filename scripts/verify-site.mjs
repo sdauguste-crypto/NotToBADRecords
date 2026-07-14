@@ -24,7 +24,10 @@ const MIME = {
 };
 
 // Third-party embed domains are expected to be unreachable in the sandbox.
-const IGNORABLE = [/open\.spotify\.com/, /youtube-nocookie\.com/, /i\.ytimg\.com/, /favicon\.ico/];
+const IGNORABLE = [
+  /open\.spotify\.com/, /youtube-nocookie\.com/, /i\.ytimg\.com/, /favicon\.ico/,
+  /gc\.zgo\.at/, /goatcounter\.com/, /formsubmit\.co/,
+];
 
 function findChromium() {
   const base = "/opt/pw-browsers";

@@ -9,11 +9,15 @@ import { useReducedMotion } from "@/components/sections/use-reduced-motion";
 const STORAGE_KEY = "ntb-newsletter";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const SUCCESS_TEXT = "✓ TRANSMISSION RECEIVED — WELCOME ABOARD, CADET";
+// FormSubmit relays each signup to the label inbox — no server needed.
+const RELAY_URL =
+  "https://formsubmit.co/ajax/motivationmusicmgmt@gmail.com";
 
 export function NewsletterTerminal() {
   const reduced = useReducedMotion();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
   // Restore prior enlistment after mount (SSR-safe).
@@ -27,18 +31,37 @@ export function NewsletterTerminal() {
     }
   }, []);
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!EMAIL_RE.test(email.trim())) {
+    const trimmed = email.trim();
+    if (!EMAIL_RE.test(trimmed)) {
       setError("INVALID FREQUENCY — CHECK EMAIL FORMAT");
       return;
     }
     setError("");
-    setSubscribed(true);
+    setSending(true);
     try {
-      window.localStorage.setItem(STORAGE_KEY, "1");
+      const res = await fetch(RELAY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          email: trimmed,
+          _subject: "NTB Mission Control — new newsletter signup",
+          _template: "table",
+          _captcha: "false",
+        }),
+      });
+      if (!res.ok) throw new Error(`relay ${res.status}`);
+      setSubscribed(true);
+      try {
+        window.localStorage.setItem(STORAGE_KEY, "1");
+      } catch {
+        // storage unavailable
+      }
     } catch {
-      // storage unavailable
+      setError("SIGNAL LOST — TRANSMISSION FAILED, TRY AGAIN");
+    } finally {
+      setSending(false);
     }
   };
 
@@ -92,11 +115,12 @@ export function NewsletterTerminal() {
                 />
                 <ShimmerButton
                   type="submit"
+                  disabled={sending}
                   shimmerColor="#ff2e88"
                   background="rgba(10, 6, 18, .95)"
-                  className="border-sunset-gold/30 px-6 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold"
+                  className="border-sunset-gold/30 px-6 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold disabled:opacity-60"
                 >
-                  TRANSMIT
+                  {sending ? "TRANSMITTING…" : "TRANSMIT"}
                 </ShimmerButton>
               </div>
               {error ? (
@@ -108,8 +132,8 @@ export function NewsletterTerminal() {
           )}
         </div>
         <p className="mt-3 text-xs tracking-[0.1em] text-foreground/40">
-          No backend attached — signal archived locally until ground control
-          hooks up a provider.
+          Signals route directly to ground control. No spam — launch alerts
+          and new drops only.
         </p>
       </div>
     </div>

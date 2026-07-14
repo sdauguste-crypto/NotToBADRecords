@@ -21,7 +21,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* GoatCounter analytics — privacy-friendly, no cookies. Counts
+            activate once the "nottobadrecords" code is registered at
+            goatcounter.com; until then the script no-ops harmlessly. */}
+        <script
+          async
+          data-goatcounter="https://nottobadrecords.goatcounter.com/count"
+          src="https://gc.zgo.at/count.js"
+        />
+      </body>
     </html>
   );
 }
