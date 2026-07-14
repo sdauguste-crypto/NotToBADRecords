@@ -66,9 +66,11 @@ function VideoCard({ video, featured = false }: VideoCardProps) {
             >
               {video.title}
             </span>
-            <span className="shrink-0 rounded-full border border-sunset-gold/40 px-2 py-0.5 text-xs tracking-[0.15em] text-sunset-gold">
-              {video.duration}
-            </span>
+            {video.duration ? (
+              <span className="shrink-0 rounded-full border border-sunset-gold/40 px-2 py-0.5 text-xs tracking-[0.15em] text-sunset-gold">
+                {video.duration}
+              </span>
+            ) : null}
           </span>
         </button>
       )}

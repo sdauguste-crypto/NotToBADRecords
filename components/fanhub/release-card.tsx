@@ -8,11 +8,20 @@ type ReleaseCardProps = {
 export function ReleaseCard({ release }: ReleaseCardProps) {
   return (
     <article className="glass-panel group relative overflow-hidden p-4 transition-all duration-300 hover:-translate-y-1 hover:border-sunset-pink/60 hover:shadow-[0_0_36px_rgba(255,46,136,.3)]">
-      <CoverArt
-        seed={release.seed}
-        title={release.title}
-        className="aspect-square w-full"
-      />
+      {release.coverImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={release.coverImage}
+          alt={`${release.title} — cover art`}
+          className="aspect-square w-full rounded-xl border border-sunset-pink/15 object-cover"
+        />
+      ) : (
+        <CoverArt
+          seed={release.seed}
+          title={release.title}
+          className="aspect-square w-full"
+        />
+      )}
       <h3 className="mt-4 truncate font-bold uppercase tracking-wide text-foreground">
         {release.title}
       </h3>

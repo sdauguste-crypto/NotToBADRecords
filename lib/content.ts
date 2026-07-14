@@ -14,6 +14,8 @@ export type Release = {
   spotifyEmbedUrl?: string;
   /** Share link to the song on Apple Music. */
   appleMusicUrl?: string;
+  /** Real cover artwork under public/covers (falls back to procedural art). */
+  coverImage?: string;
   tags: string[];
 };
 
@@ -21,7 +23,7 @@ export type Video = {
   id: string;
   title: string;
   youtubeId: string;
-  duration: string;
+  duration?: string;
 };
 
 export type GalleryItem = {
@@ -64,6 +66,7 @@ export type Social = {
 export const releases: Release[] = [
   {
     id: "rel-the-princess",
+    coverImage: "/NotToBADRecords/covers/the-princess.webp",
     title: "THE PRINCESS",
     artist: "SIMON AUGUSTE",
     year: 2023,
@@ -76,6 +79,7 @@ export const releases: Release[] = [
   },
   {
     id: "rel-rockin-with-my",
+    coverImage: "/NotToBADRecords/covers/rockin-with-my.webp",
     title: "ROCKIN WITH MY",
     artist: "SIMON AUGUSTE",
     year: 2021,
@@ -88,6 +92,7 @@ export const releases: Release[] = [
   },
   {
     id: "rel-no-lights",
+    coverImage: "/NotToBADRecords/covers/no-lights.webp",
     title: "NO LIGHTS",
     artist: "SIMON AUGUSTE",
     year: 2016,
@@ -102,28 +107,19 @@ export const releases: Release[] = [
 
 export const videos: Video[] = [
   {
-    id: "vid-chrome-hearts",
-    title: "VELVET STATIC — CHROME HEARTS (Official Video)",
-    youtubeId: "dQw4w9WgXcQ",
-    duration: "4:12",
+    id: "vid-fall-in-love",
+    title: "FALL IN LOVE (OFFICIAL MUSIC VIDEO)",
+    youtubeId: "kLXO5goajyA",
   },
   {
-    id: "vid-midnight-alloy-live",
-    title: "JULES QUARTER — MIDNIGHT ALLOY (Live at Elsewhere)",
-    youtubeId: "kXzp1BqW3f0",
-    duration: "6:48",
+    id: "vid-vampire-diaries",
+    title: "VAMPIRE DIARIES (OFFICIAL LYRIC VIDEO)",
+    youtubeId: "5yUpmuCbCVM",
   },
   {
-    id: "vid-gilded-visual",
-    title: "OKTAVE — GILDED (Visualizer)",
-    youtubeId: "Zt9qL0mNc4E",
-    duration: "3:57",
-  },
-  {
-    id: "vid-studio-diaries",
-    title: "NTB STUDIO DIARIES — Pressing Vol. II",
-    youtubeId: "xR27vTqYd8U",
-    duration: "9:31",
+    id: "vid-the-princess",
+    title: "THE PRINCESS (OFFICIAL LYRIC VIDEO)",
+    youtubeId: "30GwU97NGdg",
   },
 ];
 

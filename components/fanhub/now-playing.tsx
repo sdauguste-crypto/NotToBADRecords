@@ -19,11 +19,20 @@ export function NowPlaying() {
       <BorderBeam size={70} duration={9} colorFrom="#ff2e88" colorTo="#d9a8ff" />
 
       <div className="grid gap-8 md:grid-cols-[minmax(0,280px)_1fr] md:items-center">
-        <CoverArt
-          seed={release.seed}
-          title={release.title}
-          className="aspect-square w-full max-w-[280px]"
-        />
+        {release.coverImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={release.coverImage}
+            alt={`${release.title} — cover art`}
+            className="aspect-square w-full max-w-[280px] rounded-xl border border-sunset-pink/20 object-cover"
+          />
+        ) : (
+          <CoverArt
+            seed={release.seed}
+            title={release.title}
+            className="aspect-square w-full max-w-[280px]"
+          />
+        )}
 
         <div>
           <p className="mb-3 text-xs uppercase tracking-[0.3em] text-sunset-gold/70">
