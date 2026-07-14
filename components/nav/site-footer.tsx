@@ -62,8 +62,12 @@ export function SiteFooter() {
     <footer className="relative z-10 -mt-px border-t border-sunset-pink/20 bg-void-deep/60 px-6 py-10 backdrop-blur">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 md:flex-row md:justify-between">
         <div className="flex flex-col items-center gap-4 md:items-start">
-          <span className="text-neon-gold text-xs font-bold uppercase tracking-widest">
-            NOT TO B.A.D RECORDS
+          <span className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-crest.webp" alt="" className="h-10 w-auto" />
+            <span className="text-neon-gold text-xs font-bold uppercase tracking-widest">
+              NOT TO B.A.D RECORDS
+            </span>
           </span>
           <div className="flex items-center gap-5">
             {SOCIALS.map(({ label, Icon }) => (

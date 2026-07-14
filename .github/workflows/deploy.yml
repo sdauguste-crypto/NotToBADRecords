@@ -2,7 +2,8 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    # deploys from either branch — the claude/* branch is the repo default
+    branches: [main, "claude/**"]
   workflow_dispatch:
 
 permissions:

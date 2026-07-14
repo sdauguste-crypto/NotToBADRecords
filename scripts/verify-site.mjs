@@ -24,7 +24,7 @@ const MIME = {
 };
 
 // Third-party embed domains are expected to be unreachable in the sandbox.
-const IGNORABLE = [/open\.spotify\.com/, /youtube-nocookie\.com/, /favicon\.ico/];
+const IGNORABLE = [/open\.spotify\.com/, /youtube-nocookie\.com/, /i\.ytimg\.com/, /favicon\.ico/];
 
 function findChromium() {
   const base = "/opt/pw-browsers";
@@ -69,8 +69,9 @@ function collectErrors(page, bucket) {
   page.on("console", (msg) => {
     if (msg.type() !== "error") return;
     const text = msg.text();
-    if (IGNORABLE.some((re) => re.test(text))) return;
-    bucket.push(`[console] ${text}`);
+    const srcUrl = msg.location()?.url ?? "";
+    if (IGNORABLE.some((re) => re.test(text) || re.test(srcUrl))) return;
+    bucket.push(`[console] ${text} (${srcUrl})`);
   });
   page.on("requestfailed", (req) => {
     const url = req.url();

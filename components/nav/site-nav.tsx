@@ -78,9 +78,17 @@ export function SiteNav() {
         <a
           href="#hero"
           onClick={(e) => goTo(e, "hero")}
-          className="text-neon-gold text-sm font-bold uppercase tracking-widest md:text-base"
+          className="flex items-center gap-3"
         >
-          NOT TO B.A.D RECORDS
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-crest.webp"
+            alt=""
+            className="h-9 w-auto drop-shadow-[0_0_10px_rgba(255,46,136,0.45)] md:h-10"
+          />
+          <span className="text-neon-gold text-sm font-bold uppercase tracking-widest md:text-base">
+            NOT TO B.A.D RECORDS
+          </span>
         </a>
 
         {/* Desktop links */}
@@ -129,8 +137,12 @@ export function SiteNav() {
             className="fixed inset-0 z-50 flex flex-col bg-void/95 backdrop-blur lg:hidden"
           >
             <div className="flex items-center justify-between px-8 py-6">
-              <span className="text-neon-gold text-sm font-bold uppercase tracking-widest">
-                NOT TO B.A.D RECORDS
+              <span className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-crest.webp" alt="" className="h-9 w-auto" />
+                <span className="text-neon-gold text-sm font-bold uppercase tracking-widest">
+                  NOT TO B.A.D RECORDS
+                </span>
               </span>
               <button
                 type="button"

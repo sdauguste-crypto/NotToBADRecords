@@ -45,6 +45,18 @@ function VideoCard({ video, featured = false }: VideoCardProps) {
           aria-label={`Play video: ${video.title}`}
           className="scanlines absolute inset-0 flex cursor-pointer items-center justify-center rounded-[inherit] bg-gradient-to-br from-void-panel via-void-panel to-sunset-magenta/20"
         >
+          {/* real YouTube thumbnail, tinted into the synthwave palette;
+              eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
+            alt=""
+            loading="lazy"
+            className="absolute inset-0 h-full w-full rounded-[inherit] object-cover opacity-80 transition-opacity duration-300 group-hover:opacity-95"
+          />
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-[inherit] bg-gradient-to-t from-void-deep/80 via-transparent to-sunset-magenta/15"
+          />
           <span
             className={cn(
               "flex items-center justify-center rounded-full border-2 border-sunset-pink text-sunset-pink shadow-[0_0_24px_rgba(255,46,136,.6),inset_0_0_16px_rgba(255,46,136,.25)] transition-transform duration-300 group-hover:scale-110",
