@@ -25,6 +25,8 @@ void main() {
 const FRAGMENT = /* glsl */ `
 uniform float uBlendAB;
 uniform float uBlendBC;
+uniform float uCloudReady;
+uniform sampler2D uCloudMap;
 varying vec3 vWorldPos;
 
 ${GLSL_NOISE}
@@ -62,6 +64,16 @@ vec3 rampC(vec2 p) {
 void main() {
   float h = clamp(vWorldPos.y / 300.0, 0.0, 1.0);
   vec3 a = rampA(h);
+
+  // Photographic sunset clouds wrapped around the dome by azimuth (mirrored
+  // repeat hides the photo's edges), blended into the ramp near the horizon
+  // and dissolving toward the zenith so the palette stays coherent.
+  vec3 dir = normalize(vWorldPos);
+  float az = atan(dir.x, -dir.z);
+  vec2 cuv = vec2(az * 0.477 + 0.72, clamp(h * 1.45, 0.02, 0.98));
+  vec3 cloud = texture2D(uCloudMap, cuv).rgb * vec3(0.95, 0.72, 1.05);
+  float cw = uCloudReady * 0.55 * (1.0 - smoothstep(0.22, 0.6, h));
+  a = mix(a, cloud, cw);
   vec3 b = rampB(h);
   vec3 c = rampC(normalize(vWorldPos).xy * 4.0 + vec2(0.0, h * 3.0));
   vec3 color = mix(mix(a, b, uBlendAB), c, uBlendBC);
@@ -71,21 +83,30 @@ void main() {
 `;
 
 export default function SkyDome({ shared }: { shared: SharedUniforms }) {
-  const material = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        side: THREE.BackSide,
-        depthWrite: false,
-        fog: false,
-        uniforms: {
-          uBlendAB: shared.uBlendAB,
-          uBlendBC: shared.uBlendBC,
-        },
-        vertexShader: VERTEX,
-        fragmentShader: FRAGMENT,
-      }),
-    [shared],
-  );
+  const material = useMemo(() => {
+    const uCloudReady = { value: 0 };
+    const cloudMap = new THREE.TextureLoader().load(
+      '/textures/sunset-clouds.webp',
+      () => {
+        uCloudReady.value = 1;
+      },
+    );
+    cloudMap.wrapS = THREE.MirroredRepeatWrapping;
+    cloudMap.wrapT = THREE.ClampToEdgeWrapping;
+    return new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      depthWrite: false,
+      fog: false,
+      uniforms: {
+        uBlendAB: shared.uBlendAB,
+        uBlendBC: shared.uBlendBC,
+        uCloudReady,
+        uCloudMap: { value: cloudMap },
+      },
+      vertexShader: VERTEX,
+      fragmentShader: FRAGMENT,
+    });
+  }, [shared]);
 
   return (
     <mesh material={material} renderOrder={-10} frustumCulled={false}>

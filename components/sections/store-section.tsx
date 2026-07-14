@@ -78,6 +78,15 @@ function MerchSilhouette({
 function ProductCard({ product }: { product: Product }) {
   return (
     <article className="glass-panel relative flex flex-col items-center overflow-hidden p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-sunset-gold/50">
+      {/* diamond-plate cargo floor behind the merch */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.18]"
+        style={{
+          backgroundImage: "url('/textures/diamond-plate.webp')",
+          backgroundSize: "340px auto",
+        }}
+      />
       {product.featured ? (
         <>
           <BorderBeam size={60} duration={8} colorFrom="#ff2e88" colorTo="#d9a8ff" />
