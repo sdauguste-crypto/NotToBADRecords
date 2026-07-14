@@ -6,12 +6,14 @@ import * as THREE from 'three';
 // ---------------------------------------------------------------------------
 // Palette (hex source of truth — do not import CSS)
 // ---------------------------------------------------------------------------
+// Pink/purple regrade: the former orange/gold slots now carry hot pink and
+// lavender so every shader that reads them lands in the pink–purple range.
 export const HEX = {
   sunsetPink: '#ff2e88',
   sunsetMagenta: '#b636ff',
-  sunsetOrange: '#ff7a1a',
-  sunsetGold: '#ffc857',
-  sunGoldTop: '#ffd75e',
+  sunsetOrange: '#ff4fc3', // hot magenta-pink (was orange)
+  sunsetGold: '#d9a8ff', // soft lavender (was gold)
+  sunGoldTop: '#ffd6f2', // pale pink sun crown (was pale gold)
   void: '#0a0612',
   voidDeep: '#05030a',
   deepPurpleHorizon: '#1b0b33',
@@ -22,7 +24,7 @@ export const HEX = {
   waterBaseA: '#120a2e',
   waterBaseB: '#0c0620',
   cityBody: '#07040f',
-  moonGold: '#f6e7c1',
+  moonGold: '#e6d4ff', // pale lavender moon
   starPink: '#ff9ad5',
   cloudValley: '#2a1040',
   cloudCrest: '#ffd0e8',
@@ -121,10 +123,10 @@ export type TierConfig = {
 export const TIERS: Record<'high' | 'low', TierConfig> = {
   high: {
     dpr: [1, 2],
-    cityCount: 180,
-    starCount: 4000,
-    nebulaCount: 5,
-    cloudSegments: 96,
+    cityCount: 240,
+    starCount: 6500,
+    nebulaCount: 7,
+    cloudSegments: 128,
     antennaLights: true,
     waterGrid: true,
   },

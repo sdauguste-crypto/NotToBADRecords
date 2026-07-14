@@ -29,7 +29,6 @@ varying vec3 vWorldPos;
 
 ${GLSL_NOISE}
 
-const vec3 ORANGE  = ${glslColor(HEX.sunsetOrange)};
 const vec3 PINK    = ${glslColor(HEX.sunsetPink)};
 const vec3 MAGENTA = ${glslColor(HEX.sunsetMagenta)};
 const vec3 HORIZON = ${glslColor(HEX.deepPurpleHorizon)};
@@ -37,10 +36,16 @@ const vec3 INDIGO  = ${glslColor(HEX.indigoNight)};
 const vec3 VOID    = ${glslColor(HEX.void)};
 const vec3 SPACE   = ${glslColor(HEX.spaceBase)};
 
+// Sunset ramp runs deeper than the shared palette so the bright sun disc
+// pops out of it: rose horizon -> muted magenta -> violet -> near-black zenith.
+const vec3 A_HORIZON = ${glslColor('#c9308f')};
+const vec3 A_LOW     = ${glslColor('#8b2fd6')};
+const vec3 A_MID     = ${glslColor('#4a1a8f')};
+
 vec3 rampA(float h) {
-  vec3 c = mix(ORANGE, PINK, smoothstep(0.0, 0.25, h));
-  c = mix(c, MAGENTA, smoothstep(0.25, 0.5, h));
-  c = mix(c, HORIZON, smoothstep(0.5, 1.0, h));
+  vec3 c = mix(A_HORIZON, A_LOW, smoothstep(0.0, 0.28, h));
+  c = mix(c, A_MID, smoothstep(0.28, 0.55, h));
+  c = mix(c, HORIZON, smoothstep(0.55, 1.0, h));
   return c;
 }
 

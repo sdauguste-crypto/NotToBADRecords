@@ -1,4 +1,4 @@
-// NotToBAD Records — Mission Control
+// Not To B.A.D Records — Mission Control
 // Typed single source of truth for all page-section content.
 
 export type Release = {
@@ -268,13 +268,13 @@ export const socials: Social[] = [
   },
   {
     platform: "youtube",
-    handle: "NotToBAD Records",
+    handle: "Not To B.A.D Records",
     url: "https://youtube.com/@nottobadrecords",
     followers: "24K",
   },
   {
     platform: "spotify",
-    handle: "NotToBAD Records",
+    handle: "Not To B.A.D Records",
     url: "https://open.spotify.com/user/nottobadrecords",
     followers: "31K",
   },

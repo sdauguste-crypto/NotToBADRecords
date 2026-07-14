@@ -22,7 +22,7 @@ function MerchSilhouette({
         <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#ff2e88" />
           <stop offset="50%" stopColor="#b636ff" />
-          <stop offset="100%" stopColor="#ffc857" />
+          <stop offset="100%" stopColor="#d9a8ff" />
         </linearGradient>
       </defs>
       {kind === "tee" ? (
@@ -49,7 +49,7 @@ function MerchSilhouette({
           <circle cx="50" cy="50" r="26" fill="none" stroke="#0a0612" strokeWidth="1.5" opacity="0.5" />
           <circle cx="50" cy="50" r="32" fill="none" stroke="#0a0612" strokeWidth="1.5" opacity="0.5" />
           <circle cx="50" cy="50" r="12" fill="#0a0612" opacity="0.7" />
-          <circle cx="50" cy="50" r="2.5" fill="#ffc857" />
+          <circle cx="50" cy="50" r="2.5" fill="#d9a8ff" />
         </>
       ) : kind === "cap" ? (
         <>
@@ -80,7 +80,7 @@ function ProductCard({ product }: { product: Product }) {
     <article className="glass-panel relative flex flex-col items-center overflow-hidden p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-sunset-gold/50">
       {product.featured ? (
         <>
-          <BorderBeam size={60} duration={8} colorFrom="#ff2e88" colorTo="#ffc857" />
+          <BorderBeam size={60} duration={8} colorFrom="#ff2e88" colorTo="#d9a8ff" />
           <span className="absolute right-3 top-3 rounded-full bg-sunset-pink px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-[0_0_16px_rgba(255,46,136,.7)]">
             LIMITED
           </span>

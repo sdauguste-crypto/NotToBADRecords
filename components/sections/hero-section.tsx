@@ -8,7 +8,7 @@ import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { Button } from "@/components/ui/button";
 import { useReducedMotion } from "@/components/sections/use-reduced-motion";
 
-const TITLE_LINES = ["NOTTOBAD", "RECORDS"];
+const TITLE_LINES = ["NOT TO B.A.D", "RECORDS"];
 
 export function HeroSection() {
   const reduced = useReducedMotion();
@@ -27,7 +27,7 @@ export function HeroSection() {
         >
           <AnimatedGradientText
             colorFrom="#ff2e88"
-            colorTo="#ffc857"
+            colorTo="#d9a8ff"
             className="text-xs font-bold uppercase tracking-[0.25em] md:text-sm"
           >
             ⦿ TRANSMISSION LIVE — MISSION CONTROL ONLINE
@@ -69,7 +69,7 @@ export function HeroSection() {
         >
           <a href="#music">
             <ShimmerButton
-              shimmerColor="#ffc857"
+              shimmerColor="#d9a8ff"
               background="linear-gradient(105deg, #ff2e88, #b636ff)"
               className="px-8 py-3 text-xs font-bold uppercase tracking-[0.2em] shadow-[0_0_28px_rgba(255,46,136,.45)]"
             >

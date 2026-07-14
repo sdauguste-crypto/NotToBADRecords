@@ -8,8 +8,8 @@ export default function JourneyFallback() {
       aria-hidden="true"
       style={{
         background: [
-          'radial-gradient(circle 16vmin at 50% 62%, #ffc857 0%, #ffc857 52%, rgba(255, 200, 87, 0) 100%)',
-          'linear-gradient(to bottom, #1b0b33, #b636ff 45%, #ff2e88 65%, #ff7a1a 82%, #ffc857)',
+          'radial-gradient(circle 16vmin at 50% 62%, #d9a8ff 0%, #d9a8ff 52%, rgba(217, 168, 255, 0) 100%)',
+          'linear-gradient(to bottom, #1b0b33, #b636ff 45%, #ff2e88 65%, #ff4fc3 82%, #d9a8ff)',
         ].join(', '),
       }}
     />

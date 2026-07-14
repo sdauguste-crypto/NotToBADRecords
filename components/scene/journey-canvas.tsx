@@ -1,10 +1,18 @@
 'use client';
 
 // The R3F <Canvas>: transparent, fixed full-viewport, dpr/AA by device tier,
-// scene fog, and the first-frame readiness flag.
+// scene fog, the first-frame readiness flag, and (high tier) the cinematic
+// post-processing chain that gives neon its real glow.
 
 import { Canvas, useFrame } from '@react-three/fiber';
+import {
+  Bloom,
+  ChromaticAberration,
+  EffectComposer,
+  Vignette,
+} from '@react-three/postprocessing';
 import { useMemo, useRef } from 'react';
+import * as THREE from 'three';
 
 import { FOG_FAR, FOG_NEAR, HEX, TIERS } from './journey-config';
 import JourneyScene from './journey-scene';
@@ -21,6 +29,8 @@ function ReadyFlag() {
   });
   return null;
 }
+
+const CHROMATIC_OFFSET = new THREE.Vector2(0.0006, 0.0004);
 
 export default function JourneyCanvas() {
   const tier = useMemo(() => detectTier(), []);
@@ -43,6 +53,20 @@ export default function JourneyCanvas() {
       <fog attach="fog" args={[HEX.fogA, FOG_NEAR, FOG_FAR]} />
       <ReadyFlag />
       <JourneyScene tier={tier} />
+      {tier === 'high' && (
+        <EffectComposer>
+          {/* real HDR-style glow on the sun, neon rims, windows, and stars */}
+          <Bloom
+            intensity={0.85}
+            luminanceThreshold={0.22}
+            luminanceSmoothing={0.3}
+            mipmapBlur
+          />
+          {/* subtle lens fringe — the "shot on a camera" cue */}
+          <ChromaticAberration offset={CHROMATIC_OFFSET} />
+          <Vignette eskil={false} offset={0.18} darkness={0.62} />
+        </EffectComposer>
+      )}
     </Canvas>
   );
 }

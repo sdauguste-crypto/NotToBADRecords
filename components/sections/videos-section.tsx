@@ -27,7 +27,7 @@ function VideoCard({ video, featured = false }: VideoCardProps) {
       )}
     >
       {featured ? (
-        <BorderBeam size={70} duration={10} colorFrom="#ffc857" colorTo="#ff2e88" />
+        <BorderBeam size={70} duration={10} colorFrom="#d9a8ff" colorTo="#ff2e88" />
       ) : null}
 
       {playing ? (

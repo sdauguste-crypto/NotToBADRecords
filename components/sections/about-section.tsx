@@ -26,7 +26,7 @@ export function AboutSection() {
         >
           <p className="text-sm text-foreground/80 md:text-base">
             <span className="font-bold text-sunset-gold">
-              NotToBAD Records was founded in a basement
+              Not To B.A.D Records was founded in a basement
             </span>{" "}
             with a borrowed mixer, a broken tape deck, and the unshakable
             conviction that the sun never really sets — it just changes

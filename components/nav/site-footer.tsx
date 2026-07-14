@@ -63,7 +63,7 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 md:flex-row md:justify-between">
         <div className="flex flex-col items-center gap-4 md:items-start">
           <span className="text-neon-gold text-xs font-bold uppercase tracking-widest">
-            NOTTOBAD RECORDS
+            NOT TO B.A.D RECORDS
           </span>
           <div className="flex items-center gap-5">
             {SOCIALS.map(({ label, Icon }) => (
@@ -78,7 +78,7 @@ export function SiteFooter() {
             ))}
           </div>
           <p className="text-center text-xs text-foreground/50 md:text-left">
-            &copy; 2026 NotToBAD Records &mdash; broadcast from the edge of the
+            &copy; 2026 Not To B.A.D Records &mdash; broadcast from the edge of the
             sunset.
           </p>
         </div>

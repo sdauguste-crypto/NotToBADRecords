@@ -109,7 +109,7 @@ export function EventsSection() {
                   <div className="min-w-0 flex-1">
                     {index === 0 ? (
                       <p className="mb-1 text-xs font-bold uppercase tracking-[0.25em]">
-                        <AnimatedGradientText colorFrom="#ff2e88" colorTo="#ffc857">
+                        <AnimatedGradientText colorFrom="#ff2e88" colorTo="#d9a8ff">
                           ▲ NEXT LAUNCH
                         </AnimatedGradientText>
                       </p>

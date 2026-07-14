@@ -12,7 +12,7 @@ function mulberry32(seed: number) {
   };
 }
 
-const PALETTE = ["#ff2e88", "#b636ff", "#ff7a1a", "#ffc857", "#3d1b66"];
+const PALETTE = ["#ff2e88", "#b636ff", "#ff4fc3", "#d9a8ff", "#3d1b66"];
 
 type CoverArtProps = {
   seed: number;
@@ -27,7 +27,7 @@ function RetroSun({ accent, uid }: { accent: string; uid: string }) {
     <svg viewBox="0 0 100 100" className="h-3/5 w-3/5" aria-hidden>
       <defs>
         <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ffc857" />
+          <stop offset="0%" stopColor="#d9a8ff" />
           <stop offset="100%" stopColor={accent} />
         </linearGradient>
         <mask id={maskId}>
@@ -76,7 +76,7 @@ function RingedPlanet({ accent }: { accent: string }) {
         rx="42"
         ry="12"
         fill="none"
-        stroke="#ffc857"
+        stroke="#d9a8ff"
         strokeWidth="3"
         transform="rotate(-18 50 52)"
       />
@@ -98,8 +98,8 @@ function Cassette({ accent }: { accent: string }) {
         strokeWidth="3.5"
       />
       <rect x="24" y="36" width="52" height="16" rx="4" fill={accent} opacity="0.35" />
-      <circle cx="36" cy="44" r="5.5" fill="none" stroke="#ffc857" strokeWidth="3" />
-      <circle cx="64" cy="44" r="5.5" fill="none" stroke="#ffc857" strokeWidth="3" />
+      <circle cx="36" cy="44" r="5.5" fill="none" stroke="#d9a8ff" strokeWidth="3" />
+      <circle cx="64" cy="44" r="5.5" fill="none" stroke="#d9a8ff" strokeWidth="3" />
       <path d="M30 74 L36 60 H64 L70 74" fill="none" stroke={accent} strokeWidth="3" />
     </svg>
   );

@@ -80,7 +80,7 @@ export function SiteNav() {
           onClick={(e) => goTo(e, "hero")}
           className="text-neon-gold text-sm font-bold uppercase tracking-widest md:text-base"
         >
-          NOTTOBAD RECORDS
+          NOT TO B.A.D RECORDS
         </a>
 
         {/* Desktop links */}
@@ -130,7 +130,7 @@ export function SiteNav() {
           >
             <div className="flex items-center justify-between px-8 py-6">
               <span className="text-neon-gold text-sm font-bold uppercase tracking-widest">
-                NOTTOBAD RECORDS
+                NOT TO B.A.D RECORDS
               </span>
               <button
                 type="button"

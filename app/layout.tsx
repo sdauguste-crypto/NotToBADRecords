@@ -5,7 +5,7 @@ import "@fontsource/cinzel-decorative/900.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NotToBAD Records — Mission Control",
+  title: "Not To B.A.D Records — Mission Control",
   description:
     "Independent record label broadcasting from the edge of the sunset. Music, videos, shows, and transmissions from mission control.",
 };

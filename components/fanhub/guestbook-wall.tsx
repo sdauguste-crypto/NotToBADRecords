@@ -111,7 +111,7 @@ export function GuestbookWall() {
         <div className="mt-5 flex flex-wrap items-center gap-4">
           <ShimmerButton
             type="submit"
-            shimmerColor="#ffc857"
+            shimmerColor="#d9a8ff"
             background="linear-gradient(105deg, #ff2e88, #b636ff)"
             className="px-7 py-2.5 text-xs font-bold uppercase tracking-[0.2em]"
           >

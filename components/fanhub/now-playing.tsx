@@ -16,7 +16,7 @@ export function NowPlaying() {
 
   return (
     <div className="glass-panel relative overflow-hidden p-6 md:p-8">
-      <BorderBeam size={70} duration={9} colorFrom="#ff2e88" colorTo="#ffc857" />
+      <BorderBeam size={70} duration={9} colorFrom="#ff2e88" colorTo="#d9a8ff" />
 
       <div className="grid gap-8 md:grid-cols-[minmax(0,280px)_1fr] md:items-center">
         <CoverArt
@@ -61,7 +61,7 @@ export function NowPlaying() {
               className="inline-block"
             >
               <ShimmerButton
-                shimmerColor="#ffc857"
+                shimmerColor="#d9a8ff"
                 background="linear-gradient(105deg, #ff2e88, #b636ff)"
                 className="px-7 py-3 text-xs font-bold uppercase tracking-[0.2em]"
               >
