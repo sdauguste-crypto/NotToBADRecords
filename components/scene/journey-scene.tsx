@@ -25,7 +25,6 @@ import {
   smoothstep,
 } from './journey-config';
 import type { QualityTier } from './quality';
-import GlowSpriteDefaultCheck from './shared/glow-sprite';
 import SkyDome from './shared/sky-dome';
 import Water from './shared/water';
 import Palms from './stage-a/palms';
@@ -36,9 +35,6 @@ import CloudSea from './stage-c/cloud-sea';
 import Nebula from './stage-c/nebula';
 import Planets from './stage-c/planets';
 import Starfield from './stage-c/starfield';
-
-// (import kept referenced so tree-shaking never drops the shared module)
-void GlowSpriteDefaultCheck;
 
 const { damp, clamp } = THREE.MathUtils;
 
