@@ -5,7 +5,7 @@
 // procedural scene. Each model group scales with its stage blend so it
 // arrives/departs with the world crossfades.
 
-import { useAnimations, useGLTF } from '@react-three/drei';
+import { Environment, useAnimations, useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -213,9 +213,12 @@ export default function JourneyModels({ shared }: { shared: SharedUniforms }) {
   return (
     <Suspense fallback={null}>
       {/* lighting for the PBR models (shader-material world ignores these) */}
-      <ambientLight intensity={0.45} color="#e7c9ff" />
-      <hemisphereLight args={['#b636ff', '#1b0b33', 0.8]} />
-      <directionalLight position={[6, 18, 24]} intensity={1.6} color="#ff9ad5" />
+      <ambientLight intensity={0.3} color="#e7c9ff" />
+      <hemisphereLight args={['#b636ff', '#1b0b33', 0.6]} />
+      <directionalLight position={[6, 18, 24]} intensity={1.4} color="#ff9ad5" />
+      {/* graded blue-hour HDRI (see scripts/prepare-env.mjs) — gives the
+          metals and glass real purple-sky/gold-light reflections */}
+      <Environment files="/env/sunset-env.hdr" />
 
       {/* stage A — sunset beach */}
       <PalmGrove shared={shared} />
