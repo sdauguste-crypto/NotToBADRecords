@@ -11,6 +11,9 @@ export function detectTier(): QualityTier {
     return 'low';
   }
   try {
+    // Explicit override for debugging/testing: ?ntb-tier=high|low
+    const forced = new URLSearchParams(window.location.search).get('ntb-tier');
+    if (forced === 'high' || forced === 'low') return forced;
     const nav = navigator as Navigator & { deviceMemory?: number };
     const cores = nav.hardwareConcurrency ?? 8;
     const memory = nav.deviceMemory ?? 8;

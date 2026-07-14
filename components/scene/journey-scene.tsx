@@ -24,6 +24,7 @@ import {
   POINTER_PARALLAX_Y,
   smoothstep,
 } from './journey-config';
+import JourneyModels from './models/journey-models';
 import type { QualityTier } from './quality';
 import SkyDome from './shared/sky-dome';
 import Water from './shared/water';
@@ -124,9 +125,10 @@ export default function JourneyScene({ tier }: { tier: QualityTier }) {
       <SkyDome shared={shared} />
       <Water shared={shared} tier={tier} />
 
-      {/* stage A — retro sunset */}
+      {/* stage A — retro sunset (billboard palms only on low tier — the
+          high tier gets the real 3D grove from JourneyModels) */}
       <RetroSun shared={shared} />
-      <Palms shared={shared} />
+      {tier === 'low' && <Palms shared={shared} />}
 
       {/* stage B — neon beach city */}
       <City shared={shared} tier={tier} />
@@ -137,6 +139,9 @@ export default function JourneyScene({ tier }: { tier: QualityTier }) {
       <Planets shared={shared} />
       <Nebula shared={shared} tier={tier} />
       <CloudSea shared={shared} tier={tier} />
+
+      {/* real 3D models (high tier only) */}
+      {tier === 'high' && <JourneyModels shared={shared} />}
     </>
   );
 }
