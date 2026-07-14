@@ -59,11 +59,14 @@ export type GuestbookEntry = {
 };
 
 export type Social = {
-  platform: "instagram" | "tiktok" | "youtube" | "spotify";
+  platform: "instagram" | "tiktok" | "youtube" | "spotify" | "x" | "apple-music";
   handle: string;
   url: string;
   followers: string;
 };
+
+/** Booking / inquiries address shown in Contact. */
+export const contactEmail = "motivationmusicmgmt@gmail.com";
 
 export const releases: Release[] = [
   {
@@ -209,26 +212,38 @@ export const guestbookEntries: GuestbookEntry[] = [
 export const socials: Social[] = [
   {
     platform: "instagram",
-    handle: "@nottobadrecords",
-    url: "https://instagram.com/nottobadrecords",
+    handle: "@simondaveauguste",
+    url: "https://www.instagram.com/simondaveauguste",
     followers: "12.4K",
   },
   {
     platform: "tiktok",
-    handle: "@ntbrecords",
-    url: "https://tiktok.com/@ntbrecords",
+    handle: "@simonauguste4",
+    url: "https://www.tiktok.com/@simonauguste4",
     followers: "8.1K",
   },
   {
     platform: "youtube",
-    handle: "Not To B.A.D Records",
-    url: "https://youtube.com/@nottobadrecords",
+    handle: "@simondaveauguste",
+    url: "https://www.youtube.com/@simondaveauguste",
     followers: "24K",
   },
   {
     platform: "spotify",
-    handle: "Not To B.A.D Records",
-    url: "https://open.spotify.com/user/nottobadrecords",
+    handle: "Simon Auguste",
+    url: "https://open.spotify.com/artist/1zAgIkurm4hqFL1hf1lg8q",
     followers: "31K",
+  },
+  {
+    platform: "x",
+    handle: "@MrAugusteMusic",
+    url: "https://x.com/MrAugusteMusic",
+    followers: "—",
+  },
+  {
+    platform: "apple-music",
+    handle: "Simon Auguste",
+    url: "https://music.apple.com/us/artist/simon-auguste/1528473465",
+    followers: "—",
   },
 ];
