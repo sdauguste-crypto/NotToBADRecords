@@ -71,7 +71,7 @@ export const contactEmail = "motivationmusicmgmt@gmail.com";
 export const releases: Release[] = [
   {
     id: "rel-the-princess",
-    coverImage: "/NotToBADRecords/covers/the-princess.webp",
+    coverImage: "/covers/the-princess.webp",
     title: "THE PRINCESS",
     artist: "SIMON AUGUSTE",
     year: 2023,
@@ -84,7 +84,7 @@ export const releases: Release[] = [
   },
   {
     id: "rel-rockin-with-my",
-    coverImage: "/NotToBADRecords/covers/rockin-with-my.webp",
+    coverImage: "/covers/rockin-with-my.webp",
     title: "ROCKIN WITH MY",
     artist: "SIMON AUGUSTE",
     year: 2021,
@@ -97,7 +97,7 @@ export const releases: Release[] = [
   },
   {
     id: "rel-no-lights",
-    coverImage: "/NotToBADRecords/covers/no-lights.webp",
+    coverImage: "/covers/no-lights.webp",
     title: "NO LIGHTS",
     artist: "SIMON AUGUSTE",
     year: 2016,
@@ -135,7 +135,7 @@ export const galleryItems: GalleryItem[] = Array.from({ length: 14 }, (_, i) => 
     title: `Archive ${n}`,
     seed: 3 + i * 13,
     caption: `// ARCHIVE ${n}`,
-    image: `/NotToBADRecords/gallery/photo-${n}.webp`,
+    image: `/gallery/photo-${n}.webp`,
   };
 });
 

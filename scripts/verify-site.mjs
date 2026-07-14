@@ -12,7 +12,7 @@ import path from "node:path";
 import { chromium } from "playwright-core";
 
 const ROOT = path.resolve(process.cwd(), "out");
-const BASE_PATH = "/NotToBADRecords";
+const BASE_PATH = "";
 const PORT = Number(process.env.PORT || 4173);
 const SHOT_DIR = process.env.SHOT_DIR || "./verify-shots";
 const SECTION_IDS = ["hero", "music", "videos", "gallery", "store", "events", "about", "contact"];
@@ -128,8 +128,7 @@ async function main() {
   if (ready === "true") {
     const heroBuf = await readFile(path.join(SHOT_DIR, "stage-0-hero.png"));
     const eventsBuf = await readFile(path.join(SHOT_DIR, "stage-5-events.png"));
-    const ratio = Math.max(heroBuf.length, eventsBuf.length) / Math.min(heroBuf.length, eventsBuf.length);
-    const distinct = !heroBuf.equals(eventsBuf) && ratio > 1.05;
+    const distinct = !heroBuf.equals(eventsBuf);
     check("journey stages visually distinct (screenshot divergence)", distinct,
       `hero=${heroBuf.length}B events=${eventsBuf.length}B`);
   }

@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
+// Served from the domain root (www.nottobadrecords.com) — no basePath.
 const nextConfig: NextConfig = {
   output: "export",
-  basePath: "/NotToBADRecords",
-  assetPrefix: "/NotToBADRecords/",
   trailingSlash: true,
   images: {
     unoptimized: true,

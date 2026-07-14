@@ -58,7 +58,7 @@ export function HeroSection() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.65 }}
           className="mt-8 max-w-xl text-sm tracking-[0.15em] text-foreground/70 md:text-base"
         >
-          An independent record label broadcasting from the edge of the sunset.
+          We Really Out Here.
         </motion.p>
 
         <motion.div

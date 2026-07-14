@@ -7,7 +7,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Not To B.A.D Records — Mission Control",
   description:
-    "Independent record label broadcasting from the edge of the sunset. Music, videos, shows, and transmissions from mission control.",
+    "Simon Auguste — Not To B.A.D Records. We Really Out Here. Music, videos, shows, and transmissions from mission control.",
 };
 
 export const viewport: Viewport = {

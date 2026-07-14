@@ -78,8 +78,7 @@ export function SiteFooter() {
             ))}
           </div>
           <p className="text-center text-xs text-foreground/50 md:text-left">
-            &copy; 2026 Not To B.A.D Records &mdash; broadcast from the edge of the
-            sunset.
+            &copy; 2026 Not To B.A.D Records &mdash; We Really Out Here.
           </p>
         </div>
 

@@ -12,7 +12,7 @@ import * as THREE from 'three';
 
 import type { SharedUniforms } from '../journey-config';
 
-const BASE = '/NotToBADRecords/models';
+const BASE = '/models';
 const URLS = {
   palms: `${BASE}/palm-set.glb`,
   recordPlayer: `${BASE}/record-player.glb`,
