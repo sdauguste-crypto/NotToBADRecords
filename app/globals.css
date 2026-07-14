@@ -5,22 +5,22 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --background: #0a0612;
+  --foreground: #f4ecff;
+  --card: rgba(20, 10, 36, 0.6);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #ff2e88;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: #ffc857;
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
+  --border: rgba(255, 46, 136, 0.25);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
 }
@@ -70,6 +70,67 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Sunset spectrum palette */
+  --color-sunset-pink: #ff2e88;
+  --color-sunset-magenta: #b636ff;
+  --color-sunset-orange: #ff7a1a;
+  --color-sunset-gold: #ffc857;
+  --color-void: #0a0612;
+  --color-void-deep: #05030a;
+  --color-void-panel: #140a24;
+
+  /* Mission-control HUD animations */
+  --animate-blink: blink 1s steps(2, start) infinite;
+  --animate-flicker: flicker 4s linear infinite;
+  --animate-led-pulse: led-pulse 2s ease-in-out infinite;
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  @keyframes flicker {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    3% {
+      opacity: 0.85;
+    }
+    7% {
+      opacity: 1;
+    }
+    23% {
+      opacity: 0.88;
+    }
+    27% {
+      opacity: 1;
+    }
+    61% {
+      opacity: 0.85;
+    }
+    63% {
+      opacity: 1;
+    }
+    89% {
+      opacity: 0.9;
+    }
+    91% {
+      opacity: 1;
+    }
+  }
+  @keyframes led-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 6px currentColor, 0 0 14px currentColor;
+    }
+    50% {
+      opacity: 0.55;
+      box-shadow: 0 0 2px currentColor, 0 0 4px currentColor;
+    }
+  }
 
   /* MagicUI animations */
   --animate-marquee: marquee var(--duration) linear infinite;
@@ -129,5 +190,75 @@
   body {
     @apply bg-background text-foreground;
     font-family: "Cinzel Decorative", serif;
+  }
+}
+
+/* ---- NotToBAD Mission Control utilities ---- */
+
+@utility text-neon-pink {
+  color: #ffd7ea;
+  text-shadow:
+    0 0 6px #ff2e88,
+    0 0 24px rgba(255, 46, 136, 0.7),
+    0 0 64px rgba(255, 46, 136, 0.4);
+}
+
+@utility text-neon-gold {
+  color: #fff3d6;
+  text-shadow:
+    0 0 6px #ffc857,
+    0 0 24px rgba(255, 200, 87, 0.7),
+    0 0 64px rgba(255, 200, 87, 0.4);
+}
+
+@utility glass-panel {
+  background: rgba(20, 10, 36, 0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 46, 136, 0.22);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 32px rgba(182, 54, 255, 0.12);
+}
+
+@utility scanlines {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.16) 0 1px,
+      transparent 1px 3px
+    );
+    pointer-events: none;
+    border-radius: inherit;
+  }
+}
+
+@utility hud-corners {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-top: 1px solid rgba(255, 200, 87, 0.6);
+    border-left: 1px solid rgba(255, 200, 87, 0.6);
+    pointer-events: none;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-bottom: 1px solid rgba(255, 200, 87, 0.6);
+    border-right: 1px solid rgba(255, 200, 87, 0.6);
+    pointer-events: none;
   }
 }
