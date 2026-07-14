@@ -8,9 +8,6 @@ export const metadata: Metadata = {
   title: "NotToBAD Records — Mission Control",
   description:
     "Independent record label broadcasting from the edge of the sunset. Music, videos, shows, and transmissions from mission control.",
-  icons: {
-    icon: "/favicon.svg",
-  },
 };
 
 export const viewport: Viewport = {

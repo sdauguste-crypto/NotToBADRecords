@@ -186,11 +186,11 @@ export default function Planets({ shared }: { shared: SharedUniforms }) {
   return (
     <group ref={groupRef}>
       {/* (a) large banded gas giant */}
-      <mesh material={materials.giant} position={[-18, 32, -100]}>
-        <sphereGeometry args={[9, 48, 32]} />
+      <mesh material={materials.giant} position={[-38, 50, -110]}>
+        <sphereGeometry args={[7, 48, 32]} />
       </mesh>
       <GlowSprite
-        position={[-18, 32, -100]}
+        position={[-38, 50, -110]}
         scale={30}
         color={HEX.sunsetMagenta}
         intensity={0.18}

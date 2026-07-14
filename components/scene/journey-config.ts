@@ -69,7 +69,8 @@ export const FOG_FAR = 160;
 // Stage blend breakpoints (in sectionProgress units 0..7)
 // ---------------------------------------------------------------------------
 export const BLEND_AB: readonly [number, number] = [1.25, 2.25]; // sunset -> city
-export const BLEND_BC: readonly [number, number] = [4.5, 5.5]; // city -> space
+// finishes before the events section so the manifest reads against clean space
+export const BLEND_BC: readonly [number, number] = [4.0, 4.9]; // city -> space
 
 export function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
@@ -93,8 +94,9 @@ export const CAMERA_KEYFRAMES: readonly CameraKeyframe[] = [
   { position: v(5, 4, -10), lookAt: v(-10, 8, -75) }, // videos
   { position: v(-4, 5, -22), lookAt: v(10, 10, -75) }, // gallery
   { position: v(0, 7, -30), lookAt: v(0, 14, -80) }, // store
-  { position: v(0, 16, -38), lookAt: v(0, 30, -120) }, // events
-  { position: v(2, 26, -45), lookAt: v(-18, 32, -100) }, // about
+  // y stays above the cloud-sea plane (y=18) so it never slices the view edge-on
+  { position: v(0, 23, -38), lookAt: v(0, 32, -120) }, // events
+  { position: v(2, 26, -45), lookAt: v(-32, 46, -110) }, // about
   { position: v(0, 32, -50), lookAt: v(0, 34, -120) }, // contact
 ];
 

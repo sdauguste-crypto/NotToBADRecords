@@ -71,7 +71,7 @@ export default function Moon({ shared }: { shared: SharedUniforms }) {
   );
 
   const opacityNow = () =>
-    shared.uBlendAB.value * (1 - shared.uBlendBC.value * 0.5);
+    shared.uBlendAB.value * (1 - shared.uBlendBC.value);
 
   useFrame(({ camera }) => {
     const opacity = opacityNow();
