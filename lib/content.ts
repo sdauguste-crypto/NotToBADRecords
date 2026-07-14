@@ -31,6 +31,8 @@ export type GalleryItem = {
   title: string;
   seed: number;
   caption: string;
+  /** Real photo under public/gallery (falls back to procedural art). */
+  image?: string;
 };
 
 export type Product = {
@@ -123,18 +125,16 @@ export const videos: Video[] = [
   },
 ];
 
-export const galleryItems: GalleryItem[] = [
-  { id: "gal-01", title: "Studio B", seed: 3, caption: "Studio B, 3AM" },
-  { id: "gal-02", title: "Pressing Day", seed: 17, caption: "Pressing day" },
-  { id: "gal-03", title: "Neon Check", seed: 29, caption: "Neon check, Berlin" },
-  { id: "gal-04", title: "Soundcheck", seed: 41, caption: "Soundcheck at El Rey" },
-  { id: "gal-05", title: "Tape Vault", seed: 53, caption: "The tape vault" },
-  { id: "gal-06", title: "Rooftop", seed: 67, caption: "Rooftop listening party" },
-  { id: "gal-07", title: "Console", seed: 71, caption: "Console warm-up, take 12" },
-  { id: "gal-08", title: "Van Life", seed: 83, caption: "Tour van, somewhere in Nevada" },
-  { id: "gal-09", title: "Crate Digging", seed: 91, caption: "Crate digging, Paris" },
-  { id: "gal-10", title: "Last Encore", seed: 104, caption: "Last encore, lights up" },
-];
+export const galleryItems: GalleryItem[] = Array.from({ length: 14 }, (_, i) => {
+  const n = String(i + 1).padStart(2, "0");
+  return {
+    id: `gal-${n}`,
+    title: `Archive ${n}`,
+    seed: 3 + i * 13,
+    caption: `// ARCHIVE ${n}`,
+    image: `/NotToBADRecords/gallery/photo-${n}.webp`,
+  };
+});
 
 export const products: Product[] = [
   {

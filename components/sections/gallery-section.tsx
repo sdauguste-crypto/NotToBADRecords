@@ -12,7 +12,17 @@ import { useReducedMotion } from "@/components/sections/use-reduced-motion";
 function GalleryTile({ item }: { item: GalleryItem }) {
   return (
     <figure className="group relative w-56 shrink-0 overflow-hidden rounded-xl">
-      <CoverArt seed={item.seed} title={item.title} className="aspect-[3/4] w-full" />
+      {item.image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={item.image}
+          alt={item.title}
+          loading="lazy"
+          className="aspect-[3/4] w-full rounded-xl border border-sunset-pink/15 object-cover"
+        />
+      ) : (
+        <CoverArt seed={item.seed} title={item.title} className="aspect-[3/4] w-full" />
+      )}
       <figcaption className="absolute inset-x-0 bottom-0 flex items-end rounded-b-xl bg-gradient-to-t from-void-deep/95 via-void-deep/50 to-transparent px-4 pb-3 pt-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <span className="text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold">
           {item.caption}
@@ -30,8 +40,9 @@ const STATS = [
 
 export function GallerySection() {
   const reduced = useReducedMotion();
-  const rowOne = galleryItems.slice(0, 5);
-  const rowTwo = galleryItems.slice(5);
+  const half = Math.ceil(galleryItems.length / 2);
+  const rowOne = galleryItems.slice(0, half);
+  const rowTwo = galleryItems.slice(half);
 
   return (
     <SectionShell
