@@ -138,8 +138,8 @@ export const galleryItems: GalleryItem[] = Array.from({ length: 14 }, (_, i) => 
 
 export const products: Product[] = [
   {
-    id: "prod-chrome-vinyl",
-    name: "Chrome Hearts 180g Vinyl",
+    id: "prod-princess-vinyl",
+    name: "The Princess — Limited Vinyl",
     kind: "vinyl",
     price: 34,
     featured: true,
@@ -152,41 +152,7 @@ export const products: Product[] = [
 ];
 
 export const shows: Show[] = [
-  {
-    id: "show-brooklyn",
-    date: "JUL 18 2026",
-    venue: "Elsewhere",
-    city: "Brooklyn, NY",
-    status: "on-sale",
-  },
-  {
-    id: "show-la",
-    date: "AUG 02 2026",
-    venue: "El Rey Theatre",
-    city: "Los Angeles, CA",
-    status: "on-sale",
-  },
-  {
-    id: "show-london",
-    date: "AUG 23 2026",
-    venue: "Village Underground",
-    city: "London, UK",
-    status: "announced",
-  },
-  {
-    id: "show-berlin",
-    date: "SEP 12 2026",
-    venue: "Gretchen",
-    city: "Berlin, DE",
-    status: "sold-out",
-  },
-  {
-    id: "show-paris",
-    date: "OCT 04 2026",
-    venue: "La Bellevilloise",
-    city: "Paris, FR",
-    status: "announced",
-  },
+  // No active missions — new dates soon.
 ];
 
 export const guestbookEntries: GuestbookEntry[] = [

@@ -55,8 +55,56 @@ function StatusChip({ status }: { status: Show["status"] }) {
   );
 }
 
+function NoActiveMissions({ reduced }: { reduced: boolean }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: reduced ? 0 : 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+      className="glass-panel hud-corners relative overflow-hidden px-8 py-16 text-center md:py-24"
+    >
+      <span className="mb-6 inline-flex items-center gap-3 rounded-full border border-amber-400/40 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-amber-300">
+        <span className="h-2 w-2 rounded-full bg-amber-400 animate-led-pulse motion-reduce:animate-none" />
+        STANDBY
+      </span>
+      <p className="text-neon-pink font-black uppercase text-3xl md:text-5xl">
+        NO ACTIVE MISSIONS
+      </p>
+      <p className="mt-4 text-sm uppercase tracking-[0.3em] text-foreground/60">
+        New dates soon
+      </p>
+      <p className="mx-auto mt-6 max-w-md text-sm text-foreground/70">
+        Launch windows are being calculated. Join mission control below and
+        you&apos;ll be the first to know when tickets go live.
+      </p>
+      <a href="#contact" className="mt-8 inline-block">
+        <Button
+          variant="ghost"
+          className="rounded-full border border-sunset-pink/40 px-8 text-xs font-bold uppercase tracking-[0.2em] text-sunset-pink hover:border-sunset-pink hover:bg-sunset-pink/10 hover:text-sunset-pink"
+        >
+          GET LAUNCH ALERTS
+        </Button>
+      </a>
+    </motion.div>
+  );
+}
+
 export function EventsSection() {
   const reduced = useReducedMotion();
+
+  if (shows.length === 0) {
+    return (
+      <SectionShell
+        id="events"
+        hudLabel="// SECTION 05 — LAUNCH WINDOWS"
+        title="MISSION SCHEDULE"
+        accent="pink"
+      >
+        <NoActiveMissions reduced={reduced} />
+      </SectionShell>
+    );
+  }
 
   return (
     <SectionShell
