@@ -1,10 +1,20 @@
 "use client";
 
-// Site-wide ambient player: the top MUSIC track loops quietly for the whole
-// visit. Browsers block autoplay-with-sound, so we try immediately and fall
-// back to starting on the visitor's first interaction. The visitor's choice
-// (and any pause) is remembered, embeds duck the music, and the whole widget
-// removes itself if the audio file isn't deployed yet.
+// Site-wide ambient player: the top MUSIC track autoplays and loops for the
+// whole visit.
+//
+// Every browser blocks audible autoplay from a cold visit — it cannot be
+// coded around — so this goes as far as the platform allows, in order:
+//   1. Try to play with sound. Chrome grants this to visitors who have
+//      engaged with the domain before, so returning fans get instant audio.
+//   2. Otherwise autoplay MUTED, which is always permitted, so the track is
+//      genuinely running from page load.
+//   3. Unmute on the visitor's first qualifying gesture (unmuting without
+//      one makes Chrome pause the element), restarting from 0:00 so they
+//      hear the song from the top rather than mid-verse.
+//
+// A visitor's pause is remembered across visits, embeds duck the music, and
+// the whole widget removes itself if the audio file isn't deployed yet.
 
 import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -15,7 +25,9 @@ import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "ntb-ambient-audio";
 const VOLUME = 0.45;
-const GESTURES = ["pointerdown", "keydown", "touchstart", "wheel"] as const;
+// Only gestures that count as user activation can lift the mute; scroll and
+// mousemove do not qualify, so they are deliberately absent.
+const GESTURES = ["pointerdown", "keydown", "touchend", "click"] as const;
 
 const track = releases.find((release) => release.audioUrl);
 
@@ -23,23 +35,38 @@ export function AmbientPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [awaitingGesture, setAwaitingGesture] = useState(false);
+  // Playing, but silently — waiting on a gesture to lift the mute.
+  const [silent, setSilent] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   // Visitors who pressed pause stay paused — never re-autostart on them.
   const optedOut = useRef(false);
 
+  /** Autoplay with sound if allowed, else muted. Returns true if audible. */
   const start = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio || optedOut.current) return false;
+    audio.volume = VOLUME;
+    audio.muted = false;
     try {
       await audio.play();
       setPlaying(true);
-      setAwaitingGesture(false);
+      setSilent(false);
+      setMuted(false);
       return true;
     } catch {
-      setAwaitingGesture(true);
-      return false;
+      // Blocked with sound — fall back to muted autoplay, which is allowed.
     }
+    try {
+      audio.muted = true;
+      await audio.play();
+      setPlaying(true);
+      setSilent(true);
+      setMuted(true);
+    } catch {
+      // Even muted autoplay refused (iOS low-power); wait for the gesture.
+      setSilent(true);
+    }
+    return false;
   }, []);
 
   // The <audio> ships in the static HTML, so a missing file can error before
@@ -79,16 +106,26 @@ export function AmbientPlayer() {
     void start();
   }, [start]);
 
-  // Autoplay was blocked — arm the first real interaction to kick it off.
+  // Running silently — the first qualifying gesture brings the sound in from
+  // the top of the track.
   useEffect(() => {
-    if (!awaitingGesture || optedOut.current) return;
-    const onGesture = () => void start();
+    if (!silent || optedOut.current) return;
+    const onGesture = () => {
+      const audio = audioRef.current;
+      if (!audio || optedOut.current) return;
+      audio.muted = false;
+      audio.volume = VOLUME;
+      audio.currentTime = 0;
+      setMuted(false);
+      setSilent(false);
+      void audio.play().catch(() => undefined);
+    };
     GESTURES.forEach((type) =>
       window.addEventListener(type, onGesture, { once: true, passive: true }),
     );
     return () =>
       GESTURES.forEach((type) => window.removeEventListener(type, onGesture));
-  }, [awaitingGesture, start]);
+  }, [silent]);
 
   // A video or Spotify embed just opened — get out of its way.
   useEffect(() => {
@@ -136,13 +173,13 @@ export function AmbientPlayer() {
 
   return (
     <div className="pointer-events-none fixed bottom-4 left-4 z-40 print:hidden">
-      {/* preload="metadata": the master is several MB, so don't spend a
-          visitor's data until playback actually starts */}
+      {/* preload="auto": the track now starts on every visit, so buffer it
+          up front for a clean, gapless start */}
       <audio
         ref={audioRef}
         src={track.audioUrl}
         loop
-        preload="metadata"
+        preload="auto"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onError={() => setUnavailable(true)}
@@ -168,8 +205,15 @@ export function AmbientPlayer() {
         </button>
 
         <span className="hidden min-w-0 flex-col leading-tight sm:flex">
-          <span className="text-[0.6rem] uppercase tracking-[0.25em] text-sunset-gold/80">
-            {awaitingGesture && !playing ? "TAP TO TRANSMIT" : "NOW TRANSMITTING"}
+          <span
+            className={cn(
+              "text-[0.6rem] uppercase tracking-[0.25em]",
+              silent
+                ? "animate-blink text-sunset-pink motion-reduce:animate-none"
+                : "text-sunset-gold/80",
+            )}
+          >
+            {silent ? "TAP FOR SOUND" : "NOW TRANSMITTING"}
           </span>
           <span className="truncate text-xs font-bold uppercase tracking-wide text-foreground/90">
             {track.title}
