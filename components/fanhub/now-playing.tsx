@@ -1,19 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 
 import { releases } from "@/lib/content";
-import { announceMediaOpen } from "@/lib/media-bus";
+import { announceMediaOpen, getAmbientAudio } from "@/lib/media-bus";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { CoverArt } from "@/components/fanhub/cover-art";
 import { useReducedMotion } from "@/components/sections/use-reduced-motion";
 
+/** Seconds -> m:ss. */
+function clock(seconds: number): string {
+  const whole = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
+}
+
 export function NowPlaying() {
   const reduced = useReducedMotion();
   const [playerLoaded, setPlayerLoaded] = useState(false);
   const release = releases[0];
+
+  // Mirror the site-wide ambient player when this release is the one it
+  // loops; otherwise the bar stays decorative.
+  const [pos, setPos] = useState({ time: 0, duration: 0 });
+  useEffect(() => {
+    if (!release.audioUrl) return;
+    const id = window.setInterval(() => {
+      const audio = getAmbientAudio();
+      if (!audio || !Number.isFinite(audio.duration) || audio.duration <= 0) return;
+      setPos({ time: audio.currentTime, duration: audio.duration });
+    }, 500);
+    return () => window.clearInterval(id);
+  }, [release.audioUrl]);
+
+  const live = pos.duration > 0;
+  const percent = live ? `${Math.min(100, (pos.time / pos.duration) * 100)}%` : "37%";
 
   return (
     <div className="glass-panel relative overflow-hidden p-6 md:p-8">
@@ -52,14 +74,20 @@ export function NowPlaying() {
                 className="h-full rounded-full bg-gradient-to-r from-sunset-orange to-sunset-gold shadow-[0_0_12px_rgba(34,211,238,.7)]"
                 initial={{ width: "37%" }}
                 animate={
-                  reduced ? { width: "37%" } : { width: ["37%", "40%", "37%"] }
+                  live || reduced
+                    ? { width: percent }
+                    : { width: ["37%", "40%", "37%"] }
                 }
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                transition={
+                  live
+                    ? { duration: 0.5, ease: "linear" }
+                    : { duration: 8, repeat: Infinity, ease: "easeInOut" }
+                }
               />
             </div>
             <div className="mt-2 flex justify-between text-xs tracking-[0.2em] text-foreground/50">
-              <span>1:24</span>
-              <span>3:47</span>
+              <span>{live ? clock(pos.time) : "1:24"}</span>
+              <span>{live ? clock(pos.duration) : "3:47"}</span>
             </div>
           </div>
 

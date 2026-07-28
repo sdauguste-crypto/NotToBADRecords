@@ -21,6 +21,8 @@ const MIME = {
   ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
   ".svg": "image/svg+xml", ".json": "application/json", ".txt": "text/plain",
   ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon", ".png": "image/png",
+  ".jpg": "image/jpeg", ".webp": "image/webp", ".mp3": "audio/mpeg",
+  ".hdr": "application/octet-stream", ".glb": "model/gltf-binary",
 };
 
 // Third-party embed domains are expected to be unreachable in the sandbox.
@@ -52,7 +54,23 @@ function serve() {
         filePath = existsSync(withHtml) ? withHtml : path.join(ROOT, "404.html");
       }
       const data = await readFile(filePath);
-      res.writeHead(200, { "Content-Type": MIME[path.extname(filePath)] || "application/octet-stream" });
+      const type = MIME[path.extname(filePath)] || "application/octet-stream";
+      // Media elements fetch by range; serve them like a real host does,
+      // otherwise the audio load aborts and looks like a page error.
+      const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || "");
+      if (range) {
+        const start = range[1] ? Number(range[1]) : 0;
+        const end = range[2] ? Number(range[2]) : data.length - 1;
+        res.writeHead(206, {
+          "Content-Type": type,
+          "Accept-Ranges": "bytes",
+          "Content-Range": `bytes ${start}-${end}/${data.length}`,
+          "Content-Length": end - start + 1,
+        });
+        res.end(data.subarray(start, end + 1));
+        return;
+      }
+      res.writeHead(200, { "Content-Type": type, "Accept-Ranges": "bytes" });
       res.end(data);
     } catch {
       res.writeHead(404); res.end();
@@ -79,7 +97,12 @@ function collectErrors(page, bucket) {
   page.on("requestfailed", (req) => {
     const url = req.url();
     if (IGNORABLE.some((re) => re.test(url))) return;
-    bucket.push(`[requestfailed] ${url} :: ${req.failure()?.errorText}`);
+    const reason = req.failure()?.errorText ?? "";
+    // Media elements cut the transfer once they have what they need
+    // (preload="metadata"), which surfaces as an abort — not a failure.
+    // Anything else on the audio file (404, bad type) still counts.
+    if (/\.mp3$/.test(url) && reason.includes("ERR_ABORTED")) return;
+    bucket.push(`[requestfailed] ${url} :: ${reason}`);
   });
 }
 

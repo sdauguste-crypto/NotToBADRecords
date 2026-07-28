@@ -10,7 +10,7 @@ import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { releases } from "@/lib/content";
-import { MEDIA_OPEN_EVENT } from "@/lib/media-bus";
+import { MEDIA_OPEN_EVENT, setAmbientAudio } from "@/lib/media-bus";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "ntb-ambient-audio";
@@ -53,8 +53,12 @@ export function AmbientPlayer() {
       fail();
       return;
     }
+    setAmbientAudio(audio);
     audio.addEventListener("error", fail);
-    return () => audio.removeEventListener("error", fail);
+    return () => {
+      audio.removeEventListener("error", fail);
+      setAmbientAudio(null);
+    };
   }, []);
 
   // Restore preference, then attempt autoplay.
@@ -132,11 +136,13 @@ export function AmbientPlayer() {
 
   return (
     <div className="pointer-events-none fixed bottom-4 left-4 z-40 print:hidden">
+      {/* preload="metadata": the master is several MB, so don't spend a
+          visitor's data until playback actually starts */}
       <audio
         ref={audioRef}
         src={track.audioUrl}
         loop
-        preload="auto"
+        preload="metadata"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onError={() => setUnavailable(true)}
@@ -150,6 +156,7 @@ export function AmbientPlayer() {
         <button
           type="button"
           onClick={toggle}
+          title={playing ? "Pause the music" : "Play the music"}
           aria-label={playing ? "Pause background music" : "Play background music"}
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sunset-pink/60 text-sunset-pink transition-transform hover:scale-110"
         >
@@ -191,6 +198,7 @@ export function AmbientPlayer() {
         <button
           type="button"
           onClick={toggleMute}
+          title={muted ? "Unmute" : "Mute"}
           aria-label={muted ? "Unmute background music" : "Mute background music"}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-foreground/60 transition-colors hover:text-sunset-gold"
         >
