@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 
 import { releases } from "@/lib/content";
+import { announceMediaOpen } from "@/lib/media-bus";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { CoverArt } from "@/components/fanhub/cover-art";
@@ -16,7 +17,7 @@ export function NowPlaying() {
 
   return (
     <div className="glass-panel relative overflow-hidden p-6 md:p-8">
-      <BorderBeam size={70} duration={9} colorFrom="#ff2e88" colorTo="#d9a8ff" />
+      <BorderBeam size={70} duration={9} colorFrom="#ff2e88" colorTo="#22d3ee" />
 
       <div className="grid gap-8 md:grid-cols-[minmax(0,280px)_1fr] md:items-center">
         {release.coverImage ? (
@@ -48,7 +49,7 @@ export function NowPlaying() {
           <div className="mt-6">
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-sunset-orange to-sunset-gold shadow-[0_0_12px_rgba(255,200,87,.7)]"
+                className="h-full rounded-full bg-gradient-to-r from-sunset-orange to-sunset-gold shadow-[0_0_12px_rgba(34,211,238,.7)]"
                 initial={{ width: "37%" }}
                 animate={
                   reduced ? { width: "37%" } : { width: ["37%", "40%", "37%"] }
@@ -70,8 +71,8 @@ export function NowPlaying() {
               className="inline-block"
             >
               <ShimmerButton
-                shimmerColor="#d9a8ff"
-                background="linear-gradient(105deg, #ff2e88, #b636ff)"
+                shimmerColor="#22d3ee"
+                background="linear-gradient(105deg, #ff2e88, #1e6fff)"
                 className="px-7 py-3 text-xs font-bold uppercase tracking-[0.2em]"
               >
                 PLAY ON SPOTIFY
@@ -106,7 +107,10 @@ export function NowPlaying() {
           ) : (
             <button
               type="button"
-              onClick={() => setPlayerLoaded(true)}
+              onClick={() => {
+                announceMediaOpen();
+                setPlayerLoaded(true);
+              }}
               className="hud-corners w-full cursor-pointer rounded-xl border border-sunset-pink/25 bg-void-deep/60 px-6 py-5 text-xs font-bold uppercase tracking-[0.25em] text-sunset-gold/80 transition-colors hover:border-sunset-pink/60 hover:text-sunset-gold"
             >
               ▸ LOAD SPOTIFY PLAYER

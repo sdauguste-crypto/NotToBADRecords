@@ -5,9 +5,9 @@
 
 :root {
   --radius: 0.625rem;
-  --background: #0a0612;
-  --foreground: #f4ecff;
-  --card: rgba(20, 10, 36, 0.6);
+  --background: #04070f;
+  --foreground: #eaf6ff;
+  --card: rgba(10, 21, 51, 0.6);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
@@ -17,7 +17,7 @@
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: #d9a8ff;
+  --accent: #22d3ee;
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: rgba(255, 46, 136, 0.25);
@@ -73,12 +73,12 @@
 
   /* Sunset spectrum palette */
   --color-sunset-pink: #ff2e88;
-  --color-sunset-magenta: #b636ff;
-  --color-sunset-orange: #ff4fc3; /* hot magenta-pink (regraded from orange) */
-  --color-sunset-gold: #d9a8ff; /* soft lavender (regraded from gold) */
-  --color-void: #0a0612;
-  --color-void-deep: #05030a;
-  --color-void-panel: #140a24;
+  --color-sunset-magenta: #1e6fff;
+  --color-sunset-orange: #ff54b8; /* pink mid (regraded from orange) */
+  --color-sunset-gold: #22d3ee; /* electric cyan (regraded from gold) */
+  --color-void: #04070f;
+  --color-void-deep: #02040a;
+  --color-void-panel: #0a1533;
 
   /* Mission-control HUD animations */
   --animate-blink: blink 1s steps(2, start) infinite;
@@ -204,22 +204,22 @@
 }
 
 @utility text-neon-gold {
-  /* lavender neon (name kept for compatibility with existing markup) */
-  color: #f5e9ff;
+  /* electric cyan neon (name kept for compatibility with existing markup) */
+  color: #eafeff;
   text-shadow:
-    0 0 6px #d9a8ff,
-    0 0 24px rgba(182, 54, 255, 0.7),
-    0 0 64px rgba(182, 54, 255, 0.4);
+    0 0 6px #22d3ee,
+    0 0 24px rgba(34, 211, 238, 0.75),
+    0 0 64px rgba(34, 211, 238, 0.45);
 }
 
 @utility glass-panel {
-  background: rgba(20, 10, 36, 0.55);
+  background: rgba(8, 18, 43, 0.55);
   backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 46, 136, 0.22);
+  border: 1px solid rgba(255, 46, 136, 0.24);
   border-radius: var(--radius-xl);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 32px rgba(182, 54, 255, 0.12);
+    0 0 32px rgba(34, 211, 238, 0.14);
 }
 
 @utility scanlines {
@@ -247,8 +247,8 @@
     left: 0;
     width: 12px;
     height: 12px;
-    border-top: 1px solid rgba(255, 200, 87, 0.6);
-    border-left: 1px solid rgba(255, 200, 87, 0.6);
+    border-top: 1px solid rgba(34, 211, 238, 0.65);
+    border-left: 1px solid rgba(34, 211, 238, 0.65);
     pointer-events: none;
   }
   &::after {
@@ -258,8 +258,8 @@
     right: 0;
     width: 12px;
     height: 12px;
-    border-bottom: 1px solid rgba(255, 200, 87, 0.6);
-    border-right: 1px solid rgba(255, 200, 87, 0.6);
+    border-bottom: 1px solid rgba(34, 211, 238, 0.65);
+    border-right: 1px solid rgba(34, 211, 238, 0.65);
     pointer-events: none;
   }
 }

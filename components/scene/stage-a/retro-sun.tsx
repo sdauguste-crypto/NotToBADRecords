@@ -26,9 +26,9 @@ varying vec2 vUv;
 
 // Local sun gradient (not the shared palette): white-hot crown sinking into
 // deep violet, so the disc reads against the hot-pink sky band behind it.
-const vec3 TOP = ${glslColor('#fff2fc')};
-const vec3 MID = ${glslColor('#ff5ad1')};
-const vec3 BOT = ${glslColor('#7a2ff0')};
+const vec3 TOP = ${glslColor('#e9fbff')};
+const vec3 MID = ${glslColor('#ff3d9a')};
+const vec3 BOT = ${glslColor('#4b2bff')};
 
 void main() {
   vec2 uv = vUv;

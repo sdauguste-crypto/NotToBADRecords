@@ -38,11 +38,11 @@ const vec3 INDIGO  = ${glslColor(HEX.indigoNight)};
 const vec3 VOID    = ${glslColor(HEX.void)};
 const vec3 SPACE   = ${glslColor(HEX.spaceBase)};
 
-// Sunset ramp runs deeper than the shared palette so the bright sun disc
-// pops out of it: rose horizon -> muted magenta -> violet -> near-black zenith.
-const vec3 A_HORIZON = ${glslColor('#c9308f')};
-const vec3 A_LOW     = ${glslColor('#8b2fd6')};
-const vec3 A_MID     = ${glslColor('#4a1a8f')};
+// Miami sunset ramp: hot pink horizon -> electric violet -> deep blue ->
+// navy zenith, so the pink sun disc still pops out of the top of it.
+const vec3 A_HORIZON = ${glslColor('#ff2e88')};
+const vec3 A_LOW     = ${glslColor('#7b3bff')};
+const vec3 A_MID     = ${glslColor('#1f3aa8')};
 
 vec3 rampA(float h) {
   vec3 c = mix(A_HORIZON, A_LOW, smoothstep(0.0, 0.28, h));
@@ -71,7 +71,7 @@ void main() {
   vec3 dir = normalize(vWorldPos);
   float az = atan(dir.x, -dir.z);
   vec2 cuv = vec2(az * 0.477 + 0.72, clamp(h * 1.45, 0.02, 0.98));
-  vec3 cloud = texture2D(uCloudMap, cuv).rgb * vec3(0.95, 0.72, 1.05);
+  vec3 cloud = texture2D(uCloudMap, cuv).rgb * vec3(1.00, 0.62, 1.18);
   float cw = uCloudReady * 0.55 * (1.0 - smoothstep(0.22, 0.6, h));
   a = mix(a, cloud, cw);
   vec3 b = rampB(h);

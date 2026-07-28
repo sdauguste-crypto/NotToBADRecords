@@ -88,7 +88,7 @@ export function GallerySection() {
             transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.12 }}
             className="hud-corners px-8 py-4 text-center"
           >
-            <p className="font-bold text-3xl text-sunset-gold [text-shadow:0_0_18px_rgba(255,200,87,.5)]">
+            <p className="font-bold text-3xl text-sunset-gold [text-shadow:0_0_18px_rgba(34,211,238,.5)]">
               {stat.value}
             </p>
             <p className="mt-1 text-xs uppercase tracking-[0.3em] text-foreground/60">

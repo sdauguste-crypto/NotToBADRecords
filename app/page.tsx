@@ -1,3 +1,4 @@
+import { AmbientPlayer } from "@/components/fanhub/ambient-player";
 import JourneyBackground from "@/components/scene/journey-background";
 import { JourneyTracker } from "@/components/scroll/journey-tracker";
 import { SiteNav } from "@/components/nav/site-nav";
@@ -28,6 +29,7 @@ export default function Home() {
         <ContactSection />
       </main>
       <SiteFooter />
+      <AmbientPlayer />
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-50 opacity-[0.04]"

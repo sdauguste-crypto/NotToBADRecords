@@ -3,8 +3,8 @@
  *
  * Reads assets-inbox/golden_bay_2k.hdr, box-downsamples it to 512x256 (plenty
  * for glossy reflections once PMREM mips it), regrades the blue-hour sky
- * toward the site's magenta/purple palette, and writes an uncompressed RGBE
- * .hdr to public/env/sunset-env.hdr (~512 KB).
+ * toward the site's Miami-Vice palette (deep blue sky, hot-pink lights), and
+ * writes an uncompressed RGBE .hdr to public/env/sunset-env.hdr (~512 KB).
  *
  * Usage: node scripts/prepare-env.mjs
  */
@@ -25,9 +25,9 @@ const ch = tex.data.length / (tex.width * tex.height);
 const fx = tex.width / W;
 const fy = tex.height / H;
 
-// Box-downsample + magenta regrade: fold some blue into red (blue sky ->
-// purple) and pull green back (kills cyan); warm golds barely move since
-// their blue component is small.
+// Box-downsample + Miami regrade: the source is already blue-sky/warm-light,
+// which is the palette — so the sky keeps its blue (lifted slightly) while
+// green is pulled back to push the warm ground lights toward hot pink.
 const graded = new Float32Array(W * H * 3);
 for (let y = 0; y < H; y++) {
   for (let x = 0; x < W; x++) {
@@ -40,9 +40,9 @@ for (let y = 0; y < H; y++) {
     }
     r /= n; g /= n; b /= n;
     const o = (y * W + x) * 3;
-    graded[o] = r + 0.32 * b;
-    graded[o + 1] = g * 0.78;
-    graded[o + 2] = b;
+    graded[o] = r + 0.10 * b;
+    graded[o + 1] = g * 0.74;
+    graded[o + 2] = b * 1.12;
   }
 }
 

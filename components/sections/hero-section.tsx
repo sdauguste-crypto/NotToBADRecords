@@ -27,7 +27,7 @@ export function HeroSection() {
         >
           <AnimatedGradientText
             colorFrom="#ff2e88"
-            colorTo="#d9a8ff"
+            colorTo="#22d3ee"
             className="text-xs font-bold uppercase tracking-[0.25em] md:text-sm"
           >
             ⦿ TRANSMISSION LIVE — MISSION CONTROL ONLINE
@@ -69,8 +69,8 @@ export function HeroSection() {
         >
           <a href="#music">
             <ShimmerButton
-              shimmerColor="#d9a8ff"
-              background="linear-gradient(105deg, #ff2e88, #b636ff)"
+              shimmerColor="#22d3ee"
+              background="linear-gradient(105deg, #ff2e88, #1e6fff)"
               className="px-8 py-3 text-xs font-bold uppercase tracking-[0.2em] shadow-[0_0_28px_rgba(255,46,136,.45)]"
             >
               ENTER MISSION CONTROL

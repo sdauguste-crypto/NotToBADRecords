@@ -6,29 +6,31 @@ import * as THREE from 'three';
 // ---------------------------------------------------------------------------
 // Palette (hex source of truth — do not import CSS)
 // ---------------------------------------------------------------------------
-// Pink/purple regrade: the former orange/gold slots now carry hot pink and
-// lavender so every shader that reads them lands in the pink–purple range.
+// Miami Vice / cyberpunk regrade: hot pink against electric cyan over a
+// navy-black night. The legacy slot names are kept so every shader keeps
+// compiling — only the values moved (the old "gold" accent is now cyan,
+// the old purple mid-tone is now electric blue).
 export const HEX = {
-  sunsetPink: '#ff2e88',
-  sunsetMagenta: '#b636ff',
-  sunsetOrange: '#ff4fc3', // hot magenta-pink (was orange)
-  sunsetGold: '#d9a8ff', // soft lavender (was gold)
-  sunGoldTop: '#ffd6f2', // pale pink sun crown (was pale gold)
-  void: '#0a0612',
-  voidDeep: '#05030a',
-  deepPurpleHorizon: '#1b0b33',
-  indigoNight: '#140a24',
-  fogA: '#2a1040',
-  fogB: '#120820',
-  fogC: '#050308',
-  waterBaseA: '#120a2e',
-  waterBaseB: '#0c0620',
-  cityBody: '#07040f',
-  moonGold: '#e6d4ff', // pale lavender moon
-  starPink: '#ff9ad5',
-  cloudValley: '#2a1040',
-  cloudCrest: '#ffd0e8',
-  spaceBase: '#070410',
+  sunsetPink: '#ff2e88', // hot Miami pink
+  sunsetMagenta: '#1e6fff', // electric blue (was purple)
+  sunsetOrange: '#ff54b8', // pink mid (was orange)
+  sunsetGold: '#22d3ee', // electric cyan (was lavender/gold)
+  sunGoldTop: '#dffbff', // pale cyan sun crown
+  void: '#04070f',
+  voidDeep: '#02040a',
+  deepPurpleHorizon: '#0a1533', // deep navy
+  indigoNight: '#060c1f',
+  fogA: '#12224d',
+  fogB: '#08122b',
+  fogC: '#03050c',
+  waterBaseA: '#07143a',
+  waterBaseB: '#040c22',
+  cityBody: '#04060f',
+  moonGold: '#c8f3ff', // pale cyan moon
+  starPink: '#8fe6ff',
+  cloudValley: '#12224d',
+  cloudCrest: '#ff9ad5',
+  spaceBase: '#03060f',
 } as const;
 
 /** THREE.Color from hex WITHOUT color-space conversion (raw sRGB numbers),

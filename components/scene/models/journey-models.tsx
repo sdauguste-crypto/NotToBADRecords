@@ -213,9 +213,9 @@ export default function JourneyModels({ shared }: { shared: SharedUniforms }) {
   return (
     <Suspense fallback={null}>
       {/* lighting for the PBR models (shader-material world ignores these) */}
-      <ambientLight intensity={0.3} color="#e7c9ff" />
-      <hemisphereLight args={['#b636ff', '#1b0b33', 0.6]} />
-      <directionalLight position={[6, 18, 24]} intensity={1.4} color="#ff9ad5" />
+      <ambientLight intensity={0.3} color="#bfefff" />
+      <hemisphereLight args={['#22d3ee', '#0a1533', 0.6]} />
+      <directionalLight position={[6, 18, 24]} intensity={1.4} color="#ff6fb5" />
       {/* graded blue-hour HDRI (see scripts/prepare-env.mjs) — gives the
           metals and glass real purple-sky/gold-light reflections */}
       <Environment files="/env/sunset-env.hdr" />

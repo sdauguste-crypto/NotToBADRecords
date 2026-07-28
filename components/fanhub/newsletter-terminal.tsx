@@ -111,13 +111,13 @@ export function NewsletterTerminal() {
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder="cadet@frequency.fm"
                   aria-label="Email address"
-                  className="min-w-0 flex-1 border-0 bg-transparent px-1 py-2 text-sm tracking-[0.12em] text-foreground placeholder:text-foreground/25 focus:outline-none focus:ring-0"
+                  className="min-w-0 flex-1 rounded-md border border-sunset-pink/35 bg-void/70 px-3 py-3 text-sm tracking-[0.12em] text-foreground caret-sunset-pink transition-colors placeholder:text-foreground/30 hover:border-sunset-pink/60 focus:border-sunset-gold focus:bg-void focus:outline-none focus:ring-2 focus:ring-sunset-gold/60"
                 />
                 <ShimmerButton
                   type="submit"
                   disabled={sending}
                   shimmerColor="#ff2e88"
-                  background="rgba(10, 6, 18, .95)"
+                  background="rgba(4, 7, 15, .95)"
                   className="border-sunset-gold/30 px-6 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold disabled:opacity-60"
                 >
                   {sending ? "TRANSMITTING…" : "TRANSMIT"}

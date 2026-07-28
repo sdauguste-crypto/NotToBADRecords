@@ -16,6 +16,12 @@ export type Release = {
   appleMusicUrl?: string;
   /** Real cover artwork under public/covers (falls back to procedural art). */
   coverImage?: string;
+  /**
+   * Master audio under public/audio, used by the site-wide ambient player.
+   * The first release carrying one becomes the always-on track; the player
+   * hides itself entirely when the file is absent.
+   */
+  audioUrl?: string;
   tags: string[];
 };
 
@@ -72,6 +78,7 @@ export const releases: Release[] = [
   {
     id: "rel-the-princess",
     coverImage: "/covers/the-princess.webp",
+    audioUrl: "/audio/the-princess.mp3",
     title: "THE PRINCESS",
     artist: "SIMON AUGUSTE",
     year: 2023,
@@ -214,31 +221,31 @@ export const socials: Social[] = [
     platform: "instagram",
     handle: "@simondaveauguste",
     url: "https://www.instagram.com/simondaveauguste",
-    followers: "12.4K",
+    followers: "3,559",
   },
   {
     platform: "tiktok",
     handle: "@simonauguste4",
     url: "https://www.tiktok.com/@simonauguste4",
-    followers: "8.1K",
+    followers: "123",
   },
   {
     platform: "youtube",
     handle: "@simondaveauguste",
     url: "https://www.youtube.com/@simondaveauguste",
-    followers: "24K",
+    followers: "39",
   },
   {
     platform: "spotify",
     handle: "Simon Auguste",
     url: "https://open.spotify.com/artist/1zAgIkurm4hqFL1hf1lg8q",
-    followers: "31K",
+    followers: "—",
   },
   {
     platform: "x",
     handle: "@MrAugusteMusic",
     url: "https://x.com/MrAugusteMusic",
-    followers: "319",
+    followers: "318",
   },
   {
     platform: "apple-music",

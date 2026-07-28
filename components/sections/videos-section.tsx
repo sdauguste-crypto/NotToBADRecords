@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { Play } from "lucide-react";
 
 import { videos, type Video } from "@/lib/content";
+import { announceMediaOpen } from "@/lib/media-bus";
 import { cn } from "@/lib/utils";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { SectionShell } from "@/components/sections/section-shell";
@@ -27,7 +28,7 @@ function VideoCard({ video, featured = false }: VideoCardProps) {
       )}
     >
       {featured ? (
-        <BorderBeam size={70} duration={10} colorFrom="#d9a8ff" colorTo="#ff2e88" />
+        <BorderBeam size={70} duration={10} colorFrom="#22d3ee" colorTo="#ff2e88" />
       ) : null}
 
       {playing ? (
@@ -41,7 +42,10 @@ function VideoCard({ video, featured = false }: VideoCardProps) {
       ) : (
         <button
           type="button"
-          onClick={() => setPlaying(true)}
+          onClick={() => {
+            announceMediaOpen();
+            setPlaying(true);
+          }}
           aria-label={`Play video: ${video.title}`}
           className="scanlines absolute inset-0 flex cursor-pointer items-center justify-center rounded-[inherit] bg-gradient-to-br from-void-panel via-void-panel to-sunset-magenta/20"
         >

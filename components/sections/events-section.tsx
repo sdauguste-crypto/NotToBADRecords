@@ -141,12 +141,12 @@ export function EventsSection() {
                 {/* node dot */}
                 <span
                   aria-hidden
-                  className="absolute -left-8 top-8 h-3 w-3 -translate-x-1/2 rounded-full bg-sunset-gold shadow-[0_0_12px_rgba(255,200,87,.8)] md:-left-9"
+                  className="absolute -left-8 top-8 h-3 w-3 -translate-x-1/2 rounded-full bg-sunset-gold shadow-[0_0_12px_rgba(34,211,238,.8)] md:-left-9"
                 />
 
                 <div className="glass-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center md:p-6">
                   <div className="w-24 shrink-0 text-center">
-                    <p className="font-bold leading-none text-4xl text-sunset-gold [text-shadow:0_0_18px_rgba(255,200,87,.5)]">
+                    <p className="font-bold leading-none text-4xl text-sunset-gold [text-shadow:0_0_18px_rgba(34,211,238,.5)]">
                       {day}
                     </p>
                     <p className="mt-1 text-xs uppercase tracking-[0.25em] text-sunset-gold/70">
@@ -157,7 +157,7 @@ export function EventsSection() {
                   <div className="min-w-0 flex-1">
                     {index === 0 ? (
                       <p className="mb-1 text-xs font-bold uppercase tracking-[0.25em]">
-                        <AnimatedGradientText colorFrom="#ff2e88" colorTo="#d9a8ff">
+                        <AnimatedGradientText colorFrom="#ff2e88" colorTo="#22d3ee">
                           ▲ NEXT LAUNCH
                         </AnimatedGradientText>
                       </p>
