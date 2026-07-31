@@ -115,7 +115,10 @@ export function SocialConsole() {
               {social.handle}
             </span>
             <span className="rounded-full border border-sunset-gold/40 px-2.5 py-0.5 text-xs font-bold tracking-[0.15em] text-sunset-gold">
-              {social.followers} ▲
+              {/* the growth caret only makes sense next to a real count */}
+              {/\d/.test(social.followers)
+                ? `${social.followers} ▲`
+                : social.followers}
             </span>
             <a
               href={social.url}

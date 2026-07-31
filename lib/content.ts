@@ -251,6 +251,7 @@ export const socials: Social[] = [
     platform: "apple-music",
     handle: "Simon Auguste",
     url: "https://music.apple.com/us/artist/simon-auguste/1528473465",
-    followers: "—",
+    // Apple Music publishes no follower stat — show a status instead.
+    followers: "ON ROTATION",
   },
 ];
