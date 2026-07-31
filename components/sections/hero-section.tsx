@@ -8,7 +8,9 @@ import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { Button } from "@/components/ui/button";
 import { useReducedMotion } from "@/components/sections/use-reduced-motion";
 
-const TITLE_LINES = ["NOT TO B.A.D", "RECORDS"];
+// The artist owns this surface — the label name lives on the landing page
+// and in the nav above.
+const TITLE_LINES = ["SIMON DAVE", "AUGUSTE"];
 
 export function HeroSection() {
   const reduced = useReducedMotion();
@@ -52,20 +54,11 @@ export function HeroSection() {
           ))}
         </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: reduced ? 0 : 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut", delay: 0.65 }}
-          className="mt-8 max-w-xl text-sm tracking-[0.15em] text-foreground/70 md:text-base"
-        >
-          We Really Out Here.
-        </motion.p>
-
         <motion.div
           initial={{ opacity: 0, y: reduced ? 0 : 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut", delay: 0.85 }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          transition={{ duration: 0.7, ease: "easeOut", delay: 0.75 }}
+          className="mt-12 flex flex-wrap items-center justify-center gap-4"
         >
           <a href="#music">
             <ShimmerButton
