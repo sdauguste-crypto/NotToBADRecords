@@ -76,6 +76,14 @@
   --color-sunset-magenta: #1e6fff;
   --color-sunset-orange: #ff54b8; /* pink mid (regraded from orange) */
   --color-sunset-gold: #22d3ee; /* electric cyan (regraded from gold) */
+  /* Tier I — label identity, permanent. Used by the label landing page
+     only; era surfaces (the artist site) keep the palette above. */
+  --color-obsidian: #09080d;
+  --color-chrome: #ebeef1;
+  --color-steel: #95999f;
+  --color-blood: #b41c25;
+  --color-oxblood: #a0171d;
+
   --color-void: #04070f;
   --color-void-deep: #02040a;
   --color-void-panel: #0a1533;
@@ -236,6 +244,27 @@
     pointer-events: none;
     border-radius: inherit;
   }
+}
+
+/* Body face for label surfaces. Cinzel Decorative stays display-only per the
+   brand system; the artist era keeps Cinzel throughout. */
+@utility font-body {
+  font-family: "Work Sans", "Inter", system-ui, sans-serif;
+}
+
+/* Chrome gradient for the label wordmark — steel through white and back,
+   so the type reads as brushed metal rather than flat grey. */
+@utility text-chrome {
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #c9ced4 38%,
+    #ffffff 55%,
+    #7e838a 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 @utility hud-corners {

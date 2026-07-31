@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "@fontsource/cinzel-decorative/400.css";
 import "@fontsource/cinzel-decorative/700.css";
 import "@fontsource/cinzel-decorative/900.css";
+// Body face for label surfaces — the brand system keeps Cinzel display-only.
+import "@fontsource/work-sans/300.css";
+import "@fontsource/work-sans/400.css";
+import "@fontsource/work-sans/500.css";
 import "./globals.css";
 
 const SITE_TITLE = "Not To B.A.D Records — Mission Control";

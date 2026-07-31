@@ -102,6 +102,17 @@ function collectErrors(page, bucket) {
     // (preload="metadata"), which surfaces as an abort — not a failure.
     // Anything else on the audio file (404, bad type) still counts.
     if (/\.mp3$/.test(url) && reason.includes("ERR_ABORTED")) return;
+    // next/link prefetches route documents and the router routinely cancels
+    // them. Only extensionless same-origin paths are exempt — assets still
+    // count, and the explicit navigation checks prove routing really works.
+    const pathname = new URL(url).pathname;
+    if (
+      reason.includes("ERR_ABORTED") &&
+      url.startsWith(`http://localhost:${PORT}`) &&
+      !/\.\w{2,5}$/.test(pathname)
+    ) {
+      return;
+    }
     bucket.push(`[requestfailed] ${url} :: ${reason}`);
   });
 }
@@ -119,7 +130,44 @@ async function main() {
     headless: true,
     args: ["--no-sandbox", "--disable-dev-shm-usage", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--hide-scrollbars"],
   });
-  const url = `http://localhost:${PORT}${BASE_PATH}/`;
+  const labelUrl = `http://localhost:${PORT}${BASE_PATH}/`;
+  // The label landing now owns "/"; the artist journey lives one level down.
+  const url = `http://localhost:${PORT}${BASE_PATH}/simon-auguste/`;
+
+  // ---------- Label landing ----------
+  console.log("== Label landing (1440x900) ==");
+  const labelErrors = [];
+  const labelPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  collectErrors(labelPage, labelErrors);
+  await labelPage.goto(labelUrl, { waitUntil: "networkidle", timeout: 45000 });
+
+  const lockupOk = await labelPage.evaluate(() => {
+    const img = document.querySelector('img[src*="lockup"]');
+    return !!img && img.complete && img.naturalWidth > 0;
+  });
+  check("label: chrome lockup renders", lockupOk);
+
+  const tabs = await labelPage.evaluate(() =>
+    [...document.querySelectorAll("nav[aria-label='Label and artist'] a")].map((a) => a.textContent.trim()),
+  );
+  check("label: both tabs present", tabs.length === 2 && tabs.includes("SIMON AUGUSTE"), JSON.stringify(tabs));
+
+  const toArtist = await labelPage.evaluate(() =>
+    [...document.querySelectorAll("a")].some((a) => /simon-auguste/.test(a.getAttribute("href") || "")),
+  );
+  check("label: links through to the artist site", toArtist);
+  await labelPage.screenshot({ path: path.join(SHOT_DIR, "label-landing.png"), fullPage: true });
+
+  // The tab must actually land on the journey page.
+  await labelPage.click("nav[aria-label='Label and artist'] a[href*='simon-auguste']");
+  await labelPage.waitForURL(/simon-auguste/, { timeout: 20000 }).catch(() => {});
+  const arrived = await labelPage
+    .waitForFunction(() => !!document.getElementById("hero"), { timeout: 20000 })
+    .then(() => true)
+    .catch(() => false);
+  check("label: SIMON AUGUSTE tab opens the journey", arrived, labelPage.url());
+  check("label: zero unexpected errors", labelErrors.length === 0, labelErrors.slice(0, 5).join(" | "));
+  await labelPage.close();
 
   // ---------- Desktop pass ----------
   console.log("== Desktop (1440x900) ==");

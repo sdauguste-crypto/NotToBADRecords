@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { SECTION_IDS, type SectionId } from "@/lib/journey-state";
@@ -75,21 +76,23 @@ export function SiteNav() {
   return (
     <header className="fixed top-0 z-40 w-full">
       <div className="glass-panel mx-3 mt-3 flex items-center justify-between px-5 py-3 md:mx-auto md:max-w-6xl">
-        <a
-          href="#hero"
-          onClick={(e) => goTo(e, "hero")}
-          className="flex items-center gap-3"
-        >
+        {/* the crest is the way back up to the label */}
+        <Link href="/" className="flex items-center gap-3" title="Not To B.A.D Records">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo-crest.webp"
             alt=""
             className="h-9 w-auto drop-shadow-[0_0_10px_rgba(255,46,136,0.45)] md:h-10"
           />
-          <span className="text-neon-gold text-sm font-bold uppercase tracking-widest md:text-base">
-            NOT TO B.A.D RECORDS
+          <span className="flex flex-col leading-tight">
+            <span className="text-[0.55rem] tracking-[0.3em] text-foreground/45">
+              NOT TO B.A.D RECORDS
+            </span>
+            <span className="text-neon-gold text-sm font-bold uppercase tracking-widest md:text-base">
+              SIMON AUGUSTE
+            </span>
           </span>
-        </a>
+        </Link>
 
         {/* Desktop links */}
         <nav aria-label="Primary" className="hidden items-center gap-6 lg:flex">
@@ -137,13 +140,22 @@ export function SiteNav() {
             className="fixed inset-0 z-50 flex flex-col bg-void/95 backdrop-blur lg:hidden"
           >
             <div className="flex items-center justify-between px-8 py-6">
-              <span className="flex items-center gap-3">
+              <Link
+                href="/"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/logo-crest.webp" alt="" className="h-9 w-auto" />
-                <span className="text-neon-gold text-sm font-bold uppercase tracking-widest">
-                  NOT TO B.A.D RECORDS
+                <span className="flex flex-col leading-tight">
+                  <span className="text-[0.55rem] tracking-[0.3em] text-foreground/45">
+                    NOT TO B.A.D RECORDS
+                  </span>
+                  <span className="text-neon-gold text-sm font-bold uppercase tracking-widest">
+                    SIMON AUGUSTE
+                  </span>
                 </span>
-              </span>
+              </Link>
               <button
                 type="button"
                 className="text-foreground/80 hover:text-sunset-pink transition"
@@ -175,6 +187,13 @@ export function SiteNav() {
                   {label}
                 </motion.a>
               ))}
+              <Link
+                href="/"
+                onClick={() => setOpen(false)}
+                className="mt-4 border-t border-white/10 pt-6 text-xs tracking-[0.3em] text-foreground/50 transition hover:text-sunset-gold"
+              >
+                ← THE LABEL
+              </Link>
             </nav>
           </motion.div>
         )}
