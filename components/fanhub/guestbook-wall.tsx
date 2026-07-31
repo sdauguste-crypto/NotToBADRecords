@@ -7,6 +7,7 @@ import { Radio } from "lucide-react";
 import { guestbookEntries, type GuestbookEntry } from "@/lib/content";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { useReducedMotion } from "@/components/sections/use-reduced-motion";
+import { relayToGroundControl } from "@/lib/relay";
 
 const STORAGE_KEY = "ntb-guestbook";
 
@@ -33,6 +34,7 @@ export function GuestbookWall() {
   const [handle, setHandle] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
 
   // Hydrate persisted entries after mount to avoid SSR mismatch.
   useEffect(() => {
@@ -49,7 +51,7 @@ export function GuestbookWall() {
     }
   }, []);
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const trimmedHandle = handle.trim();
     const trimmedMessage = message.trim();
@@ -57,10 +59,30 @@ export function GuestbookWall() {
       setError("HANDLE AND MESSAGE REQUIRED — SIGNAL INCOMPLETE");
       return;
     }
+    const callsign = trimmedHandle.startsWith("@")
+      ? trimmedHandle
+      : `@${trimmedHandle}`;
+
     setError("");
+    setSending(true);
+    try {
+      // Deliver for real before showing it on the wall, so a card never
+      // appears for a message that never reached the label.
+      await relayToGroundControl({
+        handle: callsign,
+        message: trimmedMessage,
+        _subject: `NTB Fan Transmission — ${callsign}`,
+      });
+    } catch {
+      setError("SIGNAL LOST — TRANSMISSION FAILED, TRY AGAIN");
+      setSending(false);
+      return;
+    }
+    setSending(false);
+
     const entry: GuestbookEntry = {
       id: `gb-user-${Date.now()}`,
-      handle: trimmedHandle.startsWith("@") ? trimmedHandle : `@${trimmedHandle}`,
+      handle: callsign,
       message: trimmedMessage,
       stamp: formatStamp(new Date()),
     };
@@ -111,11 +133,12 @@ export function GuestbookWall() {
         <div className="mt-5 flex flex-wrap items-center gap-4">
           <ShimmerButton
             type="submit"
+            disabled={sending}
             shimmerColor="#22d3ee"
             background="linear-gradient(105deg, #ff2e88, #1e6fff)"
-            className="px-7 py-2.5 text-xs font-bold uppercase tracking-[0.2em]"
+            className="px-7 py-2.5 text-xs font-bold uppercase tracking-[0.2em] disabled:opacity-60"
           >
-            TRANSMIT
+            {sending ? "TRANSMITTING…" : "TRANSMIT"}
           </ShimmerButton>
           {error ? (
             <p className="text-xs font-bold tracking-[0.15em] text-sunset-pink">
@@ -123,6 +146,10 @@ export function GuestbookWall() {
             </p>
           ) : null}
         </div>
+        <p className="mt-4 text-xs tracking-[0.1em] text-foreground/40">
+          Transmissions route straight to ground control. Your message stays
+          pinned on your own screen — the best ones get featured.
+        </p>
       </form>
 
       {entries.length === 0 ? (

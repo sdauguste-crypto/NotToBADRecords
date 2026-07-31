@@ -5,13 +5,11 @@ import { motion } from "motion/react";
 
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { useReducedMotion } from "@/components/sections/use-reduced-motion";
+import { relayToGroundControl } from "@/lib/relay";
 
 const STORAGE_KEY = "ntb-newsletter";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const SUCCESS_TEXT = "✓ TRANSMISSION RECEIVED — WELCOME ABOARD, CADET";
-// FormSubmit relays each signup to the label inbox — no server needed.
-const RELAY_URL =
-  "https://formsubmit.co/ajax/motivationmusicmgmt@gmail.com";
 
 export function NewsletterTerminal() {
   const reduced = useReducedMotion();
@@ -41,17 +39,10 @@ export function NewsletterTerminal() {
     setError("");
     setSending(true);
     try {
-      const res = await fetch(RELAY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          email: trimmed,
-          _subject: "NTB Mission Control — new newsletter signup",
-          _template: "table",
-          _captcha: "false",
-        }),
+      await relayToGroundControl({
+        email: trimmed,
+        _subject: "NTB Mission Control — new newsletter signup",
       });
-      if (!res.ok) throw new Error(`relay ${res.status}`);
       setSubscribed(true);
       try {
         window.localStorage.setItem(STORAGE_KEY, "1");
