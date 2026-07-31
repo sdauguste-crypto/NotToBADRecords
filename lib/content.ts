@@ -225,9 +225,9 @@ export const socials: Social[] = [
   },
   {
     platform: "tiktok",
-    handle: "@simonauguste4",
-    url: "https://www.tiktok.com/@simonauguste4",
-    followers: "123",
+    handle: "@simondaveauguste",
+    url: "https://www.tiktok.com/@simondaveauguste",
+    followers: "—",
   },
   {
     platform: "youtube",
@@ -243,9 +243,9 @@ export const socials: Social[] = [
   },
   {
     platform: "x",
-    handle: "@MrAugusteMusic",
-    url: "https://x.com/MrAugusteMusic",
-    followers: "318",
+    handle: "@simondaveaugust",
+    url: "https://x.com/simondaveaugust",
+    followers: "—",
   },
   {
     platform: "apple-music",
