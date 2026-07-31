@@ -65,7 +65,7 @@ export function SiteFooter() {
           <span className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-crest.webp" alt="" className="h-10 w-auto" />
-            <span className="text-neon-gold text-xs font-bold uppercase tracking-widest">
+            <span className="font-display text-neon-gold text-xs font-bold uppercase tracking-widest">
               NOT TO B.A.D RECORDS
             </span>
           </span>
@@ -75,7 +75,7 @@ export function SiteFooter() {
                 key={label}
                 href="#about"
                 aria-label={label}
-                className="text-foreground/60 transition hover:text-sunset-pink"
+                className="text-foreground/60 transition hover:text-blood"
               >
                 <Icon className="size-5" />
               </a>

@@ -195,7 +195,7 @@ export function AmbientPlayer() {
           onClick={toggle}
           title={playing ? "Pause the music" : "Play the music"}
           aria-label={playing ? "Pause background music" : "Play background music"}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sunset-pink/60 text-sunset-pink transition-transform hover:scale-110"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-blood/70 text-blood transition-transform hover:scale-110"
         >
           {playing ? (
             <Pause className="h-3.5 w-3.5" fill="currentColor" />
@@ -209,13 +209,13 @@ export function AmbientPlayer() {
             className={cn(
               "text-[0.6rem] uppercase tracking-[0.25em]",
               silent
-                ? "animate-blink text-sunset-pink motion-reduce:animate-none"
-                : "text-sunset-gold/80",
+                ? "animate-blink text-blood motion-reduce:animate-none"
+                : "text-foreground/60",
             )}
           >
             {silent ? "TAP FOR SOUND" : "NOW TRANSMITTING"}
           </span>
-          <span className="truncate text-xs font-bold uppercase tracking-wide text-foreground/90">
+          <span className="font-display truncate text-xs font-bold uppercase tracking-wide text-foreground/90">
             {track.title}
           </span>
         </span>
@@ -244,7 +244,7 @@ export function AmbientPlayer() {
           onClick={toggleMute}
           title={muted ? "Unmute" : "Mute"}
           aria-label={muted ? "Unmute background music" : "Mute background music"}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-foreground/60 transition-colors hover:text-sunset-gold"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-foreground/60 transition-colors hover:text-blood"
         >
           {muted ? (
             <VolumeX className="h-3.5 w-3.5" />

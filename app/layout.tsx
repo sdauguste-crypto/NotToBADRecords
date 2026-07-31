@@ -2,7 +2,11 @@ import type { Metadata, Viewport } from "next";
 import "@fontsource/cinzel-decorative/400.css";
 import "@fontsource/cinzel-decorative/700.css";
 import "@fontsource/cinzel-decorative/900.css";
-// Body face for label surfaces — the brand system keeps Cinzel display-only.
+// Body faces — the brand system keeps Cinzel display-only.
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/inter/700.css";
 import "@fontsource/work-sans/300.css";
 import "@fontsource/work-sans/400.css";
 import "@fontsource/work-sans/500.css";

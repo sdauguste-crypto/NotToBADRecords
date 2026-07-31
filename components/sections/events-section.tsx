@@ -68,7 +68,7 @@ function NoActiveMissions({ reduced }: { reduced: boolean }) {
         <span className="h-2 w-2 rounded-full bg-amber-400 animate-led-pulse motion-reduce:animate-none" />
         STANDBY
       </span>
-      <p className="text-neon-pink font-black uppercase text-3xl md:text-5xl">
+      <p className="font-display text-neon-pink font-black uppercase text-3xl md:text-5xl">
         NO ACTIVE MISSIONS
       </p>
       <p className="mt-4 text-sm uppercase tracking-[0.3em] text-foreground/60">
@@ -81,7 +81,7 @@ function NoActiveMissions({ reduced }: { reduced: boolean }) {
       <a href="#contact" className="mt-8 inline-block">
         <Button
           variant="ghost"
-          className="rounded-full border border-sunset-pink/40 px-8 text-xs font-bold uppercase tracking-[0.2em] text-sunset-pink hover:border-sunset-pink hover:bg-sunset-pink/10 hover:text-sunset-pink"
+          className="btn-blood rounded-full px-8 text-xs font-bold uppercase tracking-[0.2em]"
         >
           GET LAUNCH ALERTS
         </Button>
@@ -157,7 +157,7 @@ export function EventsSection() {
                   <div className="min-w-0 flex-1">
                     {index === 0 ? (
                       <p className="mb-1 text-xs font-bold uppercase tracking-[0.25em]">
-                        <AnimatedGradientText colorFrom="#ff2e88" colorTo="#22d3ee">
+                        <AnimatedGradientText colorFrom="#b41c25" colorTo="#ebeef1">
                           ▲ NEXT LAUNCH
                         </AnimatedGradientText>
                       </p>
@@ -175,7 +175,7 @@ export function EventsSection() {
                     <Button
                       variant="ghost"
                       disabled={soldOut}
-                      className="rounded-full border border-sunset-pink/40 px-6 text-xs font-bold uppercase tracking-[0.2em] text-sunset-pink hover:border-sunset-pink hover:bg-sunset-pink/10 hover:text-sunset-pink"
+                      className="btn-blood rounded-full px-6 text-xs font-bold uppercase tracking-[0.2em]"
                     >
                       TICKETS
                     </Button>

@@ -36,7 +36,7 @@ export function HeroSection() {
           </AnimatedGradientText>
         </motion.div>
 
-        <h1 className="text-neon-gold animate-flicker font-black uppercase leading-[0.95] text-6xl md:text-8xl lg:text-9xl">
+        <h1 className="font-display text-neon-gold animate-flicker font-black uppercase leading-[0.95] text-6xl md:text-8xl lg:text-9xl">
           {TITLE_LINES.map((line, lineIndex) => (
             <motion.span
               key={line}
@@ -62,9 +62,9 @@ export function HeroSection() {
         >
           <a href="#music">
             <ShimmerButton
-              shimmerColor="#22d3ee"
-              background="linear-gradient(105deg, #ff2e88, #1e6fff)"
-              className="px-8 py-3 text-xs font-bold uppercase tracking-[0.2em] shadow-[0_0_28px_rgba(255,46,136,.45)]"
+              shimmerColor="#ebeef1"
+              background="linear-gradient(180deg, rgba(180,28,37,.30), rgba(180,28,37,.14))"
+              className="border border-blood px-8 py-3 text-xs font-bold uppercase tracking-[0.2em] text-[#ebeef1] shadow-[0_0_28px_rgba(180,28,37,.35)] hover:border-oxblood"
             >
               ENTER MISSION CONTROL
             </ShimmerButton>
@@ -72,7 +72,7 @@ export function HeroSection() {
           <Button
             asChild
             variant="ghost"
-            className="h-12 rounded-full border border-sunset-gold/40 px-8 text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold hover:border-sunset-gold hover:bg-sunset-gold/10 hover:text-sunset-gold"
+            className="h-12 rounded-full border border-blood/60 px-8 text-xs font-bold uppercase tracking-[0.2em] text-[#ebeef1] hover:border-oxblood hover:bg-blood/15 hover:text-[#ebeef1]"
           >
             <a href="#store">LATEST DROP</a>
           </Button>
@@ -85,7 +85,7 @@ export function HeroSection() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.4, duration: 0.8 }}
-        className="absolute bottom-20 left-1/2 -translate-x-1/2 text-sunset-gold/70 transition-colors hover:text-sunset-gold"
+        className="absolute bottom-20 left-1/2 -translate-x-1/2 text-blood/80 transition-colors hover:text-oxblood"
       >
         <motion.span
           className="block"
@@ -98,7 +98,7 @@ export function HeroSection() {
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 px-6 pb-4">
         <div className="hud-corners mx-auto flex max-w-4xl items-center justify-center gap-4 px-6 py-2">
-          <p className="truncate text-center text-xs tracking-[0.2em] text-sunset-gold/60">
+          <p className="truncate text-center text-xs tracking-[0.2em] text-foreground/50">
             LAT 25.79°N — LON 80.13°W&ensp;//&ensp;FREQ 88.3&ensp;//&ensp;SOL
             ELEVATION −4.2°
           </p>

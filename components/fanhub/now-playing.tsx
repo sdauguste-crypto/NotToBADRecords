@@ -58,10 +58,10 @@ export function NowPlaying() {
         )}
 
         <div>
-          <p className="mb-3 text-xs uppercase tracking-[0.3em] text-sunset-gold/70">
+          <p className="mb-3 text-xs uppercase tracking-[0.3em] text-blood">
             ▸ NOW PLAYING
           </p>
-          <h3 className="text-neon-pink font-black uppercase text-2xl md:text-3xl">
+          <h3 className="font-display text-neon-pink font-black uppercase text-2xl md:text-3xl">
             {release.title}
           </h3>
           <p className="mt-2 text-sm tracking-[0.2em] text-foreground/70">
@@ -99,9 +99,9 @@ export function NowPlaying() {
               className="inline-block"
             >
               <ShimmerButton
-                shimmerColor="#22d3ee"
-                background="linear-gradient(105deg, #ff2e88, #1e6fff)"
-                className="px-7 py-3 text-xs font-bold uppercase tracking-[0.2em]"
+                shimmerColor="#ebeef1"
+                background="linear-gradient(180deg, rgba(180,28,37,.30), rgba(180,28,37,.14))"
+                className="border border-blood px-7 py-3 text-xs font-bold uppercase tracking-[0.2em] text-[#ebeef1] hover:border-oxblood"
               >
                 PLAY ON SPOTIFY
               </ShimmerButton>
@@ -111,7 +111,7 @@ export function NowPlaying() {
                 href={release.appleMusicUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full border border-sunset-gold/40 px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold transition-colors hover:border-sunset-gold hover:bg-sunset-gold/10"
+                className="rounded-full border border-blood/60 px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] text-blood transition-colors hover:border-oxblood hover:bg-blood/10 hover:text-oxblood"
               >
                 APPLE MUSIC
               </a>
@@ -139,7 +139,7 @@ export function NowPlaying() {
                 announceMediaOpen();
                 setPlayerLoaded(true);
               }}
-              className="hud-corners w-full cursor-pointer rounded-xl border border-sunset-pink/25 bg-void-deep/60 px-6 py-5 text-xs font-bold uppercase tracking-[0.25em] text-sunset-gold/80 transition-colors hover:border-sunset-pink/60 hover:text-sunset-gold"
+              className="hud-corners w-full cursor-pointer rounded-xl border border-blood/40 bg-void-deep/60 px-6 py-5 text-xs font-bold uppercase tracking-[0.25em] text-foreground/70 transition-colors hover:border-blood hover:text-blood"
             >
               ▸ LOAD SPOTIFY PLAYER
             </button>

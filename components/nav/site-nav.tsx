@@ -84,7 +84,7 @@ export function SiteNav() {
             alt=""
             className="h-9 w-auto drop-shadow-[0_0_10px_rgba(255,46,136,0.45)] md:h-10"
           />
-          <span className="flex flex-col leading-tight">
+          <span className="font-display flex flex-col leading-tight">
             <span className="text-[0.55rem] tracking-[0.3em] text-foreground/45">
               NOT TO B.A.D RECORDS
             </span>
@@ -107,8 +107,8 @@ export function SiteNav() {
                 className={
                   "text-xs tracking-[0.25em] transition " +
                   (isActive
-                    ? "border-b border-sunset-pink text-sunset-pink shadow-[0_6px_14px_-6px_#ff2e88]"
-                    : "text-foreground/70 hover:text-sunset-pink")
+                    ? "border-b border-blood text-blood shadow-[0_6px_14px_-6px_#b41c25]"
+                    : "text-foreground/70 hover:text-blood")
                 }
               >
                 {label}
@@ -120,7 +120,7 @@ export function SiteNav() {
         {/* Mobile hamburger */}
         <button
           type="button"
-          className="text-foreground/80 hover:text-sunset-pink transition lg:hidden"
+          className="text-foreground/80 hover:text-blood transition lg:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
@@ -147,7 +147,7 @@ export function SiteNav() {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/logo-crest.webp" alt="" className="h-9 w-auto" />
-                <span className="flex flex-col leading-tight">
+                <span className="font-display flex flex-col leading-tight">
                   <span className="text-[0.55rem] tracking-[0.3em] text-foreground/45">
                     NOT TO B.A.D RECORDS
                   </span>
@@ -158,7 +158,7 @@ export function SiteNav() {
               </Link>
               <button
                 type="button"
-                className="text-foreground/80 hover:text-sunset-pink transition"
+                className="text-foreground/80 hover:text-blood transition"
                 aria-label="Close menu"
                 onClick={() => setOpen(false)}
               >
@@ -180,8 +180,8 @@ export function SiteNav() {
                   className={
                     "text-2xl uppercase tracking-[0.2em] transition " +
                     (active === id
-                      ? "text-sunset-pink"
-                      : "text-foreground/80 hover:text-sunset-pink")
+                      ? "text-blood"
+                      : "text-foreground/80 hover:text-blood")
                   }
                 >
                   {label}
@@ -190,7 +190,7 @@ export function SiteNav() {
               <Link
                 href="/"
                 onClick={() => setOpen(false)}
-                className="mt-4 border-t border-white/10 pt-6 text-xs tracking-[0.3em] text-foreground/50 transition hover:text-sunset-gold"
+                className="mt-4 border-t border-white/10 pt-6 text-xs tracking-[0.3em] text-foreground/50 transition hover:text-blood"
               >
                 ← THE LABEL
               </Link>

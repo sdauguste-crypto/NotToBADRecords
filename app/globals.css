@@ -6,21 +6,21 @@
 :root {
   --radius: 0.625rem;
   --background: #04070f;
-  --foreground: #eaf6ff;
+  --foreground: #c9cbd3; /* brand body text on void */
   --card: rgba(10, 21, 51, 0.6);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #ff2e88;
+  --primary: #b41c25; /* blood — System Law II */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: #22d3ee;
+  --accent: #b41c25; /* blood — System Law II */
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: rgba(255, 46, 136, 0.25);
+  --border: rgba(180, 28, 37, 0.3); /* fine rules go blood */
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
 }
@@ -47,7 +47,7 @@
 }
 
 @theme inline {
-  --font-sans: "Cinzel Decorative", serif;
+  --font-sans: "Inter", "Work Sans", system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -197,7 +197,22 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Cinzel Decorative", serif;
+    font-family: "Inter", "Work Sans", system-ui, sans-serif;
+  }
+  /* brand type rules: readable body rhythm, chrome emphasis, UI headings in body face */
+  p {
+    line-height: 1.7;
+  }
+  strong,
+  b {
+    color: #ebeef1;
+  }
+  h4,
+  h5,
+  h6 {
+    font-family: "Inter", "Work Sans", system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -223,11 +238,11 @@
 @utility glass-panel {
   background: rgba(8, 18, 43, 0.55);
   backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 46, 136, 0.24);
+  border: 1px solid rgba(180, 28, 37, 0.3);
   border-radius: var(--radius-xl);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 32px rgba(34, 211, 238, 0.14);
+    0 0 32px rgba(180, 28, 37, 0.1);
 }
 
 @utility scanlines {
@@ -249,7 +264,7 @@
 /* Body face for label surfaces. Cinzel Decorative stays display-only per the
    brand system; the artist era keeps Cinzel throughout. */
 @utility font-body {
-  font-family: "Work Sans", "Inter", system-ui, sans-serif;
+  font-family: "Inter", "Work Sans", system-ui, sans-serif;
 }
 
 /* Chrome gradient for the label wordmark — steel through white and back,
@@ -276,8 +291,8 @@
     left: 0;
     width: 12px;
     height: 12px;
-    border-top: 1px solid rgba(34, 211, 238, 0.65);
-    border-left: 1px solid rgba(34, 211, 238, 0.65);
+    border-top: 1px solid rgba(180, 28, 37, 0.55);
+    border-left: 1px solid rgba(180, 28, 37, 0.55);
     pointer-events: none;
   }
   &::after {
@@ -287,8 +302,25 @@
     right: 0;
     width: 12px;
     height: 12px;
-    border-bottom: 1px solid rgba(34, 211, 238, 0.65);
-    border-right: 1px solid rgba(34, 211, 238, 0.65);
+    border-bottom: 1px solid rgba(180, 28, 37, 0.55);
+    border-right: 1px solid rgba(180, 28, 37, 0.55);
     pointer-events: none;
+  }
+}
+
+/* Display face — Cinzel Decorative, whitelisted to wordmark, h1-h3 section
+   headlines, and track/release titles (brand type system). */
+@utility font-display {
+  font-family: "Cinzel Decorative", serif;
+}
+
+/* Primary CTA recipe from ntb-brand.css .btn-primary — System Law II. */
+@utility btn-blood {
+  background: linear-gradient(180deg, rgba(180, 28, 37, 0.3), rgba(180, 28, 37, 0.14));
+  border: 1px solid #b41c25;
+  color: #ebeef1;
+  &:hover {
+    background: linear-gradient(180deg, rgba(180, 28, 37, 0.45), rgba(180, 28, 37, 0.22));
+    border-color: #a0171d;
   }
 }

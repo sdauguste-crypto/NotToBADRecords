@@ -74,7 +74,7 @@ export default function LabelPage() {
                   className="group flex flex-wrap items-center justify-between gap-3 border-t border-white/10 py-6 transition-colors hover:border-blood/60"
                 >
                   <span>
-                    <span className="text-chrome block text-xl font-bold tracking-[0.18em] transition-colors group-hover:text-white sm:text-2xl">
+                    <span className="font-display text-chrome block text-xl font-bold tracking-[0.18em] transition-colors group-hover:text-white sm:text-2xl">
                       {artist.name}
                     </span>
                     <span className="font-body mt-1 block text-[0.6rem] tracking-[0.3em] text-steel">

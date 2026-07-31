@@ -98,7 +98,7 @@ export function SocialConsole() {
 
   return (
     <div className="glass-panel hud-corners p-6 md:p-8">
-      <p className="mb-6 text-xs font-bold uppercase tracking-[0.3em] text-sunset-gold/80">
+      <p className="mb-6 text-xs font-bold uppercase tracking-[0.3em] text-blood">
         ▚ COMMS CONSOLE
       </p>
 
@@ -108,25 +108,19 @@ export function SocialConsole() {
             key={social.platform}
             className="flex flex-wrap items-center gap-3 rounded-lg border border-sunset-pink/15 bg-void-deep/50 px-4 py-3"
           >
-            <span className="text-sunset-pink">
+            <span className="text-blood">
               <PlatformIcon platform={social.platform} />
             </span>
             <span className="min-w-0 flex-1 truncate text-sm tracking-wide text-foreground/85">
               {social.handle}
             </span>
-            <span className="rounded-full border border-sunset-gold/40 px-2.5 py-0.5 text-xs font-bold tracking-[0.15em] text-sunset-gold">
-              {/* the growth caret only makes sense next to a real count */}
-              {/\d/.test(social.followers)
-                ? `${social.followers} ▲`
-                : social.followers}
-            </span>
             <a
               href={social.url}
               target="_blank"
               rel="noreferrer"
-              className="group inline-flex items-center gap-2 rounded-md border border-sunset-pink/30 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-foreground/70 transition-colors hover:border-sunset-pink hover:text-sunset-pink"
+              className="group inline-flex items-center gap-2 rounded-md border border-blood/40 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-foreground/70 transition-colors hover:border-blood hover:text-blood"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-foreground/30 text-sunset-pink transition-colors group-hover:animate-led-pulse group-hover:bg-sunset-pink motion-reduce:animate-none" />
+              <span className="h-1.5 w-1.5 rounded-full bg-foreground/30 text-blood transition-colors group-hover:animate-led-pulse group-hover:bg-blood motion-reduce:animate-none" />
               OPEN CHANNEL
             </a>
           </li>

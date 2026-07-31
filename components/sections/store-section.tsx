@@ -77,7 +77,7 @@ function MerchSilhouette({
 
 function ProductCard({ product }: { product: Product }) {
   return (
-    <article className="glass-panel relative flex flex-col items-center overflow-hidden p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-sunset-gold/50">
+    <article className="glass-panel relative flex flex-col items-center overflow-hidden p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-blood/60">
       {/* diamond-plate cargo floor behind the merch */}
       <div
         aria-hidden
@@ -90,28 +90,28 @@ function ProductCard({ product }: { product: Product }) {
       {product.featured ? (
         <>
           <BorderBeam size={60} duration={8} colorFrom="#ff2e88" colorTo="#22d3ee" />
-          <span className="absolute right-3 top-3 rounded-full bg-sunset-pink px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-[0_0_16px_rgba(255,46,136,.7)]">
+          <span className="absolute right-3 top-3 rounded-full bg-blood px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-[0_0_16px_rgba(180,28,37,.7)]">
             LIMITED
           </span>
         </>
       ) : null}
 
-      <div className="flex h-32 items-center justify-center drop-shadow-[0_0_18px_rgba(34, 211, 238,.35)]">
+      <div className="flex h-32 items-center justify-center drop-shadow-[0_0_18px_rgba(34,211,238,.35)]">
         <MerchSilhouette kind={product.kind} uid={product.id} />
       </div>
 
       <h3 className="mt-4 font-bold uppercase tracking-wide text-foreground">
         {product.name}
       </h3>
-      <p className="mt-2 font-bold text-2xl text-sunset-gold [text-shadow:0_0_16px_rgba(34,211,238,.5)]">
+      <p className="mt-2 font-bold text-2xl text-[#ebeef1]">
         ${product.price}
       </p>
 
       <a href="#contact" className="mt-5 inline-block">
         <ShimmerButton
-          shimmerColor="#ff2e88"
-          background="rgba(4, 7, 15, .9)"
-          className="border-sunset-gold/30 px-6 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold"
+          shimmerColor="#ebeef1"
+          background="linear-gradient(180deg, rgba(180,28,37,.30), rgba(180,28,37,.14))"
+          className="border border-blood px-6 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-[#ebeef1] hover:border-oxblood"
         >
           NOTIFY ME
         </ShimmerButton>

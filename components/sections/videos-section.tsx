@@ -24,7 +24,7 @@ function VideoCard({ video, featured = false }: VideoCardProps) {
       className={cn(
         "glass-panel group relative aspect-video w-full overflow-hidden",
         !featured &&
-          "transition-all duration-300 hover:-translate-y-1 hover:border-sunset-gold/50",
+          "transition-all duration-300 hover:-translate-y-1 hover:border-blood/60",
       )}
     >
       {featured ? (
@@ -77,7 +77,7 @@ function VideoCard({ video, featured = false }: VideoCardProps) {
           />
           <span
             className={cn(
-              "flex items-center justify-center rounded-full border-2 border-sunset-pink text-sunset-pink shadow-[0_0_24px_rgba(255,46,136,.6),inset_0_0_16px_rgba(255,46,136,.25)] transition-transform duration-300 group-hover:scale-110",
+              "flex items-center justify-center rounded-full border-2 border-blood text-blood shadow-[0_0_24px_rgba(180,28,37,.6),inset_0_0_16px_rgba(180,28,37,.25)] transition-transform duration-300 group-hover:scale-110",
               featured ? "h-20 w-20" : "h-14 w-14",
             )}
           >
@@ -97,7 +97,7 @@ function VideoCard({ video, featured = false }: VideoCardProps) {
               {video.title}
             </span>
             {video.duration ? (
-              <span className="shrink-0 rounded-full border border-sunset-gold/40 px-2 py-0.5 text-xs tracking-[0.15em] text-sunset-gold">
+              <span className="shrink-0 rounded-full border border-blood/50 px-2 py-0.5 text-xs tracking-[0.15em] text-blood">
                 {video.duration}
               </span>
             ) : null}

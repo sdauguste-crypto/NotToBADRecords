@@ -89,7 +89,7 @@ export function GallerySection() {
           >
             {/* the founding line is long — step it down on narrow screens
                 so the chip never pushes the page sideways */}
-            <p className="font-bold text-xl text-sunset-gold [text-shadow:0_0_18px_rgba(34,211,238,.5)] sm:text-2xl md:text-3xl">
+            <p className="font-bold text-xl text-[#ebeef1] sm:text-2xl md:text-3xl">
               {stat.value}
             </p>
             <p className="mt-1 text-xs uppercase tracking-[0.3em] text-foreground/60">

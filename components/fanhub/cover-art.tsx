@@ -133,8 +133,8 @@ export function CoverArt({ seed, title, className }: CoverArtProps) {
       role={title ? "img" : undefined}
       aria-label={title ? `Cover art for ${title}` : undefined}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(4, 7, 15,.75),transparent_60%)]" />
-      <div className="relative flex h-full w-full items-center justify-center drop-shadow-[0_0_14px_rgba(4, 7, 15,.6)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(4,7,15,.75),transparent_60%)]" />
+      <div className="relative flex h-full w-full items-center justify-center drop-shadow-[0_0_14px_rgba(4,7,15,.6)]">
         {motif === 0 ? (
           <RetroSun accent="#ff2e88" uid={uid} />
         ) : motif === 1 ? (

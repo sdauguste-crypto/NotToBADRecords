@@ -25,7 +25,7 @@ export function AboutSection() {
           className="glass-panel space-y-6 p-6 leading-relaxed md:p-8"
         >
           <p className="text-sm text-foreground/80 md:text-base">
-            <span className="font-bold text-sunset-gold">
+            <span className="font-bold text-[#ebeef1]">
               Some artists make music. Simon Auguste builds worlds.
             </span>{" "}
             Born in the Bronx to a Haitian household and raised in Florida by a
@@ -42,14 +42,14 @@ export function AboutSection() {
             Entirely self-funded. We really out here.
           </p>
           <p className="text-sm text-foreground/80 md:text-base">
-            The name? <span className="font-bold text-sunset-gold">Not To
+            The name? <span className="font-bold text-[#ebeef1]">Not To
             B.A.D</span> is a spin on the Haitian Creole phrase{" "}
             <em>&ldquo;nou pa pi mal&rdquo;</em> — we&apos;re not too bad — and
             the acronym stands for &ldquo;Be A D—&rdquo; (fill in any negative
             word that starts with D). A humble brag, and a way of looking at
             life.
           </p>
-          <p className="pt-2 text-sm font-bold uppercase tracking-[0.25em] text-sunset-pink">
+          <p className="pt-2 text-sm font-bold uppercase tracking-[0.25em] text-[#ebeef1]">
             — Simon Auguste, the waviest dude in the universe
           </p>
         </motion.div>

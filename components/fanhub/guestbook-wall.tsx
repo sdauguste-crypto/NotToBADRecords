@@ -99,7 +99,7 @@ export function GuestbookWall() {
 
   return (
     <div>
-      <p className="mb-6 text-xs font-bold uppercase tracking-[0.3em] text-sunset-gold/80">
+      <p className="mb-6 text-xs font-bold uppercase tracking-[0.3em] text-blood">
         ▚ FAN TRANSMISSIONS
       </p>
 
@@ -114,7 +114,7 @@ export function GuestbookWall() {
               value={handle}
               onChange={(event) => setHandle(event.target.value)}
               placeholder="@your_callsign"
-              className="w-full rounded-lg border border-sunset-pink/25 bg-void-deep/60 px-4 py-3 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-sunset-pink"
+              className="w-full rounded-lg border border-blood/40 bg-void-deep/60 px-4 py-3 text-sm text-foreground placeholder:text-foreground/30 focus:border-blood focus:outline-none focus:ring-2 focus:ring-blood/30"
             />
           </label>
           <label className="block">
@@ -126,7 +126,7 @@ export function GuestbookWall() {
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               placeholder="Say something not too bad…"
-              className="w-full rounded-lg border border-sunset-pink/25 bg-void-deep/60 px-4 py-3 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-sunset-pink"
+              className="w-full rounded-lg border border-blood/40 bg-void-deep/60 px-4 py-3 text-sm text-foreground placeholder:text-foreground/30 focus:border-blood focus:outline-none focus:ring-2 focus:ring-blood/30"
             />
           </label>
         </div>
@@ -134,27 +134,27 @@ export function GuestbookWall() {
           <ShimmerButton
             type="submit"
             disabled={sending}
-            shimmerColor="#22d3ee"
-            background="linear-gradient(105deg, #ff2e88, #1e6fff)"
-            className="px-7 py-2.5 text-xs font-bold uppercase tracking-[0.2em] disabled:opacity-60"
+            shimmerColor="#ebeef1"
+            background="linear-gradient(180deg, rgba(180,28,37,.30), rgba(180,28,37,.14))"
+            className="border border-blood px-7 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-[#ebeef1] disabled:opacity-60 hover:border-oxblood"
           >
             {sending ? "TRANSMITTING…" : "TRANSMIT"}
           </ShimmerButton>
           {error ? (
-            <p className="text-xs font-bold tracking-[0.15em] text-sunset-pink">
+            <p className="text-xs font-bold tracking-[0.15em] text-blood">
               {error}
             </p>
           ) : null}
         </div>
-        <p className="mt-4 text-xs tracking-[0.1em] text-foreground/40">
+        <p className="mt-4 text-xs text-foreground/40">
           Transmissions route straight to ground control. Your message stays
           pinned on your own screen — the best ones get featured.
         </p>
       </form>
 
       {entries.length === 0 ? (
-        <div className="hud-corners rounded-xl border border-sunset-pink/20 bg-void-deep/40 px-6 py-10 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-sunset-gold/70">
+        <div className="hud-corners rounded-xl border border-blood/30 bg-void-deep/40 px-6 py-10 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] text-blood/90">
             // CHANNEL OPEN
           </p>
           <p className="mt-3 text-sm tracking-[0.15em] text-foreground/60">
@@ -176,8 +176,8 @@ export function GuestbookWall() {
                 style={{ rotate: `${rotationFor(entry.id)}deg` }}
               >
                 <div className="flex items-center gap-2">
-                  <Radio className="h-3.5 w-3.5 shrink-0 text-sunset-gold/70" />
-                  <p className="truncate font-bold text-sunset-pink">
+                  <Radio className="h-3.5 w-3.5 shrink-0 text-foreground/50" />
+                  <p className="truncate font-bold text-blood">
                     {entry.handle}
                   </p>
                 </div>

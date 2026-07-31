@@ -44,19 +44,19 @@ export function SectionShell({
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="mb-12 md:mb-16"
         >
-          <p className="mb-4 text-xs uppercase tracking-[0.3em] text-sunset-gold/70">
+          <p className="mb-4 text-xs uppercase tracking-[0.3em] text-blood">
             {hudLabel}
           </p>
           <h2
             className={cn(
-              "font-black uppercase leading-[1.05] text-4xl md:text-6xl",
+              "font-display font-black uppercase leading-[1.05] text-4xl md:text-6xl",
               accent === "pink" ? "text-neon-pink" : "text-neon-gold",
             )}
           >
             {title}
           </h2>
           {subtitle ? (
-            <p className="mt-4 max-w-xl text-sm tracking-wide text-foreground/60">
+            <p className="mt-4 max-w-xl text-sm text-foreground/60">
               {subtitle}
             </p>
           ) : null}
