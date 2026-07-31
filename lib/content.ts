@@ -165,56 +165,8 @@ export const shows: Show[] = [
   // No active missions — new dates soon.
 ];
 
-export const guestbookEntries: GuestbookEntry[] = [
-  {
-    id: "gb-01",
-    handle: "@neonrider_99",
-    message: "Chrome Hearts has not left my deck since the drop. Absolute transmission.",
-    stamp: "[2026.07.02 // 23:14 UTC]",
-  },
-  {
-    id: "gb-02",
-    handle: "@sunset_courier",
-    message: "Saw Velvet Static in Brooklyn last year. Still recovering. Take my money.",
-    stamp: "[2026.06.28 // 01:47 UTC]",
-  },
-  {
-    id: "gb-03",
-    handle: "@tape_ghost",
-    message: "The Vol. II cassette hiss is a feature, not a bug. Ground Control knows.",
-    stamp: "[2026.06.21 // 19:03 UTC]",
-  },
-  {
-    id: "gb-04",
-    handle: "@midnight.alloy.fan",
-    message: "Jules Quarter live set = religious experience. When Berlin restock??",
-    stamp: "[2026.06.15 // 22:30 UTC]",
-  },
-  {
-    id: "gb-05",
-    handle: "@vhs_valkyrie",
-    message: "This website looks like my dreams. The label sounds like them too.",
-    stamp: "[2026.06.09 // 03:12 UTC]",
-  },
-  {
-    id: "gb-06",
-    handle: "@okt4ve_stan",
-    message: "GILDED on gold vinyl when? Asking for the entire internet.",
-    stamp: "[2026.05.30 // 17:55 UTC]",
-  },
-  {
-    id: "gb-07",
-    handle: "@lowband_lena",
-    message: "Luna Voss harmonies at 88.3 on the drive home. Perfect frequency.",
-    stamp: "[2026.05.22 // 21:08 UTC]",
-  },
-  {
-    id: "gb-08",
-    handle: "@analog_astro",
-    message: "Joined mission control. Zero regrets. The merch smells like the future.",
-    stamp: "[2026.05.14 // 12:26 UTC]",
-  },
-];
+// Intentionally empty — the wall shows only genuine visitor messages.
+export const guestbookEntries: GuestbookEntry[] = [];
 
 export const socials: Social[] = [
   {

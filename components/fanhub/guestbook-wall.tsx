@@ -125,6 +125,17 @@ export function GuestbookWall() {
         </div>
       </form>
 
+      {entries.length === 0 ? (
+        <div className="hud-corners rounded-xl border border-sunset-pink/20 bg-void-deep/40 px-6 py-10 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] text-sunset-gold/70">
+            // CHANNEL OPEN
+          </p>
+          <p className="mt-3 text-sm tracking-[0.15em] text-foreground/60">
+            No transmissions yet — be the first.
+          </p>
+        </div>
+      ) : null}
+
       <div className="scanlines rounded-xl">
         <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
           <AnimatePresence initial={false}>
