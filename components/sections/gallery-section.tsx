@@ -33,8 +33,7 @@ function GalleryTile({ item }: { item: GalleryItem }) {
 }
 
 const STATS = [
-  { value: "2024", label: "EST." },
-  { value: "12", label: "RELEASES" },
+  { value: "MAY 2015 TO FOREVER", label: "EST." },
   { value: "∞", label: "VIBES" },
 ];
 
@@ -86,9 +85,11 @@ export function GallerySection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.12 }}
-            className="hud-corners px-8 py-4 text-center"
+            className="hud-corners px-6 py-4 text-center sm:px-8"
           >
-            <p className="font-bold text-3xl text-sunset-gold [text-shadow:0_0_18px_rgba(34,211,238,.5)]">
+            {/* the founding line is long — step it down on narrow screens
+                so the chip never pushes the page sideways */}
+            <p className="font-bold text-xl text-sunset-gold [text-shadow:0_0_18px_rgba(34,211,238,.5)] sm:text-2xl md:text-3xl">
               {stat.value}
             </p>
             <p className="mt-1 text-xs uppercase tracking-[0.3em] text-foreground/60">
