@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { LabelTabs } from "@/components/label/label-tabs";
+import { LabelVideoBackdrop } from "@/components/label/label-video-backdrop";
 import { contactEmail } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -24,6 +25,8 @@ const ROSTER = [
 export default function LabelPage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-obsidian text-chrome">
+      {/* the film loop runs full-bleed under everything, graded to obsidian */}
+      <LabelVideoBackdrop />
       {/* a single blood ember behind the crest — the only light in the room */}
       <div
         aria-hidden

@@ -21,7 +21,7 @@ const MIME = {
   ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
   ".svg": "image/svg+xml", ".json": "application/json", ".txt": "text/plain",
   ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon", ".png": "image/png",
-  ".jpg": "image/jpeg", ".webp": "image/webp", ".mp3": "audio/mpeg",
+  ".jpg": "image/jpeg", ".webp": "image/webp", ".mp3": "audio/mpeg", ".mp4": "video/mp4", ".webm": "video/webm",
   ".hdr": "application/octet-stream", ".glb": "model/gltf-binary",
 };
 
@@ -101,7 +101,7 @@ function collectErrors(page, bucket) {
     // Media elements cut the transfer once they have what they need
     // (preload="metadata"), which surfaces as an abort — not a failure.
     // Anything else on the audio file (404, bad type) still counts.
-    if (/\.mp3$/.test(url) && reason.includes("ERR_ABORTED")) return;
+    if (/\.(mp3|mp4|webm)$/.test(url) && reason.includes("ERR_ABORTED")) return;
     // next/link prefetches route documents and the router routinely cancels
     // them. Only extensionless same-origin paths are exempt — assets still
     // count, and the explicit navigation checks prove routing really works.
@@ -156,6 +156,15 @@ async function main() {
     [...document.querySelectorAll("a")].some((a) => /simon-auguste/.test(a.getAttribute("href") || "")),
   );
   check("label: links through to the artist site", toArtist);
+
+  // Background film loop: present, muted, and actually advancing.
+  await labelPage.waitForTimeout(2500);
+  const film = await labelPage.evaluate(() => {
+    const v = document.querySelector("video");
+    if (!v) return { present: false };
+    return { present: true, muted: v.muted, playing: !v.paused && v.currentTime > 0.2 };
+  });
+  check("label: film loop playing muted", film.present && film.muted && film.playing, JSON.stringify(film));
   await labelPage.screenshot({ path: path.join(SHOT_DIR, "label-landing.png"), fullPage: true });
 
   // The tab must actually land on the journey page.
