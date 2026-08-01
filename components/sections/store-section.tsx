@@ -96,9 +96,18 @@ function ProductCard({ product }: { product: Product }) {
         </>
       ) : null}
 
-      <div className="flex h-32 items-center justify-center drop-shadow-[0_0_18px_rgba(34,211,238,.35)]">
-        <MerchSilhouette kind={product.kind} uid={product.id} />
-      </div>
+      {product.image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={product.image}
+          alt={product.name}
+          className="h-40 w-40 rounded-lg border border-white/10 object-cover"
+        />
+      ) : (
+        <div className="flex h-32 items-center justify-center drop-shadow-[0_0_18px_rgba(34,211,238,.35)]">
+          <MerchSilhouette kind={product.kind} uid={product.id} />
+        </div>
+      )}
 
       <h3 className="mt-4 font-bold uppercase tracking-wide text-foreground">
         {product.name}
@@ -107,13 +116,19 @@ function ProductCard({ product }: { product: Product }) {
         ${product.price}
       </p>
 
-      <a href="#contact" className="mt-5 inline-block">
+      {/* live commerce when the Shopify link exists; coming-soon otherwise */}
+      <a
+        href={product.shopifyUrl ?? "#contact"}
+        target={product.shopifyUrl ? "_blank" : undefined}
+        rel={product.shopifyUrl ? "noreferrer" : undefined}
+        className="mt-5 inline-block"
+      >
         <ShimmerButton
           shimmerColor="#ebeef1"
           background="linear-gradient(180deg, rgba(180,28,37,.30), rgba(180,28,37,.14))"
           className="border border-blood px-6 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-[#ebeef1] hover:border-oxblood"
         >
-          NOTIFY ME
+          {product.shopifyUrl ? "BUY NOW" : "NOTIFY ME"}
         </ShimmerButton>
       </a>
     </article>

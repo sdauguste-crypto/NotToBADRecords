@@ -47,6 +47,13 @@ export type Product = {
   kind: "tee" | "hoodie" | "vinyl" | "cap" | "poster";
   price: number;
   featured?: boolean;
+  /** Real product photo under public/store (falls back to the silhouette). */
+  image?: string;
+  /**
+   * Shopify product/checkout URL. When set, the card renders a live BUY
+   * button; while absent the card stays in coming-soon NOTIFY ME mode.
+   */
+  shopifyUrl?: string;
 };
 
 export type Show = {
