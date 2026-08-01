@@ -195,8 +195,8 @@ export const socials: Social[] = [
   },
   {
     platform: "x",
-    handle: "@MrAugusteMusic",
-    url: "https://x.com/MrAugusteMusic",
+    handle: "@simondaveaugust",
+    url: "https://x.com/simondaveaugust",
     followers: "318",
   },
   {
