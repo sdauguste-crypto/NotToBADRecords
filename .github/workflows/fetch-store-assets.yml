@@ -7,6 +7,9 @@ name: Fetch store assets
 
 on:
   workflow_dispatch:
+  push:
+    branches: ["claude/**"]
+    paths: ["scripts/store-assets.json"]
 
 permissions:
   contents: write
