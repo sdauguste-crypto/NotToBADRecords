@@ -8,11 +8,12 @@ import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
-export type LabelTab = "label" | "artist";
+export type LabelTab = "label" | "artist" | "store";
 
 const TABS: { key: LabelTab; label: string; href: string }[] = [
   { key: "label", label: "NOT TO B.A.D RECORDS", href: "/" },
   { key: "artist", label: "SIMON AUGUSTE", href: "/simon-auguste/" },
+  { key: "store", label: "STORE", href: "/store/" },
 ];
 
 export function LabelTabs({

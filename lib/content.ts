@@ -49,6 +49,20 @@ export type Product = {
   featured?: boolean;
 };
 
+export type StoreProduct = {
+  id: string;
+  name: string;
+  /** Tier from the Brand Merchandise & Apparel Strategy doc. */
+  tier: "streetwear" | "elevated" | "print";
+  category: string;
+  price: number;
+  /** One-line aesthetic note shown on the card. */
+  note: string;
+  /** Product mockup under public/store. */
+  image: string;
+  featured?: boolean;
+};
+
 export type Show = {
   id: string;
   date: string;
@@ -159,6 +173,87 @@ export const products: Product[] = [
   { id: "prod-sunset-cap", name: "Sunset Cap", kind: "cap", price: 28 },
   { id: "prod-mission-poster", name: "Mission Poster", kind: "poster", price: 18 },
   { id: "prod-cassette-bundle", name: "Cassette Bundle", kind: "vinyl", price: 22 },
+];
+
+// The label storefront line-up, straight from the Brand Merchandise &
+// Apparel Strategy doc: an affordable streetwear drop for the fans and an
+// elevated, sustainably sourced line above it. Everything ships waitlist-
+// first while sourcing is finalized.
+export const storeProducts: StoreProduct[] = [
+  {
+    id: "doberman-tee",
+    name: "Doberman Graphic Tee",
+    tier: "streetwear",
+    category: "Streetwear",
+    price: 38,
+    note: "Minimal red mark up front. Full psychedelic print on the reverse.",
+    image: "/store/doberman-tee.webp",
+  },
+  {
+    id: "psychedelic-hoodie",
+    name: "Psychedelic Heavyweight Hoodie",
+    tier: "streetwear",
+    category: "Streetwear",
+    price: 58,
+    note: "Fever-dream comic art. The Silver Surfer chasing the wave.",
+    image: "/store/psychedelic-hoodie.webp",
+    featured: true,
+  },
+  {
+    id: "cyber-windbreaker",
+    name: "Cyber-Grunge Windbreaker",
+    tier: "streetwear",
+    category: "Outerwear",
+    price: 60,
+    note: "Oversized nylon shell. Neon white and red against a black base.",
+    image: "/store/cyber-windbreaker.webp",
+  },
+  {
+    id: "timeless-jeans",
+    name: "Timeless Fit Jeans",
+    tier: "streetwear",
+    category: "Bottoms",
+    price: 54,
+    note: "Classic cut denim with a Doberman stitched into the coin pocket.",
+    image: "/store/timeless-jeans.webp",
+  },
+  {
+    id: "surfer-jacket",
+    name: "The Surfer Jean Jacket",
+    tier: "elevated",
+    category: "Outerwear",
+    price: 148,
+    note: "Distressed denim, 80s patches, a full Doberman across the back.",
+    image: "/store/surfer-jacket.webp",
+    featured: true,
+  },
+  {
+    id: "catwoman-vest",
+    name: "Catwoman Leather Vest",
+    tier: "elevated",
+    category: "Elevated Wear",
+    price: 180,
+    note: "A sleek teaser silhouette in sustainable faux leather.",
+    image: "/store/catwoman-vest.webp",
+  },
+  {
+    id: "retro-blazer",
+    name: "Retro-Futurist Blazer",
+    tier: "elevated",
+    category: "Elevated Wear",
+    price: 220,
+    note: "Clean black tailoring lined in high-contrast blood red.",
+    image: "/store/retro-blazer.webp",
+  },
+  {
+    id: "comic-lookbook",
+    name: "Comic-Style Lookbook",
+    tier: "print",
+    category: "Print",
+    price: 24,
+    note: "Seasonal fashion bound into the narrative skits, issue by issue.",
+    image: "/store/comic-lookbook.webp",
+  },
 ];
 
 export const shows: Show[] = [

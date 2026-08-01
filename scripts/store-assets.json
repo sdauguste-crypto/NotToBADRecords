@@ -1,0 +1,50 @@
+{
+  "comment": "Generated product mockups for the /store page. The fetch-store-assets workflow downloads each URL on a GitHub runner, converts it to webp at the given width, and commits it to public/store/.",
+  "assets": [
+    {
+      "file": "surfer-jacket.webp",
+      "width": 896,
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HCUri6VesK7ClTxtOw8k5lPiYP/hf_20260801_025644_898db5d5-fea9-448f-94b6-dc4d159a38e6.png"
+    },
+    {
+      "file": "cyber-windbreaker.webp",
+      "width": 896,
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HCUri6VesK7ClTxtOw8k5lPiYP/hf_20260801_025646_11c2a70a-b752-4053-97a8-14d30c4cdca8.png"
+    },
+    {
+      "file": "psychedelic-hoodie.webp",
+      "width": 896,
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HCUri6VesK7ClTxtOw8k5lPiYP/hf_20260801_025648_a1136489-f9f4-4b71-94dd-f0fa81ca405f.png"
+    },
+    {
+      "file": "doberman-tee.webp",
+      "width": 896,
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HCUri6VesK7ClTxtOw8k5lPiYP/hf_20260801_025651_6f9a5167-f8e0-4575-8982-3f7eac63bcf2.png"
+    },
+    {
+      "file": "catwoman-vest.webp",
+      "width": 896,
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HCUri6VesK7ClTxtOw8k5lPiYP/hf_20260801_025652_020144d3-f59d-47e2-9d5f-0770df745370.png"
+    },
+    {
+      "file": "retro-blazer.webp",
+      "width": 896,
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HCUri6VesK7ClTxtOw8k5lPiYP/hf_20260801_025654_cf2a4707-36da-4a98-9cec-73758c9e0ae1.png"
+    },
+    {
+      "file": "timeless-jeans.webp",
+      "width": 896,
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HCUri6VesK7ClTxtOw8k5lPiYP/hf_20260801_025658_5ea0d3e5-63f5-42fb-8f2e-1299ef39086e.png"
+    },
+    {
+      "file": "comic-lookbook.webp",
+      "width": 896,
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HCUri6VesK7ClTxtOw8k5lPiYP/hf_20260801_025659_59c770ea-a306-40cd-a2ac-1fa963e040a5.png"
+    },
+    {
+      "file": "hero.webp",
+      "width": 1600,
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HCUri6VesK7ClTxtOw8k5lPiYP/hf_20260801_025926_3a72fb46-1f02-4304-aa9f-16531a106df9.png"
+    }
+  ]
+}
