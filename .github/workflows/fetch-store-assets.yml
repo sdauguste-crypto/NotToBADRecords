@@ -26,7 +26,7 @@ jobs:
 
       - name: Download and convert
         run: |
-          mkdir -p public/store
+          mkdir -p public/store assets-inbox/store-png
           jq -c '.assets[]' scripts/store-assets.json | while read -r row; do
             file=$(echo "$row" | jq -r .file)
             url=$(echo "$row" | jq -r .url)
@@ -34,14 +34,17 @@ jobs:
             echo "Fetching $file"
             curl -sSfL --retry 3 -o /tmp/src.png "$url"
             cwebp -quiet -q 82 -resize "$width" 0 /tmp/src.png -o "public/store/$file"
+            # keep the untouched full-resolution PNG original alongside the
+            # web-optimized copy, for print / Drive / future re-edits
+            cp /tmp/src.png "assets-inbox/store-png/${file%.webp}.png"
           done
-          ls -la public/store
+          ls -la public/store assets-inbox/store-png
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/store
+          git add public/store assets-inbox/store-png
           git diff --cached --quiet && echo "No changes" && exit 0
           git commit -m "Add generated store product imagery"
           git push

@@ -1,5 +1,5 @@
 {
-  "comment": "Generated product mockups for the /store page. Pushing a change to this file triggers the fetch-store-assets workflow, which downloads each URL on a GitHub runner, converts it to webp at the given width, and commits it to public/store/.",
+  "comment": "Generated product mockups for the /store page. Pushing a change to this file triggers the fetch-store-assets workflow, which downloads each URL on a GitHub runner, converts it to webp at the given width, and commits it to public/store/. Untouched PNG originals are kept under assets-inbox/store-png/.",
   "assets": [
     {
       "file": "surfer-jacket.webp",
