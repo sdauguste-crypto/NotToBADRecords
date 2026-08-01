@@ -80,7 +80,7 @@ function ProductCard({
           <h3 className="text-sm font-bold tracking-[0.14em] text-chrome sm:text-base">
             {product.name.toUpperCase()}
           </h3>
-          <p className="font-body shrink-0 text-sm font-medium tracking-[0.08em] text-blood">
+          <p className="font-body shrink-0 text-sm font-medium tracking-[0.08em] text-chrome">
             ${product.price}
           </p>
         </div>
@@ -175,8 +175,9 @@ export function Storefront() {
               key={product.id}
               delay={i * 0.07}
               className={
-                // alternate wide / narrow so the row never reads as a template
-                i % 3 === 0 ? "lg:col-span-7" : i % 3 === 1 ? "lg:col-span-5" : "lg:col-span-6"
+                // rows alternate 7+5 then 5+7 so the grid stays full but
+                // never reads as a template
+                i % 4 === 0 || i % 4 === 3 ? "lg:col-span-7" : "lg:col-span-5"
               }
             >
               <ProductCard product={product} priority={i < 2} />
@@ -209,7 +210,7 @@ export function Storefront() {
                 {elevated[0].note} Cut in small runs from sustainable
                 materials, sourced through fair-wage partners.
               </p>
-              <p className="font-body text-lg font-medium tracking-[0.08em] text-blood">
+              <p className="font-body text-lg font-medium tracking-[0.08em] text-chrome">
                 ${elevated[0].price}
               </p>
               <div>
@@ -249,7 +250,7 @@ export function Storefront() {
                   {lookbook.note} Each chapter of the music unlocks the next
                   set of pieces, so the clothes read like the records do.
                 </p>
-                <p className="font-body mt-5 text-lg font-medium tracking-[0.08em] text-blood">
+                <p className="font-body mt-5 text-lg font-medium tracking-[0.08em] text-chrome">
                   ${lookbook.price}
                 </p>
                 <div className="mt-6">
