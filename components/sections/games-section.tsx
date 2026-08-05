@@ -32,7 +32,7 @@ export function GamesSection() {
       hudLabel="// SECTION 04 — ARCADE"
       title="THE ARCADE"
       accent="gold"
-      subtitle="One credit, infinite road."
+      subtitle="One credit. Three circuits. No brakes required."
     >
       <motion.div
         initial={{ opacity: 0, y: reduced ? 0 : 36 }}
@@ -58,15 +58,15 @@ export function GamesSection() {
                 OVERDRIVE
               </h3>
               <p className="font-body max-w-md px-6 text-center text-xs leading-relaxed text-[#c9cbd3]/80">
-                The Silver Surfer Run. Outrun the night through three worlds —
-                NO LIGHTS, ROCKIN WITH MY, THE PRINCESS — and collect the
-                records on the way out.
+                Grand Prix of the Silver Surfer multiverse. Five cars, two
+                laps, three circuits — NO LIGHTS, ROCKIN WITH MY, THE
+                PRINCESS. Finish top three to unlock the next level.
               </p>
               <span className="btn-blood font-body mt-2 rounded-full px-10 py-4 text-xs font-bold tracking-[0.3em] transition-transform group-hover:scale-105">
                 ▸ START ENGINE
               </span>
               <p className="font-body text-[0.6rem] tracking-[0.25em] text-[#ebeef1]/40">
-                KEYBOARD ◀ ▶ ▲ ▼ · OR TAP LEFT / RIGHT
+                KEYBOARD ◀ ▶ ▼ · OR TAP TO STEER
               </p>
             </button>
           )}

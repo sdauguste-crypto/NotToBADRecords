@@ -222,19 +222,28 @@ async function main() {
   const startBtn = page.getByRole("button", { name: /START OVERDRIVE/i });
   check("arcade: START ENGINE present", (await startBtn.count()) > 0);
   await startBtn.first().click();
+  const select = await page
+    .waitForSelector("[data-overdrive] button", { timeout: 30000 })
+    .then(() => true)
+    .catch(() => false);
+  check("arcade: circuit select shows", select);
+  await page.click("[data-overdrive] button:not([disabled])");
   const booted = await page
     .waitForSelector("[data-overdrive] canvas", { timeout: 30000 })
     .then(() => true)
     .catch(() => false);
-  check("arcade: game canvas boots", booted);
-  await page.waitForTimeout(4500);
-  const readScore = () =>
-    page.evaluate(() => document.querySelector("[data-overdrive]")?.textContent?.match(/(\d{7})/)?.[1] ?? "0");
-  const s1 = await readScore();
+  check("arcade: race canvas boots", booted);
+  // The physics delta clamp makes the countdown run in slow motion under
+  // the software renderer, so assert progress (countdown digit or race
+  // clock advancing) rather than a wall-clock schedule.
+  await page.waitForTimeout(4000);
+  const snap = () =>
+    page.evaluate(() => document.querySelector("[data-overdrive]")?.textContent ?? "");
+  const t1 = await snap();
   await page.keyboard.press("ArrowLeft");
-  await page.waitForTimeout(2500);
-  const s2 = await readScore();
-  check("arcade: score ticking", Number(s2) > Number(s1), `${s1} -> ${s2}`);
+  await page.waitForTimeout(12000);
+  const t2 = await snap();
+  check("arcade: race loop advancing", t1 !== t2, `${t1.slice(0, 40)} -> ${t2.slice(0, 40)}`);
   await page.screenshot({ path: path.join(SHOT_DIR, "overdrive-live.png") });
 
   check("desktop: zero unexpected errors", errors.length === 0, errors.slice(0, 5).join(" | "));
