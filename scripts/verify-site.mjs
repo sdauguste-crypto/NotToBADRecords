@@ -237,13 +237,22 @@ async function main() {
   // the software renderer, so assert progress (countdown digit or race
   // clock advancing) rather than a wall-clock schedule.
   await page.waitForTimeout(4000);
-  const snap = () =>
-    page.evaluate(() => document.querySelector("[data-overdrive]")?.textContent ?? "");
-  const t1 = await snap();
+  const t1 = await page.evaluate(
+    () => document.querySelector("[data-overdrive]")?.textContent ?? "",
+  );
   await page.keyboard.press("ArrowLeft");
-  await page.waitForTimeout(12000);
-  const t2 = await snap();
-  check("arcade: race loop advancing", t1 !== t2, `${t1.slice(0, 40)} -> ${t2.slice(0, 40)}`);
+  // Under swiftshader the sim runs in slow motion (delta clamp), so a fixed
+  // window is unreliable — wait for the HUD to change, however long a tick
+  // takes, bounded at 90s.
+  const changed = await page
+    .waitForFunction(
+      (prev) => (document.querySelector("[data-overdrive]")?.textContent ?? "") !== prev,
+      t1,
+      { timeout: 90000, polling: 1000 },
+    )
+    .then(() => true)
+    .catch(() => false);
+  check("arcade: race loop advancing", changed, changed ? "HUD ticked" : "no HUD change in 90s");
   await page.screenshot({ path: path.join(SHOT_DIR, "overdrive-live.png") });
 
   check("desktop: zero unexpected errors", errors.length === 0, errors.slice(0, 5).join(" | "));
