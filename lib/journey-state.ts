@@ -10,6 +10,7 @@ export const SECTION_IDS = [
   "music",
   "videos",
   "gallery",
+  "games",
   "store",
   "events",
   "about",
@@ -22,8 +23,8 @@ export type JourneyState = {
   /** 0..1 overall document scroll (coarse fallback signal) */
   progress: number;
   /**
-   * Continuous 0..7 keyed to the measured offsetTop of the 8 sections:
-   * 0 = top of #hero, 1 = top of #music, ... 7 = top of #contact.
+   * Continuous 0..8 keyed to the measured offsetTop of the 9 sections:
+   * 0 = top of #hero, 1 = top of #music, ... 8 = top of #contact.
    * Piecewise-linear between section tops; robust to unequal heights.
    */
   sectionProgress: number;

@@ -10,6 +10,7 @@ const NAV_LINKS: { id: SectionId; label: string }[] = [
   { id: "music", label: "MUSIC" },
   { id: "videos", label: "VIDEOS" },
   { id: "gallery", label: "GALLERY" },
+  { id: "games", label: "GAMES" },
   { id: "store", label: "STORE" },
   { id: "events", label: "EVENTS" },
   { id: "about", label: "ABOUT" },

@@ -14,7 +14,7 @@ export function ContactSection() {
   return (
     <SectionShell
       id="contact"
-      hudLabel="// SECTION 07 — COMMS"
+      hudLabel="// SECTION 08 — COMMS"
       title="GROUND CONTROL"
       accent="pink"
     >

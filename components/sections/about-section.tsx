@@ -12,7 +12,7 @@ export function AboutSection() {
   return (
     <SectionShell
       id="about"
-      hudLabel="// SECTION 06 — ORIGIN"
+      hudLabel="// SECTION 07 — ORIGIN"
       title="THE STORY"
       accent="gold"
     >

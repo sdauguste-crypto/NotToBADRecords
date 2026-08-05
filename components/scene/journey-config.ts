@@ -74,7 +74,8 @@ export const FOG_FAR = 160;
 // ---------------------------------------------------------------------------
 export const BLEND_AB: readonly [number, number] = [1.25, 2.25]; // sunset -> city
 // finishes before the events section so the manifest reads against clean space
-export const BLEND_BC: readonly [number, number] = [4.0, 4.9]; // city -> space
+// (in sectionProgress units — store is now index 5, events 6, with games at 4)
+export const BLEND_BC: readonly [number, number] = [5.0, 5.9]; // city -> space
 
 export function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
@@ -82,8 +83,8 @@ export function smoothstep(edge0: number, edge1: number, x: number): number {
 }
 
 // ---------------------------------------------------------------------------
-// Camera keyframes — one per section index 0..7
-// (hero, music, videos, gallery, store, events, about, contact)
+// Camera keyframes — one per section index 0..8
+// (hero, music, videos, gallery, games, store, events, about, contact)
 // ---------------------------------------------------------------------------
 export type CameraKeyframe = {
   position: THREE.Vector3;
@@ -97,6 +98,8 @@ export const CAMERA_KEYFRAMES: readonly CameraKeyframe[] = [
   { position: v(1.5, 3, 6), lookAt: v(-2, 6, -110) }, // music
   { position: v(5, 4, -10), lookAt: v(-10, 8, -75) }, // videos
   { position: v(-4, 5, -22), lookAt: v(10, 10, -75) }, // gallery
+  // street-level swoop through the towers — the racing-game section
+  { position: v(4, 3.6, -26), lookAt: v(-8, 8, -78) }, // games
   { position: v(0, 7, -30), lookAt: v(0, 14, -80) }, // store
   // y stays above the cloud-sea plane (y=18) so it never slices the view edge-on
   { position: v(0, 23, -38), lookAt: v(0, 32, -120) }, // events

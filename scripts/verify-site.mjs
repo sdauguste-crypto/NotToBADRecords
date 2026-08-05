@@ -15,7 +15,7 @@ const ROOT = path.resolve(process.cwd(), "out");
 const BASE_PATH = "";
 const PORT = Number(process.env.PORT || 4173);
 const SHOT_DIR = process.env.SHOT_DIR || "./verify-shots";
-const SECTION_IDS = ["hero", "music", "videos", "gallery", "store", "events", "about", "contact"];
+const SECTION_IDS = ["hero", "music", "videos", "gallery", "games", "store", "events", "about", "contact"];
 
 const MIME = {
   ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
@@ -216,6 +216,27 @@ async function main() {
     check("journey stages visually distinct (screenshot divergence)", distinct,
       `hero=${heroBuf.length}B events=${eventsBuf.length}B`);
   }
+  // ---------- Arcade: boot OVERDRIVE and prove the run advances ----------
+  await page.evaluate(() => document.getElementById("games")?.scrollIntoView({ behavior: "instant" }));
+  await page.waitForTimeout(900);
+  const startBtn = page.getByRole("button", { name: /START OVERDRIVE/i });
+  check("arcade: START ENGINE present", (await startBtn.count()) > 0);
+  await startBtn.first().click();
+  const booted = await page
+    .waitForSelector("[data-overdrive] canvas", { timeout: 30000 })
+    .then(() => true)
+    .catch(() => false);
+  check("arcade: game canvas boots", booted);
+  await page.waitForTimeout(4500);
+  const readScore = () =>
+    page.evaluate(() => document.querySelector("[data-overdrive]")?.textContent?.match(/(\d{7})/)?.[1] ?? "0");
+  const s1 = await readScore();
+  await page.keyboard.press("ArrowLeft");
+  await page.waitForTimeout(2500);
+  const s2 = await readScore();
+  check("arcade: score ticking", Number(s2) > Number(s1), `${s1} -> ${s2}`);
+  await page.screenshot({ path: path.join(SHOT_DIR, "overdrive-live.png") });
+
   check("desktop: zero unexpected errors", errors.length === 0, errors.slice(0, 5).join(" | "));
   await page.close();
 

@@ -141,7 +141,7 @@ export function StoreSection() {
   return (
     <SectionShell
       id="store"
-      hudLabel="// SECTION 04 — SUPPLY"
+      hudLabel="// SECTION 05 — SUPPLY"
       title="THE CARGO BAY"
       accent="gold"
       subtitle="Hyperspace shipping soon."

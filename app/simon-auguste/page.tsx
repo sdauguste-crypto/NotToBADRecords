@@ -9,6 +9,7 @@ import { HeroSection } from "@/components/sections/hero-section";
 import { MusicSection } from "@/components/sections/music-section";
 import { VideosSection } from "@/components/sections/videos-section";
 import { GallerySection } from "@/components/sections/gallery-section";
+import { GamesSection } from "@/components/sections/games-section";
 import { StoreSection } from "@/components/sections/store-section";
 import { EventsSection } from "@/components/sections/events-section";
 import { AboutSection } from "@/components/sections/about-section";
@@ -32,6 +33,7 @@ export default function ArtistPage() {
         <MusicSection />
         <VideosSection />
         <GallerySection />
+        <GamesSection />
         <StoreSection />
         <EventsSection />
         <AboutSection />
