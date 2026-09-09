@@ -23,11 +23,13 @@ function GalleryTile({ item }: { item: GalleryItem }) {
       ) : (
         <CoverArt seed={item.seed} title={item.title} className="aspect-[3/4] w-full" />
       )}
-      <figcaption className="absolute inset-x-0 bottom-0 flex items-end rounded-b-xl bg-gradient-to-t from-void-deep/95 via-void-deep/50 to-transparent px-4 pb-3 pt-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <span className="text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold">
-          {item.caption}
-        </span>
-      </figcaption>
+      {item.caption ? (
+        <figcaption className="absolute inset-x-0 bottom-0 flex items-end rounded-b-xl bg-gradient-to-t from-void-deep/95 via-void-deep/50 to-transparent px-4 pb-3 pt-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <span className="text-xs font-bold uppercase tracking-[0.2em] text-sunset-gold">
+            {item.caption}
+          </span>
+        </figcaption>
+      ) : null}
     </figure>
   );
 }

@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { products, type Product } from "@/lib/content";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { Button } from "@/components/ui/button";
 import { SectionShell } from "@/components/sections/section-shell";
 import { useReducedMotion } from "@/components/sections/use-reduced-motion";
 
@@ -135,8 +136,76 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
+// Shown while the catalog is empty: no invented pieces, no invented prices —
+// the first run is announced to the list before it is sold anywhere.
+function DropTeaser({ reduced }: { reduced: boolean }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: reduced ? 0 : 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+      className="glass-panel hud-corners relative overflow-hidden px-8 py-16 text-center md:py-24"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.14]"
+        style={{
+          backgroundImage: "url('/textures/diamond-plate.webp')",
+          backgroundSize: "340px auto",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-[100px]"
+        style={{ background: "radial-gradient(circle, #b41c25 0%, transparent 70%)" }}
+      />
+      <BorderBeam size={90} duration={10} colorFrom="#b41c25" colorTo="#ebeef1" />
+
+      <div className="relative">
+        <span className="mb-6 inline-flex items-center gap-3 rounded-full border border-blood/50 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-blood">
+          <span className="h-2 w-2 rounded-full bg-blood animate-led-pulse motion-reduce:animate-none" />
+          IN PRODUCTION
+        </span>
+        <p className="font-display text-neon-pink font-black uppercase text-5xl md:text-7xl">
+          DROP 001
+        </p>
+        <p className="mt-4 text-xs uppercase tracking-[0.35em] text-foreground/60">
+          The first Not To B.A.D run
+        </p>
+        <p className="mx-auto mt-6 max-w-md text-sm text-foreground/70">
+          Being cut now. Space Cadets see it first — the pieces, the sizes,
+          and the date reach the list before they reach anyone else.
+        </p>
+        <a href="#contact" className="mt-8 inline-block">
+          <Button
+            variant="ghost"
+            className="btn-blood rounded-full px-8 text-xs font-bold uppercase tracking-[0.2em]"
+          >
+            GET FIRST ACCESS
+          </Button>
+        </a>
+      </div>
+    </motion.div>
+  );
+}
+
 export function StoreSection() {
   const reduced = useReducedMotion();
+
+  if (products.length === 0) {
+    return (
+      <SectionShell
+        id="store"
+        hudLabel="// SECTION 05 — SUPPLY"
+        title="THE CARGO BAY"
+        accent="gold"
+        subtitle="First run in production."
+      >
+        <DropTeaser reduced={reduced} />
+      </SectionShell>
+    );
+  }
 
   return (
     <SectionShell

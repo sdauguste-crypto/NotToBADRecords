@@ -22,7 +22,7 @@ const MIME = {
   ".svg": "image/svg+xml", ".json": "application/json", ".txt": "text/plain",
   ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon", ".png": "image/png",
   ".jpg": "image/jpeg", ".webp": "image/webp", ".mp3": "audio/mpeg", ".mp4": "video/mp4", ".webm": "video/webm",
-  ".hdr": "application/octet-stream", ".glb": "model/gltf-binary",
+  ".hdr": "application/octet-stream", ".glb": "model/gltf-binary", ".xml": "application/xml",
 };
 
 // Third-party embed domains are expected to be unreachable in the sandbox.
@@ -195,7 +195,29 @@ async function main() {
     const tops = ids.map((id) => document.getElementById(id)?.offsetTop ?? -1);
     return { tops, ascending: tops.every((t, i) => t >= 0 && (i === 0 || t > tops[i - 1])) };
   }, SECTION_IDS);
-  check("8 sections present in ascending order", order.ascending, JSON.stringify(order.tops));
+  check("9 sections present in ascending order", order.ascending, JSON.stringify(order.tops));
+
+  // ---------- Honest content: nothing invented is on the page ----------
+  const content = await page.evaluate(() => {
+    const text = document.body.innerText;
+    const ld = [...document.querySelectorAll('script[type="application/ld+json"]')]
+      .map((s) => { try { return JSON.parse(s.textContent); } catch { return null; } });
+    const graph = ld[0]?.["@graph"] ?? [];
+    return {
+      noArchivePlaceholders: !/\/\/ ARCHIVE \d/.test(text),
+      noFakeCoords: !/LAT \d/.test(text) && !/NOMINAL/.test(text),
+      dropTeaser: /DROP 001/.test(text) && !/\$\d/.test(text),
+      // innerText carries the CSS uppercase transform
+      delancey: /the delancey/i.test(text),
+      spotifyStat: !/\n—\n/.test(text),
+      ldTypes: graph.map((n) => n?.["@type"]),
+    };
+  });
+  check("content: no placeholder captions or fake HUD coords", content.noArchivePlaceholders && content.noFakeCoords);
+  check("content: store shows the DROP 001 teaser, no invented prices", content.dropTeaser);
+  check("content: Sept 19 Delancey date listed", content.delancey);
+  check("seo: JSON-LD graph carries the label and the MusicGroup",
+    content.ldTypes.includes("Organization") && content.ldTypes.includes("MusicGroup"), JSON.stringify(content.ldTypes));
 
   const canvasCount = await page.evaluate(() => document.querySelectorAll("canvas").length);
   check("WebGL canvas present", ready !== "true" || canvasCount >= 1);
@@ -257,6 +279,53 @@ async function main() {
 
   check("desktop: zero unexpected errors", errors.length === 0, errors.slice(0, 5).join(" | "));
   await page.close();
+
+  // ---------- Secondary pages: /listen/ and /press/ ----------
+  console.log("== Listen + Press ==");
+  const secErrors = [];
+  const secPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  collectErrors(secPage, secErrors);
+  await secPage.goto(`http://localhost:${PORT}${BASE_PATH}/listen/`, { waitUntil: "networkidle", timeout: 45000 });
+  const listen = await secPage.evaluate(() => ({
+    h1: document.querySelector("h1")?.textContent?.trim() ?? "",
+    spotify: [...document.querySelectorAll("a[href*='open.spotify.com']")].length,
+    apple: [...document.querySelectorAll("a[href*='music.apple.com']")].length,
+    list: [...document.querySelectorAll("a[href*='#contact']")].length,
+    cover: (() => { const i = document.querySelector("main img"); return !!i && i.complete && i.naturalWidth > 0; })(),
+    overflow: document.documentElement.scrollWidth,
+  }));
+  check("listen: smart link renders with Spotify + Apple + list capture",
+    listen.h1 === "SIMON AUGUSTE" && listen.spotify >= 1 && listen.apple >= 1 && listen.list >= 1 && listen.cover,
+    JSON.stringify(listen));
+  check("listen: no horizontal overflow on mobile", listen.overflow <= 390 + 1, `scrollWidth=${listen.overflow}`);
+  await secPage.screenshot({ path: path.join(SHOT_DIR, "listen.png"), fullPage: true });
+
+  await secPage.setViewportSize({ width: 1440, height: 900 });
+  await secPage.goto(`http://localhost:${PORT}${BASE_PATH}/press/`, { waitUntil: "networkidle", timeout: 45000 });
+  const press = await secPage.evaluate(() => {
+    const text = document.body.innerText;
+    const bio = [...document.querySelectorAll("h2")].find((h) => h.textContent.trim() === "BIO")?.nextElementSibling?.textContent ?? "";
+    return {
+      booking: [...document.querySelectorAll("a[href^='mailto:motivationmusicmgmt']")].length,
+      photos: [...document.querySelectorAll("main img")].filter((i) => i.complete && i.naturalWidth > 0).length,
+      bioWords: bio.trim().split(/\s+/).length,
+      noNumbers: !/monthly listeners|followers/i.test(text),
+      ld: !!document.querySelector('script[type="application/ld+json"]'),
+    };
+  });
+  check("press: booking email, photos, JSON-LD present",
+    press.booking >= 2 && press.photos >= 4 && press.ld, JSON.stringify(press));
+  check("press: bio within 150 words, no audience numbers", press.bioWords > 60 && press.bioWords <= 150 && press.noNumbers, `words=${press.bioWords}`);
+  await secPage.screenshot({ path: path.join(SHOT_DIR, "press.png"), fullPage: true });
+
+  const sitemapOk = await secPage.evaluate(async (base) => {
+    const r = await fetch(`${base}/sitemap.xml`);
+    const body = await r.text();
+    return r.ok && /\/listen\//.test(body) && /\/press\//.test(body) && /\/simon-auguste\//.test(body);
+  }, `http://localhost:${PORT}${BASE_PATH}`);
+  check("seo: sitemap.xml lists every page", sitemapOk);
+  check("secondary pages: zero unexpected errors", secErrors.length === 0, secErrors.slice(0, 5).join(" | "));
+  await secPage.close();
 
   // ---------- Reduced motion ----------
   console.log("== Reduced motion ==");

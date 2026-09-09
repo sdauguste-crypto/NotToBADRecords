@@ -151,9 +151,6 @@ export function SocialConsole() {
           to { transform: scaleY(0.35); }
         }
       `}</style>
-      <p className="mt-3 text-right text-[10px] uppercase tracking-[0.3em] text-foreground/40">
-        SIGNAL STRENGTH — NOMINAL
-      </p>
     </div>
   );
 }

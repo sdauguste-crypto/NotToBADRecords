@@ -36,7 +36,8 @@ export type GalleryItem = {
   id: string;
   title: string;
   seed: number;
-  caption: string;
+  /** Where/when the shot was taken. Omitted until the real captions land. */
+  caption?: string;
   /** Real photo under public/gallery (falls back to procedural art). */
   image?: string;
 };
@@ -58,10 +59,15 @@ export type Product = {
 
 export type Show = {
   id: string;
+  /** Display date, "MON DD YYYY" — the schedule splits it on spaces. */
   date: string;
+  /** ISO date for structured data. */
+  isoDate: string;
   venue: string;
   city: string;
   status: "on-sale" | "sold-out" | "announced";
+  /** Ticket link. While absent the card routes to the list signup instead. */
+  ticketUrl?: string;
 };
 
 export type GuestbookEntry = {
@@ -146,30 +152,25 @@ export const galleryItems: GalleryItem[] = Array.from({ length: 14 }, (_, i) => 
   const n = String(i + 1).padStart(2, "0");
   return {
     id: `gal-${n}`,
-    title: `Archive ${n}`,
+    title: `Simon Auguste — photo ${n}`,
     seed: 3 + i * 13,
-    caption: `// ARCHIVE ${n}`,
     image: `/gallery/photo-${n}.webp`,
   };
 });
 
-export const products: Product[] = [
-  {
-    id: "prod-princess-vinyl",
-    name: "The Princess — Limited Vinyl",
-    kind: "vinyl",
-    price: 34,
-    featured: true,
-  },
-  { id: "prod-monogram-tee", name: "NTB Monogram Tee", kind: "tee", price: 45 },
-  { id: "prod-crest-hoodie", name: "Label Crest Hoodie", kind: "hoodie", price: 85 },
-  { id: "prod-sunset-cap", name: "Sunset Cap", kind: "cap", price: 28 },
-  { id: "prod-mission-poster", name: "Mission Poster", kind: "poster", price: 18 },
-  { id: "prod-cassette-bundle", name: "Cassette Bundle", kind: "vinyl", price: 22 },
-];
+// Empty until Shopify carries real stock. While empty the Cargo Bay shows
+// the DROP 001 teaser and routes interest to the list instead of a cart.
+export const products: Product[] = [];
 
 export const shows: Show[] = [
-  // No active missions — new dates soon.
+  {
+    id: "show-delancey-2026-09-19",
+    date: "SEP 19 2026",
+    isoDate: "2026-09-19",
+    venue: "The Delancey",
+    city: "New York, NY",
+    status: "announced",
+  },
 ];
 
 // Intentionally empty — the wall shows only genuine visitor messages.
@@ -198,7 +199,9 @@ export const socials: Social[] = [
     platform: "spotify",
     handle: "Simon Auguste",
     url: "https://open.spotify.com/artist/1zAgIkurm4hqFL1hf1lg8q",
-    followers: "—",
+    // Listener counts stay off the site until they are worth printing —
+    // the stat column reads as a status, like Apple Music below.
+    followers: "NOW STREAMING",
   },
   {
     platform: "x",

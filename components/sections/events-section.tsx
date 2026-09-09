@@ -172,13 +172,20 @@ export function EventsSection() {
 
                   <div className="flex shrink-0 flex-wrap items-center gap-3">
                     <StatusChip status={show.status} />
-                    <Button
-                      variant="ghost"
-                      disabled={soldOut}
-                      className="btn-blood rounded-full px-6 text-xs font-bold uppercase tracking-[0.2em]"
+                    {/* no ticket link yet → the ask is the list, not a sale */}
+                    <a
+                      href={show.ticketUrl ?? "#contact"}
+                      target={show.ticketUrl ? "_blank" : undefined}
+                      rel={show.ticketUrl ? "noreferrer" : undefined}
                     >
-                      TICKETS
-                    </Button>
+                      <Button
+                        variant="ghost"
+                        disabled={soldOut}
+                        className="btn-blood rounded-full px-6 text-xs font-bold uppercase tracking-[0.2em]"
+                      >
+                        {show.ticketUrl ? "TICKETS" : "GET ON THE LIST"}
+                      </Button>
+                    </a>
                   </div>
                 </div>
               </motion.li>

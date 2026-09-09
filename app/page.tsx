@@ -111,7 +111,14 @@ export default function LabelPage() {
 
       <footer className="relative z-10 flex flex-col items-center gap-4 border-t border-white/10 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
         <p className="font-body text-[0.6rem] tracking-[0.3em] text-steel">
-          SIMON DAVE AUGUSTE ·{" "}
+          <Link href="/listen/" className="transition-colors hover:text-blood">
+            LISTEN
+          </Link>{" "}
+          ·{" "}
+          <Link href="/press/" className="transition-colors hover:text-blood">
+            PRESS KIT
+          </Link>{" "}
+          ·{" "}
           <a
             href={`mailto:${contactEmail}`}
             className="transition-colors hover:text-blood"

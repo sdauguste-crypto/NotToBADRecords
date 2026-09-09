@@ -1,4 +1,7 @@
+import Link from "next/link";
 import { Music2 } from "lucide-react";
+
+import { socials, type Social } from "@/lib/content";
 
 function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -50,11 +53,21 @@ function TiktokIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-const SOCIALS = [
-  { label: "Instagram", Icon: InstagramIcon },
-  { label: "YouTube", Icon: YoutubeIcon },
-  { label: "Music", Icon: Music2 },
-  { label: "TikTok", Icon: TiktokIcon },
+const SOCIAL_ICONS: {
+  platform: Social["platform"];
+  label: string;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}[] = [
+  { platform: "instagram", label: "Instagram", Icon: InstagramIcon },
+  { platform: "youtube", label: "YouTube", Icon: YoutubeIcon },
+  { platform: "spotify", label: "Spotify", Icon: Music2 },
+  { platform: "tiktok", label: "TikTok", Icon: TiktokIcon },
+];
+
+const PAGES = [
+  { href: "/listen/", label: "LISTEN" },
+  { href: "/press/", label: "PRESS KIT" },
+  { href: "/", label: "THE LABEL" },
 ];
 
 export function SiteFooter() {
@@ -70,17 +83,37 @@ export function SiteFooter() {
             </span>
           </span>
           <div className="flex items-center gap-5">
-            {SOCIALS.map(({ label, Icon }) => (
-              <a
-                key={label}
-                href="#about"
-                aria-label={label}
-                className="text-foreground/60 transition hover:text-blood"
-              >
-                <Icon className="size-5" />
-              </a>
-            ))}
+            {SOCIAL_ICONS.map(({ platform, label, Icon }) => {
+              const social = socials.find((s) => s.platform === platform);
+              if (!social) return null;
+              return (
+                <a
+                  key={platform}
+                  href={social.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  className="text-foreground/60 transition hover:text-blood"
+                >
+                  <Icon className="size-5" />
+                </a>
+              );
+            })}
           </div>
+          <nav
+            aria-label="Site pages"
+            className="flex flex-wrap items-center justify-center gap-5 md:justify-start"
+          >
+            {PAGES.map((page) => (
+              <Link
+                key={page.href}
+                href={page.href}
+                className="text-xs tracking-[0.25em] text-foreground/60 transition hover:text-blood"
+              >
+                {page.label}
+              </Link>
+            ))}
+          </nav>
           <p className="text-center text-xs text-foreground/50 md:text-left">
             &copy; 2026 Not To B.A.D Records &mdash; We Really Out Here.
           </p>
@@ -88,10 +121,10 @@ export function SiteFooter() {
 
         <div className="flex items-center gap-2 text-xs tracking-[0.25em] text-foreground/60">
           <span className="relative flex size-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-            <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blood opacity-60" />
+            <span className="relative inline-flex size-2 rounded-full bg-blood" />
           </span>
-          SYSTEMS NOMINAL
+          INDEPENDENT — MASTERS OWNED
         </div>
       </div>
     </footer>

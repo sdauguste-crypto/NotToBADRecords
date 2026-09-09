@@ -99,8 +99,8 @@ export function HeroSection() {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 px-6 pb-4">
         <div className="hud-corners mx-auto flex max-w-4xl items-center justify-center gap-4 px-6 py-2">
           <p className="truncate text-center text-xs tracking-[0.2em] text-foreground/50">
-            LAT 25.79°N — LON 80.13°W&ensp;//&ensp;FREQ 88.3&ensp;//&ensp;SOL
-            ELEVATION −4.2°
+            NEW YORK CITY&ensp;//&ensp;EST. 2015&ensp;//&ensp;INDEPENDENT —
+            MASTERS OWNED
           </p>
         </div>
       </div>

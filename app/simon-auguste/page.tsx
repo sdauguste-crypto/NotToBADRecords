@@ -14,6 +14,8 @@ import { StoreSection } from "@/components/sections/store-section";
 import { EventsSection } from "@/components/sections/events-section";
 import { AboutSection } from "@/components/sections/about-section";
 import { ContactSection } from "@/components/sections/contact-section";
+import { JsonLd } from "@/components/seo/json-ld";
+import { artistJsonLd } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
   title: "Simon Auguste — Not To B.A.D Records",
@@ -25,6 +27,7 @@ export const metadata: Metadata = {
 export default function ArtistPage() {
   return (
     <>
+      <JsonLd data={artistJsonLd()} />
       <JourneyBackground />
       <JourneyTracker />
       <SiteNav />
