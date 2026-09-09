@@ -206,7 +206,8 @@ async function main() {
     return {
       noArchivePlaceholders: !/\/\/ ARCHIVE \d/.test(text),
       noFakeCoords: !/LAT \d/.test(text) && !/NOMINAL/.test(text),
-      dropTeaser: /DROP 001/.test(text) && !/\$\d/.test(text),
+      // teaser must not claim a production status nobody has confirmed
+      dropTeaser: /DROP 001/.test(text) && !/\$\d/.test(text) && !/IN PRODUCTION|BEING CUT/i.test(text),
       // innerText carries the CSS uppercase transform
       delancey: /the delancey/i.test(text),
       spotifyStat: !/\n—\n/.test(text),
@@ -300,8 +301,11 @@ async function main() {
   check("listen: no horizontal overflow on mobile", listen.overflow <= 390 + 1, `scrollWidth=${listen.overflow}`);
   await secPage.screenshot({ path: path.join(SHOT_DIR, "listen.png"), fullPage: true });
 
-  await secPage.setViewportSize({ width: 1440, height: 900 });
+  // press kit at phone width first — the booking email must wrap, not scroll
   await secPage.goto(`http://localhost:${PORT}${BASE_PATH}/press/`, { waitUntil: "networkidle", timeout: 45000 });
+  const pressOverflow = await secPage.evaluate(() => document.documentElement.scrollWidth);
+  check("press: no horizontal overflow on mobile", pressOverflow <= 390 + 1, `scrollWidth=${pressOverflow}`);
+  await secPage.setViewportSize({ width: 1440, height: 900 });
   const press = await secPage.evaluate(() => {
     const text = document.body.innerText;
     const bio = [...document.querySelectorAll("h2")].find((h) => h.textContent.trim() === "BIO")?.nextElementSibling?.textContent ?? "";

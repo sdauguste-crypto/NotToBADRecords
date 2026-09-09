@@ -8,16 +8,30 @@ import { releases, shows, socials } from "@/lib/content";
 
 const latest = releases[0];
 
+const TITLE = "Listen — Simon Auguste";
+const DESCRIPTION =
+  "Simon Auguste on Spotify, Apple Music, and YouTube. Not To B.A.D Records.";
+const CARD_IMAGE = latest.coverImage ?? "/og-card.jpg";
+
+// Page-level openGraph/twitter replace the root's wholesale, so every field
+// a share card needs is restated here.
 export const metadata: Metadata = {
-  title: "Listen — Simon Auguste",
-  description:
-    "Simon Auguste on Spotify, Apple Music, and YouTube. Not To B.A.D Records.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/listen/" },
   openGraph: {
-    title: "Listen — Simon Auguste",
-    description: "Every way to listen, in one place.",
+    title: TITLE,
+    description: DESCRIPTION,
     url: "/listen/",
-    images: latest.coverImage ? [{ url: latest.coverImage }] : undefined,
+    siteName: "Not To B.A.D Records",
+    type: "website",
+    images: [{ url: CARD_IMAGE }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [CARD_IMAGE],
   },
 };
 

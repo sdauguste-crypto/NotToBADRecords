@@ -74,7 +74,7 @@ export function HeroSection() {
             variant="ghost"
             className="h-12 rounded-full border border-blood/60 px-8 text-xs font-bold uppercase tracking-[0.2em] text-[#ebeef1] hover:border-oxblood hover:bg-blood/15 hover:text-[#ebeef1]"
           >
-            <a href="#store">LATEST DROP</a>
+            <a href="#store">DROP 001</a>
           </Button>
         </motion.div>
       </div>
@@ -96,7 +96,9 @@ export function HeroSection() {
         </motion.span>
       </motion.a>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 px-6 pb-4">
+      {/* phones: the strip would truncate and sit under the audio player —
+          the footer carries the same line there */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden px-6 pb-4 sm:block">
         <div className="hud-corners mx-auto flex max-w-4xl items-center justify-center gap-4 px-6 py-2">
           <p className="truncate text-center text-xs tracking-[0.2em] text-foreground/50">
             NEW YORK CITY&ensp;//&ensp;EST. 2015&ensp;//&ensp;INDEPENDENT —

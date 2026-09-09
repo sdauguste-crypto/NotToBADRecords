@@ -163,9 +163,8 @@ function DropTeaser({ reduced }: { reduced: boolean }) {
       <BorderBeam size={90} duration={10} colorFrom="#b41c25" colorTo="#ebeef1" />
 
       <div className="relative">
-        <span className="mb-6 inline-flex items-center gap-3 rounded-full border border-blood/50 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-blood">
-          <span className="h-2 w-2 rounded-full bg-blood animate-led-pulse motion-reduce:animate-none" />
-          IN PRODUCTION
+        <span className="mb-6 inline-flex items-center rounded-full border border-blood/50 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-blood">
+          SPACE CADETS FIRST
         </span>
         <p className="font-display text-neon-pink font-black uppercase text-5xl md:text-7xl">
           DROP 001
@@ -174,17 +173,16 @@ function DropTeaser({ reduced }: { reduced: boolean }) {
           The first Not To B.A.D run
         </p>
         <p className="mx-auto mt-6 max-w-md text-sm text-foreground/70">
-          Being cut now. Space Cadets see it first — the pieces, the sizes,
-          and the date reach the list before they reach anyone else.
+          Space Cadets hear about it first — the pieces, the sizes, and the
+          date reach the list before anyone else.
         </p>
-        <a href="#contact" className="mt-8 inline-block">
-          <Button
-            variant="ghost"
-            className="btn-blood rounded-full px-8 text-xs font-bold uppercase tracking-[0.2em]"
-          >
-            GET FIRST ACCESS
-          </Button>
-        </a>
+        <Button
+          asChild
+          variant="ghost"
+          className="btn-blood mt-8 rounded-full px-8 text-xs font-bold uppercase tracking-[0.2em]"
+        >
+          <a href="#contact">GET FIRST ACCESS</a>
+        </Button>
       </div>
     </motion.div>
   );
@@ -200,7 +198,7 @@ export function StoreSection() {
         hudLabel="// SECTION 05 — SUPPLY"
         title="THE CARGO BAY"
         accent="gold"
-        subtitle="First run in production."
+        subtitle="The list hears first."
       >
         <DropTeaser reduced={reduced} />
       </SectionShell>

@@ -3,22 +3,35 @@ import Link from "next/link";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { contactEmail, releases, shows, socials, videos } from "@/lib/content";
-import { artistJsonLd } from "@/lib/structured-data";
+import { artistJsonLd, titleCase } from "@/lib/structured-data";
 
 // The press kit is a label surface: Tier I only (obsidian, chrome, steel,
 // blood). Booking-first — a talent buyer should find the ask, the proof, and
 // the email without scrolling past a single decorative element.
 
+const TITLE = "Press Kit — Simon Auguste";
+const DESCRIPTION =
+  "Simon Auguste press kit: bio, photos, releases, live format, and booking contact. Not To B.A.D Records, New York.";
+
+// Page-level openGraph/twitter replace the root's wholesale, so every field
+// a share card needs is restated here.
 export const metadata: Metadata = {
-  title: "Press Kit — Simon Auguste",
-  description:
-    "Simon Auguste press kit: bio, photos, releases, live format, and booking contact. Not To B.A.D Records, New York.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/press/" },
   openGraph: {
-    title: "Press Kit — Simon Auguste",
-    description:
-      "Bio, photos, releases, live format, and booking contact for Simon Auguste.",
+    title: TITLE,
+    description: DESCRIPTION,
     url: "/press/",
+    siteName: "Not To B.A.D Records",
+    type: "website",
+    images: [{ url: "/og-card.jpg", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/og-card.jpg"],
   },
 };
 
@@ -46,12 +59,6 @@ function Heading({ children }: { children: React.ReactNode }) {
       {children}
     </h2>
   );
-}
-
-function titleCase(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/(^|\s|\()(\S)/g, (_, gap: string, ch: string) => gap + ch.toUpperCase());
 }
 
 export default function PressPage() {
@@ -101,10 +108,11 @@ export default function PressPage() {
                   loading={index === 0 ? "eager" : "lazy"}
                   className="aspect-[3/4] w-full border border-white/10 object-cover"
                 />
+                {/* always visible — touch screens have no hover */}
                 <a
                   href={src}
                   download
-                  className="font-body absolute inset-x-0 bottom-0 bg-obsidian/85 px-3 py-2 text-center text-[0.6rem] tracking-[0.3em] text-chrome opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                  className="font-body absolute inset-x-0 bottom-0 bg-obsidian/80 px-3 py-2 text-center text-[0.6rem] tracking-[0.3em] text-chrome/80 transition-colors hover:bg-blood hover:text-white focus:bg-blood focus:text-white"
                 >
                   DOWNLOAD
                 </a>
@@ -112,7 +120,7 @@ export default function PressPage() {
             ))}
           </ul>
           <p className="font-body mt-3 text-[0.6rem] tracking-[0.2em] text-steel/70">
-            Hover a frame to download. Additional formats on request.
+            Additional formats on request.
           </p>
         </section>
 
@@ -303,8 +311,11 @@ export default function PressPage() {
             href={`mailto:${contactEmail}?subject=Booking%20—%20Simon%20Auguste`}
             className="font-body mt-5 inline-flex items-center gap-3 border border-blood/60 bg-blood/10 px-6 py-4 text-xs tracking-[0.3em] text-chrome transition-colors hover:bg-blood hover:text-white"
           >
-            {contactEmail.toUpperCase()} →
+            EMAIL BOOKING →
           </a>
+          <p className="font-body mt-3 text-sm text-steel [overflow-wrap:anywhere]">
+            {contactEmail}
+          </p>
         </section>
       </main>
 

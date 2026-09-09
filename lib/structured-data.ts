@@ -8,11 +8,11 @@ export const SITE_URL = "https://www.nottobadrecords.com";
 const LABEL_ID = `${SITE_URL}/#label`;
 const ARTIST_ID = `${SITE_URL}/simon-auguste/#artist`;
 
-/** "THE PRINCESS" → "The Princess" for structured names. */
-function titleCase(text: string): string {
+/** "THE PRINCESS (OFFICIAL LYRIC VIDEO)" → "The Princess (Official Lyric Video)". */
+export function titleCase(text: string): string {
   return text
     .toLowerCase()
-    .replace(/(^|\s|\()(\S)/g, (_, gap: string, ch: string) => gap + ch.toUpperCase());
+    .replace(/(^|[\s(])([a-z])/g, (_, gap: string, ch: string) => gap + ch.toUpperCase());
 }
 
 export function artistJsonLd() {
@@ -36,7 +36,9 @@ export function artistJsonLd() {
         image: `${SITE_URL}/og-card.jpg`,
         genre: ["Hip-Hop", "R&B"],
         foundingLocation: { "@type": "Place", name: "New York, NY" },
-        recordLabel: { "@id": LABEL_ID },
+        // schema.org puts recordLabel on MusicRelease, not MusicGroup — the
+        // label is the parent organization here.
+        parentOrganization: { "@id": LABEL_ID },
         sameAs: socials.map((s) => s.url),
         track: releases.map((r) => ({
           "@type": "MusicRecording",
@@ -46,7 +48,8 @@ export function artistJsonLd() {
           image: r.coverImage ? `${SITE_URL}${r.coverImage}` : undefined,
           byArtist: { "@id": ARTIST_ID },
         })),
-        video: videos.map((v) => ({
+        // Thing.subjectOf → the videos are works about the artist
+        subjectOf: videos.map((v) => ({
           "@type": "VideoObject",
           name: titleCase(v.title),
           url: `https://www.youtube.com/watch?v=${v.youtubeId}`,
