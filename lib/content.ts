@@ -65,7 +65,8 @@ export type Show = {
   isoDate: string;
   venue: string;
   city: string;
-  status: "on-sale" | "sold-out" | "announced";
+  /** postponed: the original date stays in isoDate (schema.org convention) but the card shows no date */
+  status: "on-sale" | "sold-out" | "announced" | "postponed";
   /** Ticket link. While absent the card routes to the list signup instead. */
   ticketUrl?: string;
 };
@@ -169,7 +170,8 @@ export const shows: Show[] = [
     isoDate: "2026-09-19",
     venue: "The Delancey",
     city: "New York, NY",
-    status: "announced",
+    // postponed Sept 9 — new date not yet set
+    status: "postponed",
   },
 ];
 

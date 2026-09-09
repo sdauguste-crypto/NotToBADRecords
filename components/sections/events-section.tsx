@@ -31,6 +31,12 @@ const STATUS_CONFIG: Record<
     text: "text-amber-300",
     border: "border-amber-400/40",
   },
+  postponed: {
+    label: "POSTPONED",
+    dot: "bg-steel text-steel",
+    text: "text-steel",
+    border: "border-steel/40",
+  },
 };
 
 function StatusChip({ status }: { status: Show["status"] }) {
@@ -47,7 +53,7 @@ function StatusChip({ status }: { status: Show["status"] }) {
         className={cn(
           "h-2 w-2 rounded-full",
           config.dot,
-          status !== "sold-out" && "animate-led-pulse motion-reduce:animate-none",
+          status !== "sold-out" && status !== "postponed" && "animate-led-pulse motion-reduce:animate-none",
         )}
       />
       {config.label}
@@ -124,6 +130,7 @@ export function EventsSection() {
           {shows.map((show, index) => {
             const [month, day, year] = show.date.split(" ");
             const soldOut = show.status === "sold-out";
+            const postponed = show.status === "postponed";
 
             return (
               <motion.li
@@ -145,17 +152,28 @@ export function EventsSection() {
                 />
 
                 <div className="glass-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center md:p-6">
-                  <div className="w-24 shrink-0 text-center">
-                    <p className="font-bold leading-none text-4xl text-sunset-gold [text-shadow:0_0_18px_rgba(34,211,238,.5)]">
-                      {day}
-                    </p>
-                    <p className="mt-1 text-xs uppercase tracking-[0.25em] text-sunset-gold/70">
-                      {month} {year}
-                    </p>
-                  </div>
+                  {postponed ? (
+                    <div className="w-24 shrink-0 text-center">
+                      <p className="font-bold leading-none text-3xl text-steel">
+                        TBA
+                      </p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.25em] text-steel/70">
+                        NEW DATE
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="w-24 shrink-0 text-center">
+                      <p className="font-bold leading-none text-4xl text-sunset-gold [text-shadow:0_0_18px_rgba(34,211,238,.5)]">
+                        {day}
+                      </p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.25em] text-sunset-gold/70">
+                        {month} {year}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="min-w-0 flex-1">
-                    {index === 0 ? (
+                    {index === 0 && !postponed ? (
                       <p className="mb-1 text-xs font-bold uppercase tracking-[0.25em]">
                         <AnimatedGradientText colorFrom="#b41c25" colorTo="#ebeef1">
                           ▲ NEXT LAUNCH
@@ -167,6 +185,7 @@ export function EventsSection() {
                     </h3>
                     <p className="mt-1 text-xs tracking-[0.25em] text-foreground/60">
                       {show.city}
+                      {postponed ? " · The list hears the new date first" : null}
                     </p>
                   </div>
 

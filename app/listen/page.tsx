@@ -52,7 +52,8 @@ const FOLLOW = [
 ].filter((l): l is { label: string; href: string } => !!l.href);
 
 export default function ListenPage() {
-  const nextShow = shows[0];
+  // a link-in-bio only points at dates that exist
+  const nextShow = shows.find((s) => s.status !== "postponed");
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-obsidian text-chrome">

@@ -58,8 +58,12 @@ export function artistJsonLd() {
         event: shows.map((show) => ({
           "@type": "MusicEvent",
           name: `Simon Auguste live at ${show.venue}`,
+          // postponed keeps the original startDate until a new one exists
           startDate: show.isoDate,
-          eventStatus: "https://schema.org/EventScheduled",
+          eventStatus:
+            show.status === "postponed"
+              ? "https://schema.org/EventPostponed"
+              : "https://schema.org/EventScheduled",
           location: {
             "@type": "MusicVenue",
             name: show.venue,

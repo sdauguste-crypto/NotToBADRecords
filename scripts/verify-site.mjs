@@ -208,15 +208,16 @@ async function main() {
       noFakeCoords: !/LAT \d/.test(text) && !/NOMINAL/.test(text),
       // teaser must not claim a production status nobody has confirmed
       dropTeaser: /DROP 001/.test(text) && !/\$\d/.test(text) && !/IN PRODUCTION|BEING CUT/i.test(text),
-      // innerText carries the CSS uppercase transform
-      delancey: /the delancey/i.test(text),
+      // innerText carries the CSS uppercase transform; the Sept 19 date must
+      // not show anywhere while the show is postponed
+      delancey: /the delancey/i.test(text) && /postponed/i.test(text) && !/SEP 19/i.test(text),
       spotifyStat: !/\n—\n/.test(text),
       ldTypes: graph.map((n) => n?.["@type"]),
     };
   });
   check("content: no placeholder captions or fake HUD coords", content.noArchivePlaceholders && content.noFakeCoords);
   check("content: store shows the DROP 001 teaser, no invented prices", content.dropTeaser);
-  check("content: Sept 19 Delancey date listed", content.delancey);
+  check("content: Delancey listed as postponed, no stale date", content.delancey);
   check("seo: JSON-LD graph carries the label and the MusicGroup",
     content.ldTypes.includes("Organization") && content.ldTypes.includes("MusicGroup"), JSON.stringify(content.ldTypes));
 

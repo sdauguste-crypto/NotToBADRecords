@@ -176,7 +176,9 @@ export default function PressPage() {
               <p>
                 <span className="text-steel">Next date · </span>
                 {nextShow.venue}, {nextShow.city} —{" "}
-                {titleCase(nextShow.date)}
+                {nextShow.status === "postponed"
+                  ? "postponed, new date to be announced"
+                  : titleCase(nextShow.date)}
               </p>
             ) : null}
             <p>
