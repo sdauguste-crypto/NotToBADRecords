@@ -152,8 +152,8 @@ async function main() {
   const brandOk = await labelPage.evaluate(async (base) => {
     const files = [
       "/label/lockup.webp", "/label/mark.webp", "/label/banner.webp",
-      "/label/seal.webp", "/logo-crest.webp", "/og-card.jpg",
-      "/icon.png", "/apple-icon.png",
+      "/label/seal.webp", "/label/mark-solid.webp", "/logo-crest.webp",
+      "/og-card.jpg", "/icon.png", "/apple-icon.png", "/favicon.ico",
     ];
     const results = await Promise.all(
       files.map(async (f) => [f, (await fetch(`${base}${f}`)).status]),
