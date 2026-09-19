@@ -83,7 +83,7 @@ export function SiteNav() {
           <img
             src="/logo-crest.webp"
             alt=""
-            className="h-9 w-auto drop-shadow-[0_0_10px_rgba(255,46,136,0.45)] md:h-10"
+            className="h-9 w-auto drop-shadow-[0_0_10px_rgba(180,28,37,0.5)] md:h-10"
           />
           <span className="font-display flex flex-col leading-tight">
             <span className="text-[0.55rem] tracking-[0.3em] text-foreground/45">

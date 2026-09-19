@@ -84,6 +84,15 @@ export default function PressPage() {
       </header>
 
       <main className="mx-auto w-full max-w-4xl px-6 pb-24 pt-14">
+        {/* the official banner is this document's letterhead */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/label/banner.webp"
+          alt="Not To B.A.D Records"
+          width={1400}
+          height={588}
+          className="mb-12 w-full max-w-xs"
+        />
         <p className="font-body text-[0.6rem] tracking-[0.4em] text-steel">
           PRESS KIT
         </p>
@@ -319,6 +328,17 @@ export default function PressPage() {
             {contactEmail}
           </p>
         </section>
+
+        {/* the kit is stamped with the house seal */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/label/seal.webp"
+          alt=""
+          width={700}
+          height={941}
+          loading="lazy"
+          className="mx-auto mt-20 w-56 opacity-90"
+        />
       </main>
 
       <footer className="flex flex-col items-center gap-4 border-t border-white/10 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">

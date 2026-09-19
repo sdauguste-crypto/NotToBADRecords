@@ -147,6 +147,21 @@ async function main() {
   });
   check("label: chrome lockup renders", lockupOk);
 
+  // Every brand file the 2026 pack generates must actually be served — a
+  // broken path here shows up as a missing logo, not an error.
+  const brandOk = await labelPage.evaluate(async (base) => {
+    const files = [
+      "/label/lockup.webp", "/label/mark.webp", "/label/banner.webp",
+      "/label/seal.webp", "/logo-crest.webp", "/og-card.jpg",
+      "/icon.png", "/apple-icon.png",
+    ];
+    const results = await Promise.all(
+      files.map(async (f) => [f, (await fetch(`${base}${f}`)).status]),
+    );
+    return results.filter(([, status]) => status !== 200);
+  }, `http://localhost:${PORT}${BASE_PATH}`);
+  check("brand: every 2026 logo asset is served", brandOk.length === 0, JSON.stringify(brandOk));
+
   const tabs = await labelPage.evaluate(() =>
     [...document.querySelectorAll("nav[aria-label='Label and artist'] a")].map((a) => a.textContent.trim()),
   );
@@ -307,12 +322,24 @@ async function main() {
   const pressOverflow = await secPage.evaluate(() => document.documentElement.scrollWidth);
   check("press: no horizontal overflow on mobile", pressOverflow <= 390 + 1, `scrollWidth=${pressOverflow}`);
   await secPage.setViewportSize({ width: 1440, height: 900 });
+  // the seal is lazy and sits under the fold — scroll so it decodes before we
+  // assert on it (and so it lands in the screenshot)
+  await secPage.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await secPage.waitForFunction(
+    () => [...document.querySelectorAll("main img")].every((i) => i.complete),
+    null,
+    { timeout: 15000 },
+  );
+  await secPage.evaluate(() => window.scrollTo(0, 0));
   const press = await secPage.evaluate(() => {
     const text = document.body.innerText;
     const bio = [...document.querySelectorAll("h2")].find((h) => h.textContent.trim() === "BIO")?.nextElementSibling?.textContent ?? "";
     return {
       booking: [...document.querySelectorAll("a[href^='mailto:motivationmusicmgmt']")].length,
       photos: [...document.querySelectorAll("main img")].filter((i) => i.complete && i.naturalWidth > 0).length,
+      // letterhead banner + house seal, both from the official pack
+      banner: (() => { const i = document.querySelector('img[src*="banner"]'); return !!i && i.complete && i.naturalWidth > 0; })(),
+      seal: (() => { const i = document.querySelector('img[src*="seal"]'); return !!i && i.complete && i.naturalWidth > 0; })(),
       bioWords: bio.trim().split(/\s+/).length,
       noNumbers: !/monthly listeners|followers/i.test(text),
       ld: !!document.querySelector('script[type="application/ld+json"]'),
@@ -320,6 +347,7 @@ async function main() {
   });
   check("press: booking email, photos, JSON-LD present",
     press.booking >= 2 && press.photos >= 4 && press.ld, JSON.stringify(press));
+  check("press: banner letterhead and house seal render", press.banner && press.seal, JSON.stringify(press));
   check("press: bio within 150 words, no audience numbers", press.bioWords > 60 && press.bioWords <= 150 && press.noNumbers, `words=${press.bioWords}`);
   await secPage.screenshot({ path: path.join(SHOT_DIR, "press.png"), fullPage: true });
 
