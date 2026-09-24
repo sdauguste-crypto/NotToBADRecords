@@ -122,8 +122,26 @@ function collectErrors(page, bucket) {
 // the sunset stage carries far more color entropy than near-black space, so
 // its PNG compresses much larger.
 
+/** Every text file in the export, so copy rules can be checked site-wide. */
+async function exportedText(dir = ROOT) {
+  const out = [];
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...(await exportedText(full)));
+    else if (/\.(html|js|json|txt|xml)$/.test(entry.name)) out.push([full, await readFile(full, "utf8")]);
+  }
+  return out;
+}
+
 async function main() {
   await mkdir(SHOT_DIR, { recursive: true });
+
+  // "Silver Surfer" is a Marvel property; the universe is Channel Surfer.
+  const surfer = (await exportedText())
+    .filter(([, text]) => /silver\s+surfer/i.test(text))
+    .map(([file]) => path.relative(ROOT, file));
+  check("copy: no Silver Surfer anywhere in the built site", surfer.length === 0, surfer.join(", "));
+
   const server = await serve();
   const browser = await chromium.launch({
     executablePath: findChromium(),
@@ -163,7 +181,7 @@ async function main() {
   const brandOk = await labelPage.evaluate(async (base) => {
     const files = [
       "/label/lockup.webp", "/label/mark.webp", "/label/banner.webp",
-      "/label/seal.webp", "/label/mark-solid.webp", "/logo-crest.webp",
+      "/label/seal.webp", "/logo-crest.webp",
       "/og-card.jpg", "/icon.png", "/apple-icon.png", "/favicon.ico",
     ];
     const results = await Promise.all(

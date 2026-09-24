@@ -36,7 +36,7 @@ export function AboutSection() {
           </p>
           <p className="text-sm text-foreground/80 md:text-base">
             His catalog lives inside{" "}
-            <em>The Adventures of Young Simon &amp; The Silver Surfer</em> — a
+            <em>The Adventures of Young Simon</em> — a
             cinematic multiverse where a child&apos;s unhinged innocence
             collides with cosmic self-discovery. Self-produced. Master-owned.
             Entirely self-funded. We really out here.

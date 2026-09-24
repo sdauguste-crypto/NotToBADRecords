@@ -148,8 +148,8 @@ export default function PressPage() {
               <p>
                 His catalog — &ldquo;No Lights&rdquo; (2016), &ldquo;Rockin
                 with My&rdquo; (2021), and &ldquo;The Princess&rdquo; (2023)
-                — lives inside <em>The Adventures of Young Simon &amp; The
-                Silver Surfer</em>, a cinematic multiverse where a
+                — lives inside <em>The Adventures of Young Simon</em>, a
+                cinematic multiverse where a
                 child&rsquo;s unhinged innocence collides with cosmic
                 self-discovery. He is a graduate of the Roc Nation Music
                 Program.

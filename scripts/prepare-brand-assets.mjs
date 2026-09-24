@@ -25,7 +25,6 @@ const CARD = 10; // the #0a0a0b ground the composed logos sit on
 // keys to a haze of alpha-1 pixels over the whole frame. Anything under this
 // is ground, and real edges are rescaled so the dead-zone costs no antialiasing.
 const FLOOR = 14;
-const BLOOD = { r: 0xb4, g: 0x1c, b: 0x25 };
 
 /** Flat dark ground -> alpha, with the ground unmultiplied out of the color. */
 async function keyOutCard(input) {
@@ -48,24 +47,6 @@ async function keyOutCard(input) {
   return sharp(out, { raw: { width: info.width, height: info.height, channels: 4 } })
     .png()
     .toBuffer();
-}
-
-/**
- * Drop only the flat card, keeping everything drawn on it opaque. Used for
- * the filled discs, where keyOutCard()'s brightness rule would make the blood
- * itself half transparent.
- */
-async function cutCard(input) {
-  const { data, info } = await sharp(input).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-  const out = Buffer.alloc(info.width * info.height * 4);
-  const NEAR = 14, FAR = 30; // ramp across the disc's antialiased rim
-  for (let i = 0, o = 0; i < data.length; i += info.channels, o += 4) {
-    const r = data[i], g = data[i + 1], b = data[i + 2];
-    const d = Math.hypot(r - CARD, g - CARD, b - CARD);
-    const cover = d <= NEAR ? 0 : d >= FAR ? 255 : Math.round(((d - NEAR) / (FAR - NEAR)) * 255);
-    out[o] = r; out[o + 1] = g; out[o + 2] = b; out[o + 3] = cover;
-  }
-  return sharp(out, { raw: { width: info.width, height: info.height, channels: 4 } }).png().toBuffer();
 }
 
 const trimmed = (buf) => sharp(buf).trim({ threshold: 1 });
@@ -175,15 +156,9 @@ await webp(seal, "public/label/seal.webp", 760);
 // --- Nav crest — the seal ---------------------------------------------------
 await webp(seal, "public/logo-crest.webp", 256);
 
-// NTB-4e stacks three 924x574 discs: obsidian, bone, blood. The obsidian one
-// keys down to a solid dog silhouette, kept for small mono placements.
+// NTB-4e stacks three 924x574 discs: obsidian, bone, blood.
 const AVATARS = `${IN}/logos/NTB-4e-avatar-marks.png`;
 const { height: avatarH } = await sharp(AVATARS).metadata();
-const darkBox = await discBox(AVATARS, 0, Math.round(avatarH / 3));
-const solidMark = await cropToArt(
-  await keyOutCard(await sharp(AVATARS).extract(darkBox).png().toBuffer()),
-);
-await webp(solidMark, "public/label/mark-solid.webp", 256);
 
 // --- Icons — the white (bone) logo -------------------------------------------
 // 512px and the 180px Apple icon carry the full bone lockup — dog, rule and
