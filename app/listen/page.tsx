@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { releases, shows, socials } from "@/lib/content";
+import { shows, socials } from "@/lib/content";
 
 // The link-in-bio destination: one page, one column, every way to listen.
 // No scene, no player — it has to open instantly on a phone from a social app.
 
-const latest = releases[0];
-
 const TITLE = "Listen — Simon Auguste";
 const DESCRIPTION =
   "Simon Auguste on Spotify, Apple Music, and YouTube. Not To B.A.D Records.";
-const CARD_IMAGE = latest.coverImage ?? "/og-card.jpg";
+const PORTRAIT = { src: "/listen/portrait.jpg", width: 1200, height: 800 };
+
+// Your name and the way in breathe toward blood so the eye finds the door.
+const PULSE = "animate-blood-pulse motion-reduce:animate-none";
 
 // Page-level openGraph/twitter replace the root's wholesale, so every field
 // a share card needs is restated here.
@@ -25,13 +26,13 @@ export const metadata: Metadata = {
     url: "/listen/",
     siteName: "Not To B.A.D Records",
     type: "website",
-    images: [{ url: CARD_IMAGE }],
+    images: [{ url: PORTRAIT.src, width: PORTRAIT.width, height: PORTRAIT.height }],
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    images: [CARD_IMAGE],
+    images: [PORTRAIT.src],
   },
 };
 
@@ -71,21 +72,23 @@ export default function ListenPage() {
           NOT TO B.A.D RECORDS
         </Link>
 
-        {latest.coverImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={latest.coverImage}
-            alt={`${latest.title} cover art`}
-            className="mt-8 w-56 rounded-md border border-white/10 shadow-[0_30px_80px_-20px_rgba(180,28,37,0.55)]"
-          />
-        ) : null}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={PORTRAIT.src}
+          width={PORTRAIT.width}
+          height={PORTRAIT.height}
+          alt="Sunset over the water from a waterfront terrace"
+          className="mt-8 w-full rounded-md border border-white/10 shadow-[0_30px_80px_-20px_rgba(180,28,37,0.55)]"
+        />
 
         <h1 className="font-display mt-8 text-2xl font-bold tracking-[0.18em] sm:text-3xl">
-          SIMON AUGUSTE
+          <Link
+            href="/simon-auguste/"
+            className={`${PULSE} [--pulse-rest:var(--color-chrome)] transition-colors hover:text-blood`}
+          >
+            SIMON AUGUSTE
+          </Link>
         </h1>
-        <p className="font-body mt-2 text-[0.6rem] tracking-[0.35em] text-steel">
-          {latest.title} · {latest.year}
-        </p>
 
         <ul className="mt-10 w-full space-y-3">
           {LISTEN.map((link) => (
@@ -137,7 +140,7 @@ export default function ListenPage() {
 
         <Link
           href="/simon-auguste/"
-          className="font-body mt-12 text-[0.6rem] tracking-[0.35em] text-steel/70 transition-colors hover:text-blood"
+          className={`${PULSE} font-body mt-12 text-[0.65rem] tracking-[0.35em] transition-colors hover:text-blood`}
         >
           ▸ ENTER MISSION CONTROL
         </Link>

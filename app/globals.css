@@ -92,6 +92,8 @@
   --animate-blink: blink 1s steps(2, start) infinite;
   --animate-flicker: flicker 4s linear infinite;
   --animate-led-pulse: led-pulse 2s ease-in-out infinite;
+  /* slow breath from steel to blood — draws the eye without blinking */
+  --animate-blood-pulse: blood-pulse 3.2s ease-in-out infinite;
 
   @keyframes blink {
     50% {
@@ -126,6 +128,17 @@
     }
     91% {
       opacity: 1;
+    }
+  }
+  @keyframes blood-pulse {
+    0%,
+    100% {
+      color: var(--pulse-rest, var(--color-steel));
+      text-shadow: none;
+    }
+    50% {
+      color: var(--color-blood);
+      text-shadow: 0 0 10px rgba(180, 28, 37, 0.55);
     }
   }
   @keyframes led-pulse {

@@ -103,7 +103,7 @@ export function EventsSection() {
     return (
       <SectionShell
         id="events"
-        hudLabel="// SECTION 06 — LAUNCH WINDOWS"
+        hudLabel="// SECTION 05 — LAUNCH WINDOWS"
         title="MISSION SCHEDULE"
         accent="pink"
       >
@@ -115,7 +115,7 @@ export function EventsSection() {
   return (
     <SectionShell
       id="events"
-      hudLabel="// SECTION 06 — LAUNCH WINDOWS"
+      hudLabel="// SECTION 05 — LAUNCH WINDOWS"
       title="MISSION SCHEDULE"
       accent="pink"
     >

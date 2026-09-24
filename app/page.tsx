@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const ROSTER = [
   {
     name: "SIMON AUGUSTE",
-    era: "SILVER SURFER ERA",
+    era: "CHANNEL SURFER ERA",
     status: "ACTIVE",
     href: "/simon-auguste/",
   },
@@ -57,12 +57,6 @@ export default function LabelPage() {
           aria-hidden
           className="mt-10 h-px w-40 bg-gradient-to-r from-transparent via-blood to-transparent"
         />
-
-        <p className="font-body mt-10 max-w-xl text-sm font-light leading-relaxed tracking-[0.04em] text-steel">
-          An independent record label built in the Bronx and run on its own
-          terms — masters owned, records self-produced, nothing asked for.
-          Every artist here gets an era. The house behind them does not change.
-        </p>
 
         {/* Roster — the artist sites live under the label */}
         <section className="mt-16 w-full max-w-2xl text-left">
@@ -111,17 +105,17 @@ export default function LabelPage() {
 
       <footer className="relative z-10 flex flex-col items-center gap-4 border-t border-white/10 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
         <p className="font-body text-[0.6rem] tracking-[0.3em] text-steel">
-          <Link href="/listen/" className="transition-colors hover:text-blood">
+          <Link href="/listen/" className="animate-blood-pulse motion-reduce:animate-none transition-colors hover:text-blood">
             LISTEN
           </Link>{" "}
           ·{" "}
-          <Link href="/press/" className="transition-colors hover:text-blood">
+          <Link href="/press/" className="animate-blood-pulse motion-reduce:animate-none transition-colors hover:text-blood">
             PRESS KIT
           </Link>{" "}
           ·{" "}
           <a
             href={`mailto:${contactEmail}`}
-            className="transition-colors hover:text-blood"
+            className="animate-blood-pulse motion-reduce:animate-none transition-colors hover:text-blood"
           >
             {contactEmail.toUpperCase()}
           </a>

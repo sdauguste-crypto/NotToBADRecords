@@ -15,7 +15,7 @@ const ROOT = path.resolve(process.cwd(), "out");
 const BASE_PATH = "";
 const PORT = Number(process.env.PORT || 4173);
 const SHOT_DIR = process.env.SHOT_DIR || "./verify-shots";
-const SECTION_IDS = ["hero", "music", "videos", "gallery", "games", "store", "events", "about", "contact"];
+const SECTION_IDS = ["hero", "music", "videos", "gallery", "store", "events", "about", "contact"];
 
 const MIME = {
   ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
@@ -147,6 +147,17 @@ async function main() {
   });
   check("label: chrome lockup renders", lockupOk);
 
+  const landing = await labelPage.evaluate(() => {
+    const text = document.body.innerText;
+    return {
+      era: /CHANNEL SURFER ERA/.test(text) && !/SILVER SURFER ERA/.test(text),
+      noBio: !/built in the Bronx/i.test(text),
+      pulsingFooter: [...document.querySelectorAll("footer a.animate-blood-pulse")].length,
+    };
+  });
+  check("label: Channel Surfer era, no bio, footer links pulse",
+    landing.era && landing.noBio && landing.pulsingFooter === 3, JSON.stringify(landing));
+
   // Every brand file the 2026 pack generates must actually be served — a
   // broken path here shows up as a missing logo, not an error.
   const brandOk = await labelPage.evaluate(async (base) => {
@@ -250,49 +261,18 @@ async function main() {
   }
   if (ready === "true") {
     const heroBuf = await readFile(path.join(SHOT_DIR, "stage-0-hero.png"));
-    const eventsBuf = await readFile(path.join(SHOT_DIR, "stage-5-events.png"));
+    const eventsBuf = await readFile(path.join(SHOT_DIR, `stage-${SECTION_IDS.indexOf("events")}-events.png`));
     const distinct = !heroBuf.equals(eventsBuf);
     check("journey stages visually distinct (screenshot divergence)", distinct,
       `hero=${heroBuf.length}B events=${eventsBuf.length}B`);
   }
-  // ---------- Arcade: boot OVERDRIVE and prove the run advances ----------
-  await page.evaluate(() => document.getElementById("games")?.scrollIntoView({ behavior: "instant" }));
-  await page.waitForTimeout(900);
-  const startBtn = page.getByRole("button", { name: /START OVERDRIVE/i });
-  check("arcade: START ENGINE present", (await startBtn.count()) > 0);
-  await startBtn.first().click();
-  const select = await page
-    .waitForSelector("[data-overdrive] button", { timeout: 30000 })
-    .then(() => true)
-    .catch(() => false);
-  check("arcade: circuit select shows", select);
-  await page.click("[data-overdrive] button:not([disabled])");
-  const booted = await page
-    .waitForSelector("[data-overdrive] canvas", { timeout: 30000 })
-    .then(() => true)
-    .catch(() => false);
-  check("arcade: race canvas boots", booted);
-  // The physics delta clamp makes the countdown run in slow motion under
-  // the software renderer, so assert progress (countdown digit or race
-  // clock advancing) rather than a wall-clock schedule.
-  await page.waitForTimeout(4000);
-  const t1 = await page.evaluate(
-    () => document.querySelector("[data-overdrive]")?.textContent ?? "",
+  // ---------- The arcade was retired: no section, no nav entry ----------
+  const arcadeGone = await page.evaluate(
+    () =>
+      !document.getElementById("games") &&
+      ![...document.querySelectorAll("nav a")].some((a) => /GAMES/i.test(a.textContent ?? "")),
   );
-  await page.keyboard.press("ArrowLeft");
-  // Under swiftshader the sim runs in slow motion (delta clamp), so a fixed
-  // window is unreliable — wait for the HUD to change, however long a tick
-  // takes, bounded at 90s.
-  const changed = await page
-    .waitForFunction(
-      (prev) => (document.querySelector("[data-overdrive]")?.textContent ?? "") !== prev,
-      t1,
-      { timeout: 90000, polling: 1000 },
-    )
-    .then(() => true)
-    .catch(() => false);
-  check("arcade: race loop advancing", changed, changed ? "HUD ticked" : "no HUD change in 90s");
-  await page.screenshot({ path: path.join(SHOT_DIR, "overdrive-live.png") });
+  check("arcade removed: no games section or nav link", arcadeGone);
 
   check("desktop: zero unexpected errors", errors.length === 0, errors.slice(0, 5).join(" | "));
   await page.close();
@@ -308,11 +288,18 @@ async function main() {
     spotify: [...document.querySelectorAll("a[href*='open.spotify.com']")].length,
     apple: [...document.querySelectorAll("a[href*='music.apple.com']")].length,
     list: [...document.querySelectorAll("a[href*='#contact']")].length,
-    cover: (() => { const i = document.querySelector("main img"); return !!i && i.complete && i.naturalWidth > 0; })(),
+    portrait: (() => { const i = document.querySelector("main img[src*='portrait']"); return !!i && i.complete && i.naturalWidth > 0; })(),
+    // the name and ENTER MISSION CONTROL are the ways in, and both pulse
+    nameLink: document.querySelector("h1 a")?.getAttribute("href") ?? "",
+    pulsing: [...document.querySelectorAll("a.animate-blood-pulse")].filter((a) => /simon-auguste\/$/.test(a.getAttribute("href") ?? "")).length,
+    noPromotedSong: !/THE PRINCESS/i.test(document.querySelector("main")?.textContent ?? ""),
     overflow: document.documentElement.scrollWidth,
   }));
   check("listen: smart link renders with Spotify + Apple + list capture",
-    listen.h1 === "SIMON AUGUSTE" && listen.spotify >= 1 && listen.apple >= 1 && listen.list >= 1 && listen.cover,
+    listen.h1 === "SIMON AUGUSTE" && listen.spotify >= 1 && listen.apple >= 1 && listen.list >= 1 && listen.portrait,
+    JSON.stringify(listen));
+  check("listen: portrait instead of a promoted song; name + ENTER MISSION CONTROL pulse to the artist site",
+    listen.noPromotedSong && /simon-auguste\/$/.test(listen.nameLink) && listen.pulsing === 2,
     JSON.stringify(listen));
   check("listen: no horizontal overflow on mobile", listen.overflow <= 390 + 1, `scrollWidth=${listen.overflow}`);
   await secPage.screenshot({ path: path.join(SHOT_DIR, "listen.png"), fullPage: true });

@@ -195,7 +195,7 @@ export function StoreSection() {
     return (
       <SectionShell
         id="store"
-        hudLabel="// SECTION 05 — SUPPLY"
+        hudLabel="// SECTION 04 — SUPPLY"
         title="THE CARGO BAY"
         accent="gold"
         subtitle="The list hears first."
@@ -208,7 +208,7 @@ export function StoreSection() {
   return (
     <SectionShell
       id="store"
-      hudLabel="// SECTION 05 — SUPPLY"
+      hudLabel="// SECTION 04 — SUPPLY"
       title="THE CARGO BAY"
       accent="gold"
       subtitle="Hyperspace shipping soon."
