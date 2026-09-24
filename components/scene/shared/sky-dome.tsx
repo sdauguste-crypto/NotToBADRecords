@@ -1,7 +1,7 @@
 'use client';
 
-// Full-sky gradient dome. Three color ramps (sunset / night / space) blended
-// by the stage uniforms, plus a 1/255 dither to kill banding.
+// Full-sky gradient dome. Three color ramps (sunset / city dusk / space)
+// blended by the stage uniforms, plus a 1/255 dither to kill banding.
 
 import { useMemo } from 'react';
 import * as THREE from 'three';
@@ -31,11 +31,8 @@ varying vec3 vWorldPos;
 
 ${GLSL_NOISE}
 
-const vec3 PINK    = ${glslColor(HEX.sunsetPink)};
 const vec3 MAGENTA = ${glslColor(HEX.sunsetMagenta)};
 const vec3 HORIZON = ${glslColor(HEX.deepPurpleHorizon)};
-const vec3 INDIGO  = ${glslColor(HEX.indigoNight)};
-const vec3 VOID    = ${glslColor(HEX.void)};
 const vec3 SPACE   = ${glslColor(HEX.spaceBase)};
 
 // Miami sunset ramp: hot pink horizon -> electric violet -> deep blue ->
@@ -51,9 +48,17 @@ vec3 rampA(float h) {
   return c;
 }
 
+// City dusk: coral-pink glow on the waterline -> violet -> indigo -> night
+// zenith. The towers reflect the same ramp (see stage-b/city.tsx).
+const vec3 B_GLOW   = ${glslColor('#ff5a8a')};
+const vec3 B_VIOLET = ${glslColor('#8a3fd1')};
+const vec3 B_INDIGO = ${glslColor('#241f7a')};
+const vec3 B_ZENITH = ${glslColor('#080b24')};
+
 vec3 rampB(float h) {
-  vec3 c = mix(INDIGO, VOID, smoothstep(0.08, 0.8, h));
-  c += PINK * 0.12 * (1.0 - smoothstep(0.0, 0.12, h));
+  vec3 c = mix(B_GLOW, B_VIOLET, smoothstep(0.0, 0.09, h));
+  c = mix(c, B_INDIGO, smoothstep(0.09, 0.26, h));
+  c = mix(c, B_ZENITH, smoothstep(0.26, 0.62, h));
   return c;
 }
 
@@ -74,7 +79,11 @@ void main() {
   vec3 cloud = texture2D(uCloudMap, cuv).rgb * vec3(1.00, 0.62, 1.18);
   float cw = uCloudReady * 0.55 * (1.0 - smoothstep(0.22, 0.6, h));
   a = mix(a, cloud, cw);
+  // the same cloud deck carries into the city, cooled toward violet and
+  // dimmed so the skyline's neon stays the brightest thing in frame
   vec3 b = rampB(h);
+  vec3 duskCloud = texture2D(uCloudMap, cuv).rgb * vec3(0.55, 0.32, 0.8);
+  b = mix(b, duskCloud, uCloudReady * 0.3 * (1.0 - smoothstep(0.12, 0.4, h)));
   vec3 c = rampC(normalize(vWorldPos).xy * 4.0 + vec2(0.0, h * 3.0));
   vec3 color = mix(mix(a, b, uBlendAB), c, uBlendBC);
   color += (hash21(gl_FragCoord.xy) - 0.5) / 255.0;

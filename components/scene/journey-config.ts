@@ -117,31 +117,25 @@ export const CAMERA_DAMP_LAMBDA_REDUCED = 12;
 // ---------------------------------------------------------------------------
 export type TierConfig = {
   dpr: number | [number, number];
-  cityCount: number;
   starCount: number;
   nebulaCount: number;
   cloudSegments: number;
-  antennaLights: boolean;
   waterGrid: boolean;
 };
 
 export const TIERS: Record<'high' | 'low', TierConfig> = {
   high: {
     dpr: [1, 2],
-    cityCount: 240,
     starCount: 6500,
     nebulaCount: 7,
     cloudSegments: 128,
-    antennaLights: true,
     waterGrid: true,
   },
   low: {
     dpr: 1,
-    cityCount: 80,
     starCount: 1500,
     nebulaCount: 3,
     cloudSegments: 48,
-    antennaLights: false,
     waterGrid: false,
   },
 };

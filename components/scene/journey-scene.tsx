@@ -39,6 +39,9 @@ import Starfield from './stage-c/starfield';
 
 const { damp, clamp } = THREE.MathUtils;
 
+/** Index of the final keyframe — one per section, so sectionProgress 0..LAST. */
+const LAST = CAMERA_KEYFRAMES.length - 1;
+
 export default function JourneyScene({ tier }: { tier: QualityTier }) {
   const shared = useMemo(createSharedUniforms, []);
 
@@ -70,7 +73,7 @@ export default function JourneyScene({ tier }: { tier: QualityTier }) {
     const dt = Math.min(rawDelta, 0.1); // guard against tab-switch spikes
     const { sectionProgress, pointerX, pointerY, reducedMotion } = journeyState;
 
-    const sp = clamp(sectionProgress, 0, 7);
+    const sp = clamp(sectionProgress, 0, LAST);
     const blendAB = smoothstep(BLEND_AB[0], BLEND_AB[1], sp);
     const blendBC = smoothstep(BLEND_BC[0], BLEND_BC[1], sp);
 
@@ -81,11 +84,12 @@ export default function JourneyScene({ tier }: { tier: QualityTier }) {
     shared.uTime.value += dt * (reducedMotion ? 0 : 1);
     shared.uDpr.value = gl.getPixelRatio();
 
-    // Camera path: Catmull-Rom through the 8 keyframe positions.
-    curve.getPoint(sp / 7, work.pathPos);
+    // Camera path: Catmull-Rom through the keyframe positions. getPoint is
+    // uniform per segment, so sp / LAST lands exactly on keyframe sp.
+    curve.getPoint(sp / LAST, work.pathPos);
 
     // LookAt: piecewise lerp between keyframe lookAts.
-    const i = Math.min(6, Math.floor(sp));
+    const i = Math.min(LAST - 1, Math.floor(sp));
     work.lookTarget.lerpVectors(
       CAMERA_KEYFRAMES[i].lookAt,
       CAMERA_KEYFRAMES[i + 1].lookAt,

@@ -1,7 +1,8 @@
 'use client';
 
-// Ocean plane: noise shimmer, gold sun streak (stage A), pink shore glow
-// (stage B), optional retro grid on high tier. Fades out entirely by stage C.
+// Ocean plane: noise shimmer, gold sun streak (stage A), the city's neon
+// mirrored in the harbour (stage B), optional retro grid on high tier. Fades
+// out entirely by stage C.
 
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
@@ -15,6 +16,7 @@ import {
   TIERS,
 } from '../journey-config';
 import type { QualityTier } from '../quality';
+import { reflectionSources } from '../stage-b/city-layout';
 
 const VERTEX = /* glsl */ `
 varying vec3 vWorld;
@@ -28,6 +30,8 @@ void main() {
 }
 `;
 
+const REFLECTIONS = 12;
+
 const FRAGMENT = /* glsl */ `
 uniform float uTime;
 uniform float uBlendAB;
@@ -35,6 +39,10 @@ uniform float uBlendBC;
 uniform float uGrid;
 uniform float uMapReady;
 uniform sampler2D uNormalMap;
+// city neon the water mirrors: x, z, strength, width — see city-layout.ts
+uniform vec4 uRefl[${REFLECTIONS}];
+uniform vec3 uReflColor[${REFLECTIONS}];
+uniform int uReflCount;
 varying vec3 vWorld;
 #include <fog_pars_fragment>
 
@@ -77,14 +85,33 @@ void main() {
   spec *= 1.0 - smoothstep(-30.0, -6.0, vWorld.z);
   color += spec * mix(mix(GOLD, PINK, 0.4), PINK, uBlendAB) * 0.9 * uMapReady;
 
-  // Pink shore glow band (stage B).
-  color += exp(-pow((vWorld.z + 62.0) / 8.0, 2.0)) * PINK * 0.35 * uBlendAB;
+  // Neon towers mirrored in the harbour (stage B). A vertical light reflects
+  // along the ground line between it and the eye, so each streak is steered
+  // by the camera; ripple noise breaks it into the familiar broken bands.
+  if (uBlendAB > 0.01) {
+    float cityLight = uBlendAB * (1.0 - uBlendBC);
+    float chop = smoothstep(0.25, 0.8, vnoise(vec2(vWorld.x * 0.7, vWorld.z * 2.1 + uTime * 0.9)));
+    for (int i = 0; i < ${REFLECTIONS}; i++) {
+      if (i >= uReflCount) break;
+      vec4 src = uRefl[i];
+      float t = (vWorld.z - cameraPosition.z) / (src.y - cameraPosition.z);
+      if (t <= 0.0 || t >= 1.0) continue;
+      float cx = cameraPosition.x + (src.x - cameraPosition.x) * t + rip.x * 1.6;
+      float halfW = src.w * 0.16 * t + 0.25;
+      float streak = exp(-pow((vWorld.x - cx) / halfW, 2.0));
+      color += uReflColor[i] * streak * src.z * (0.3 + 0.7 * t) * (0.35 + 0.65 * chop) * cityLight;
+    }
+  }
 
-  // Faint retro grid, high tier only, fading near the camera.
+  // Neon spill off the promenade lip onto the water (stage B).
+  color += exp(-pow((vWorld.z + 52.5) / 5.0, 2.0)) * mix(PINK, GOLD, 0.55) * 0.22 * uBlendAB;
+
+  // Faint retro grid, high tier only, fading near the camera and gone by
+  // the city.
   if (uGrid > 0.5) {
     float grid = step(0.97, fract(vWorld.x * 0.15))
                + step(0.97, fract(vWorld.z * 0.15));
-    color += grid * PINK * 0.05 * smoothstep(12.0, 40.0, -vWorld.z);
+    color += grid * PINK * 0.05 * smoothstep(12.0, 40.0, -vWorld.z) * (1.0 - uBlendAB);
   }
 
   float alpha = 1.0 - uBlendBC;
@@ -113,6 +140,18 @@ export default function Water({
     normalMap.wrapS = THREE.MirroredRepeatWrapping;
     normalMap.wrapT = THREE.MirroredRepeatWrapping;
     normalMap.colorSpace = THREE.NoColorSpace;
+
+    const sources = reflectionSources(tier, REFLECTIONS);
+    const refl = Array.from({ length: REFLECTIONS }, (_, i) => {
+      const t = sources[i];
+      return t
+        ? new THREE.Vector4(t.x, t.z + t.depth / 2, Math.min(1, t.height / 40) * 0.85, t.width)
+        : new THREE.Vector4();
+    });
+    const reflColor = Array.from({ length: REFLECTIONS }, (_, i) =>
+      sources[i] ? sources[i].neon.clone() : new THREE.Color(),
+    );
+
     return new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
@@ -125,6 +164,9 @@ export default function Water({
         uGrid: { value: TIERS[tier].waterGrid ? 1 : 0 },
         uMapReady,
         uNormalMap: { value: normalMap },
+        uRefl: { value: refl },
+        uReflColor: { value: reflColor },
+        uReflCount: { value: sources.length },
       },
       vertexShader: VERTEX,
       fragmentShader: FRAGMENT,

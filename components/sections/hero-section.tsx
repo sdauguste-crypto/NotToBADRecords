@@ -18,7 +18,7 @@ export function HeroSection() {
   return (
     <section
       id="hero"
-      className="scanlines relative flex min-h-screen w-full flex-col overflow-hidden"
+      className="relative flex min-h-screen w-full flex-col overflow-hidden"
     >
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-6 pb-28 pt-24 text-center">
         <motion.div

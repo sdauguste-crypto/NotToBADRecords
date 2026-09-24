@@ -11,6 +11,7 @@ import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 import type { SharedUniforms } from '../journey-config';
+import { promenadeZ } from '../stage-b/city-layout';
 
 const BASE = '/models';
 const URLS = {
@@ -121,6 +122,52 @@ function FloatingRecordPlayer({ shared }: { shared: SharedUniforms }) {
   );
 }
 
+/** Palm clusters along the city promenade, clear of the holo-screens. */
+const PROMENADE_PALMS: Array<{ x: number; size: number; mirror: boolean }> = [
+  { x: -70, size: 30, mirror: false },
+  { x: -14, size: 24, mirror: true },
+  { x: 24, size: 26, mirror: false },
+  { x: 76, size: 30, mirror: true },
+];
+
+function PromenadePalms({ shared }: { shared: SharedUniforms }) {
+  const { scene } = useGLTF(URLS.palms, false, true);
+  const ref = useRef<THREE.Group>(null);
+  const clusters = useMemo(
+    () =>
+      PROMENADE_PALMS.map(({ x, size, mirror }) => {
+        const g = normalize(scene, size);
+        g.position.set(x, 0.55, promenadeZ(x) - 1.6);
+        if (mirror) g.scale.x = -1;
+        // after dark these read as silhouettes against the lit towers; the
+        // sunset grove shares the source materials, so these get their own
+        g.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          const dusk = (m: THREE.Material) => {
+            const c = m.clone() as THREE.MeshStandardMaterial;
+            c.color?.multiplyScalar(0.22);
+            c.envMapIntensity = 0.35;
+            return c;
+          };
+          mesh.material = Array.isArray(mesh.material)
+            ? mesh.material.map(dusk)
+            : dusk(mesh.material);
+        });
+        return g;
+      }),
+    [scene],
+  );
+  useStageVisibility(ref, shared, stageB);
+  return (
+    <group ref={ref}>
+      {clusters.map((g, i) => (
+        <primitive key={i} object={g} />
+      ))}
+    </group>
+  );
+}
+
 function HoverCarFlyby({ shared }: { shared: SharedUniforms }) {
   const { scene } = useGLTF(URLS.hoverCar, false, true);
   const ref = useRef<THREE.Group>(null);
@@ -131,7 +178,8 @@ function HoverCarFlyby({ shared }: { shared: SharedUniforms }) {
     if (!ref.current) return;
     ref.current.visible = stageB(shared) > 0.03;
     const cycle = (t * 7) % 130;
-    ref.current.position.set(-62 + cycle, 9 + Math.sin(t * 1.3) * 1.1, -56);
+    // over the promenade, in front of the waterfront towers
+    ref.current.position.set(-62 + cycle, 11 + Math.sin(t * 1.3) * 1.1, -48.5);
     ref.current.rotation.set(0, Math.PI / 2, Math.sin(t * 1.3) * 0.12);
   });
 
@@ -226,6 +274,7 @@ export default function JourneyModels({ shared }: { shared: SharedUniforms }) {
       <FloatingRecordPlayer shared={shared} />
 
       {/* stage B — neon city */}
+      <PromenadePalms shared={shared} />
       <HoverCarFlyby shared={shared} />
 
       {/* stage C — deep space */}

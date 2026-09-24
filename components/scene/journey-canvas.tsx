@@ -5,16 +5,21 @@
 // post-processing chain that gives neon its real glow.
 
 import { Canvas, useFrame } from '@react-three/fiber';
-import {
-  Bloom,
-  ChromaticAberration,
-  EffectComposer,
-  Vignette,
-} from '@react-three/postprocessing';
+import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing';
+import type { BloomEffect } from 'postprocessing';
 import { useMemo, useRef } from 'react';
-import * as THREE from 'three';
 
-import { FOG_FAR, FOG_NEAR, HEX, TIERS } from './journey-config';
+import { journeyState } from '@/lib/journey-state';
+
+import {
+  BLEND_AB,
+  BLEND_BC,
+  FOG_FAR,
+  FOG_NEAR,
+  HEX,
+  smoothstep,
+  TIERS,
+} from './journey-config';
 import JourneyScene from './journey-scene';
 import { detectTier } from './quality';
 
@@ -30,7 +35,37 @@ function ReadyFlag() {
   return null;
 }
 
-const CHROMATIC_OFFSET = new THREE.Vector2(0.0006, 0.0004);
+// The sunset wants its whole sky to haze into glow; the city wants only its
+// neon to, or the bright dusk sky veils every tower in milk.
+const THRESHOLD_SUNSET = 0.28;
+const THRESHOLD_CITY = 0.7;
+
+function StageBloom() {
+  const bloom = useRef<BloomEffect>(null);
+  useFrame(() => {
+    const sp = journeyState.sectionProgress;
+    const city =
+      smoothstep(BLEND_AB[0], BLEND_AB[1], sp) *
+      (1 - smoothstep(BLEND_BC[0], BLEND_BC[1], sp));
+    if (bloom.current) {
+      bloom.current.luminanceMaterial.threshold =
+        THRESHOLD_SUNSET + (THRESHOLD_CITY - THRESHOLD_SUNSET) * city;
+    }
+  });
+  return (
+    <EffectComposer>
+      {/* HDR glow: the city's neon strips run past 1.0 and bloom into light */}
+      <Bloom
+        ref={bloom}
+        intensity={0.9}
+        luminanceThreshold={THRESHOLD_SUNSET}
+        luminanceSmoothing={0.35}
+        mipmapBlur
+      />
+      <Vignette eskil={false} offset={0.22} darkness={0.5} />
+    </EffectComposer>
+  );
+}
 
 export default function JourneyCanvas() {
   const tier = useMemo(() => detectTier(), []);
@@ -53,20 +88,7 @@ export default function JourneyCanvas() {
       <fog attach="fog" args={[HEX.fogA, FOG_NEAR, FOG_FAR]} />
       <ReadyFlag />
       <JourneyScene tier={tier} />
-      {tier === 'high' && (
-        <EffectComposer>
-          {/* real HDR-style glow on the sun, neon rims, windows, and stars */}
-          <Bloom
-            intensity={0.85}
-            luminanceThreshold={0.22}
-            luminanceSmoothing={0.3}
-            mipmapBlur
-          />
-          {/* subtle lens fringe — the "shot on a camera" cue */}
-          <ChromaticAberration offset={CHROMATIC_OFFSET} />
-          <Vignette eskil={false} offset={0.18} darkness={0.62} />
-        </EffectComposer>
-      )}
+      {tier === 'high' && <StageBloom />}
     </Canvas>
   );
 }
