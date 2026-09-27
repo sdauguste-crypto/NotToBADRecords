@@ -28,6 +28,7 @@ import JourneyModels from './models/journey-models';
 import type { QualityTier } from './quality';
 import SkyDome from './shared/sky-dome';
 import Water from './shared/water';
+import Watercraft from './shared/watercraft';
 import Palms from './stage-a/palms';
 import RetroSun from './stage-a/retro-sun';
 import City from './stage-b/city';
@@ -128,6 +129,8 @@ export default function JourneyScene({ tier }: { tier: QualityTier }) {
       {/* shared world */}
       <SkyDome shared={shared} />
       <Water shared={shared} tier={tier} />
+      {/* a yacht and jet skis crossing the harbour, sunset and city alike */}
+      <Watercraft shared={shared} tier={tier} />
 
       {/* stage A — retro sunset (billboard palms only on low tier — the
           high tier gets the real 3D grove from JourneyModels) */}
