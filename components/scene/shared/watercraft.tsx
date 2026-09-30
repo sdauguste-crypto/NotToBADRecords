@@ -440,11 +440,19 @@ function JetSkiModel({
 // ---------------------------------------------------------------------------
 
 const WAKE_POINTS = 48;
+const WAKE_Y = 0.035;
 
-/** A foam ribbon laid along the path a craft has actually travelled. */
+/**
+ * A foam ribbon laid along the path a craft has actually travelled. It runs
+ * every frame for every craft, so it allocates nothing: the trail is a fixed
+ * ring of points and the vertices are written in place.
+ */
 class Wake {
   readonly geometry = new THREE.BufferGeometry();
-  private readonly trail: THREE.Vector3[] = [];
+  private readonly points = Array.from({ length: WAKE_POINTS }, () => new THREE.Vector3());
+  /** Index of the newest point in the ring. */
+  private head = 0;
+  private count = 0;
   private readonly positions = new Float32Array(WAKE_POINTS * 2 * 3);
 
   constructor(
@@ -472,34 +480,56 @@ class Wake {
     this.geometry.drawRange.count = 0;
   }
 
-  update(at: THREE.Vector3) {
-    const head = this.trail[0];
-    // a craft that wrapped around the scene starts a fresh wake
-    if (head && head.distanceToSquared(at) > 100) this.trail.length = 0;
-    if (!this.trail[0] || this.trail[0].distanceTo(at) >= this.spacing) {
-      this.trail.unshift(new THREE.Vector3(at.x, 0.035, at.z));
-      if (this.trail.length > WAKE_POINTS) this.trail.pop();
-    } else {
-      this.trail[0].set(at.x, 0.035, at.z);
-    }
+  /** i-th point back from the craft (0 = newest). */
+  private at(i: number) {
+    return this.points[(this.head - i + WAKE_POINTS) % WAKE_POINTS];
+  }
 
-    const n = this.trail.length;
-    const dir = new THREE.Vector3();
-    for (let i = 0; i < n; i++) {
-      const a = this.trail[Math.max(0, i - 1)];
-      const b = this.trail[Math.min(n - 1, i + 1)];
-      dir.subVectors(a, b);
-      if (dir.lengthSq() < 1e-6) dir.set(1, 0, 0);
-      dir.normalize();
-      const half = this.startHalfWidth + i * this.spacing * this.spread;
-      const p = this.trail[i];
-      // perpendicular on the water: (dz, -dx)
-      this.positions.set([p.x + dir.z * half, p.y, p.z - dir.x * half], i * 6);
-      this.positions.set([p.x - dir.z * half, p.y, p.z + dir.x * half], i * 6 + 3);
+  update(x: number, z: number) {
+    const newest = this.at(0);
+    const dx0 = newest.x - x;
+    const dz0 = newest.z - z;
+    const d2 = dx0 * dx0 + dz0 * dz0;
+    // a craft that wrapped around the scene starts a fresh wake
+    if (this.count > 0 && d2 > 100) this.count = 0;
+    if (this.count === 0 || d2 >= this.spacing * this.spacing) {
+      this.head = (this.head + 1) % WAKE_POINTS;
+      this.count = Math.min(WAKE_POINTS, this.count + 1);
     }
-    this.geometry.attributes.position.needsUpdate = true;
+    this.at(0).set(x, WAKE_Y, z);
+
+    const n = this.count;
+    const P = this.positions;
+    for (let i = 0; i < n; i++) {
+      const a = this.at(Math.max(0, i - 1));
+      const b = this.at(Math.min(n - 1, i + 1));
+      let dx = a.x - b.x;
+      let dz = a.z - b.z;
+      const len = Math.hypot(dx, dz);
+      if (len < 1e-3) {
+        dx = 1;
+        dz = 0;
+      } else {
+        dx /= len;
+        dz /= len;
+      }
+      const half = this.startHalfWidth + i * this.spacing * this.spread;
+      const p = this.at(i);
+      // either side of the path, perpendicular on the water
+      const o = i * 6;
+      P[o] = p.x + dz * half;
+      P[o + 1] = WAKE_Y;
+      P[o + 2] = p.z - dx * half;
+      P[o + 3] = p.x - dz * half;
+      P[o + 4] = WAKE_Y;
+      P[o + 5] = p.z + dx * half;
+    }
+    const position = this.geometry.getAttribute('position') as THREE.BufferAttribute;
+    position.clearUpdateRanges();
+    position.addUpdateRange(0, n * 6);
+    position.needsUpdate = true;
+    // drawn with frustum culling off, so its bounds are never needed
     this.geometry.drawRange.count = Math.max(0, n - 1) * 6;
-    this.geometry.computeBoundingSphere();
   }
 }
 
@@ -574,7 +604,6 @@ function JetSki({
     });
     return { g, m };
   }, [shared, uOpacity]);
-  const work = useMemo(() => new THREE.Vector3(), []);
 
   useFrame(() => {
     const t = shared.uTime.value;
@@ -591,7 +620,7 @@ function JetSki({
       0.08 + Math.sin(t * 7.1 + route.phase) * 0.05,
       'YXZ',
     );
-    wake.update(work.set(x, 0, z));
+    wake.update(x, z);
   });
 
   return (
@@ -624,7 +653,6 @@ function Yacht({
   const ref = useRef<THREE.Group>(null);
   const wake = useMemo(() => new Wake(1.1, 1.4, 0.3), []);
   const wakeMaterial = useWakeMaterial(shared, 0.9, uOpacity);
-  const work = useMemo(() => new THREE.Vector3(), []);
 
   useFrame(() => {
     const t = shared.uTime.value;
@@ -634,7 +662,7 @@ function Yacht({
     const x = wrapX(t, 1.9, 70, 1);
     group.position.set(x, Math.sin(t * 0.55) * 0.06, -46);
     group.rotation.set(Math.sin(t * 0.43) * 0.012, 0, Math.sin(t * 0.37) * 0.01);
-    wake.update(work.set(x - YACHT_LENGTH * 0.35, 0, -46));
+    wake.update(x - YACHT_LENGTH * 0.35, -46);
   });
 
   return (

@@ -250,7 +250,9 @@
 
 @utility glass-panel {
   background: rgba(8, 18, 43, 0.55);
-  backdrop-filter: blur(14px);
+  /* the scene behind repaints every frame, so every panel re-blurs every
+     frame; under a 55% tint 10px reads the same as 14px at half the kernel */
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(180, 28, 37, 0.3);
   border-radius: var(--radius-xl);
   box-shadow:

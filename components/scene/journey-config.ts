@@ -113,7 +113,6 @@ export const CAMERA_DAMP_LAMBDA_REDUCED = 12;
 // Per-tier counts / toggles
 // ---------------------------------------------------------------------------
 export type TierConfig = {
-  dpr: number | [number, number];
   starCount: number;
   nebulaCount: number;
   cloudSegments: number;
@@ -122,14 +121,12 @@ export type TierConfig = {
 
 export const TIERS: Record<'high' | 'low', TierConfig> = {
   high: {
-    dpr: [1, 2],
     starCount: 6500,
     nebulaCount: 7,
     cloudSegments: 128,
     waterGrid: true,
   },
   low: {
-    dpr: 1,
     starCount: 1500,
     nebulaCount: 3,
     cloudSegments: 48,

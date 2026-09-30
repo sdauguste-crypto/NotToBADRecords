@@ -259,28 +259,34 @@ function FloatingAstronaut({ shared }: { shared: SharedUniforms }) {
 
 export default function JourneyModels({ shared }: { shared: SharedUniforms }) {
   return (
-    <Suspense fallback={null}>
-      {/* lighting for the PBR models (shader-material world ignores these) */}
+    <>
+      {/* Lighting for the PBR models. It sits outside the Suspense on
+          purpose: three.js keys every shader — the shader-material world's
+          too — by the scene's light count, so lights that mounted when the
+          models finished loading recompiled every shader on the page at
+          once, a freeze a few seconds in. */}
       <ambientLight intensity={0.3} color="#bfefff" />
       <hemisphereLight args={['#22d3ee', '#0a1533', 0.6]} />
       <directionalLight position={[6, 18, 24]} intensity={1.4} color="#ff6fb5" />
-      {/* graded blue-hour HDRI (see scripts/prepare-env.mjs) — gives the
-          metals and glass real purple-sky/gold-light reflections */}
-      <Environment files="/env/sunset-env.hdr" />
+      <Suspense fallback={null}>
+        {/* graded blue-hour HDRI (see scripts/prepare-env.mjs) — gives the
+            metals and glass real purple-sky/gold-light reflections */}
+        <Environment files="/env/sunset-env.hdr" />
 
-      {/* stage A — sunset beach */}
-      <PalmGrove shared={shared} />
-      <LotusOnTheShore shared={shared} />
-      <FloatingRecordPlayer shared={shared} />
+        {/* stage A — sunset beach */}
+        <PalmGrove shared={shared} />
+        <LotusOnTheShore shared={shared} />
+        <FloatingRecordPlayer shared={shared} />
 
-      {/* stage B — neon city */}
-      <PromenadePalms shared={shared} />
-      <HoverCarFlyby shared={shared} />
+        {/* stage B — neon city */}
+        <PromenadePalms shared={shared} />
+        <HoverCarFlyby shared={shared} />
 
-      {/* stage C — deep space */}
-      <DriftingSatellite shared={shared} />
-      <SpaceshipCruise shared={shared} />
-      <FloatingAstronaut shared={shared} />
-    </Suspense>
+        {/* stage C — deep space */}
+        <DriftingSatellite shared={shared} />
+        <SpaceshipCruise shared={shared} />
+        <FloatingAstronaut shared={shared} />
+      </Suspense>
+    </>
   );
 }
