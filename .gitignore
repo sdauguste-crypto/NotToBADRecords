@@ -6,3 +6,9 @@ dist/
 *.log
 next-env.d.ts
 tsconfig.tsbuildinfo
+
+# Unreleased masters never enter this public repo — the full song must not
+# sit at a public URL before release (the private stream is served elsewhere).
+/private/
+*MASTER*.mp3
+*MASTER*.wav
