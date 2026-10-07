@@ -9,6 +9,7 @@ import { SectionShell } from "@/components/sections/section-shell";
 import { useReducedMotion } from "@/components/sections/use-reduced-motion";
 import { NowPlaying } from "@/components/fanhub/now-playing";
 import { ReleaseCard } from "@/components/fanhub/release-card";
+import { WednesdayFeature } from "@/components/wednesday/music-feature";
 
 export function MusicSection() {
   const reduced = useReducedMotion();
@@ -20,6 +21,8 @@ export function MusicSection() {
       title="LATEST TRANSMISSIONS"
       accent="pink"
     >
+      <WednesdayFeature />
+
       <motion.div
         initial={{ opacity: 0, y: reduced ? 0 : 36 }}
         whileInView={{ opacity: 1, y: 0 }}

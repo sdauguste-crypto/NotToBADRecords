@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { SECTION_IDS, type SectionId } from "@/lib/journey-state";
+import { ReleaseBanner } from "@/components/wednesday/release-banner";
 
 const NAV_LINKS: { id: SectionId; label: string }[] = [
   { id: "music", label: "MUSIC" },
@@ -75,6 +76,7 @@ export function SiteNav() {
 
   return (
     <header className="fixed top-0 z-40 w-full">
+      <ReleaseBanner />
       <div className="glass-panel mx-3 mt-3 flex items-center justify-between px-5 py-3 md:mx-auto md:max-w-6xl">
         {/* the crest is the way back up to the label */}
         <Link href="/" className="flex items-center gap-3" title="Not To B.A.D Records">
