@@ -19,7 +19,7 @@ export const wednesday = {
    * Public 15–30 s preview clip under public/wednesday (never the full song).
    * The player stays hidden until this is set.
    */
-  previewClip: undefined as string | undefined,
+  previewClip: "/wednesday/preview.mp3" as string | undefined, // 0:00–0:15
   /** Streaming links — each button appears once its link is set. */
   links: {
     spotify: undefined as string | undefined,

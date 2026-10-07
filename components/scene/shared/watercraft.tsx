@@ -136,6 +136,8 @@ vec3 sky(float ry) {
   return mix(${glslColor('#0a1433')}, c, smoothstep(-0.2, 0.02, ry));
 }
 
+// pow(x, 2.0) is undefined for x < 0 in GLSL and NaNs on some GPUs
+float sq(float x) { return x * x; }
 void main() {
   vec3 N = normalize(vNormal);
   vec3 V = normalize(cameraPosition - vWorld);
@@ -150,7 +152,7 @@ void main() {
   // the neon skyline behind the harbour washes the sterns and sides pink
   color += uColor * vec3(1.0, 0.25, 0.65) * 0.28 * max(dot(N, vec3(0.0, 0.2, -1.0)), 0.0) * uBlendAB;
   // rim of light where the surface turns away — the sunset silhouette
-  float fres = pow(1.0 - ndv, 4.0);
+  float fres = pow(clamp(1.0 - ndv, 0.0, 1.0), 4.0);
   color += Lc * fres * 0.35 * (1.0 - uBlendAB);
   color += sky(reflect(-V, N).y) * mix(0.12, 0.9, fres) * uGloss;
 
@@ -174,7 +176,7 @@ void main() {
     float boot = smoothstep(-0.12, -0.1, vLocal.y) * (1.0 - smoothstep(0.17, 0.19, vLocal.y));
     color = mix(color, ${glslColor('#0d1226')} * (0.4 + Lc * diffuse) + sky(reflect(-V, N).y) * fres * 0.8, boot);
   }
-  color += uLed * exp(-pow((vLocal.y - uLedY) / 0.018, 2.0)) * mix(0.35, 1.0, uBlendAB);
+  color += uLed * exp(-sq((vLocal.y - uLedY) / 0.018)) * mix(0.35, 1.0, uBlendAB);
 
   gl_FragColor = vec4(color + uEmissive, 1.0);
   #include <fog_fragment>
@@ -212,9 +214,11 @@ varying float vAcross;
 varying vec3 vWorld;
 #include <fog_pars_fragment>
 ${GLSL_NOISE}
+// pow(x, 2.0) is undefined for x < 0 in GLSL and NaNs on some GPUs
+float sq(float x) { return x * x; }
 void main() {
-  float arms = exp(-pow((abs(vAcross) - 0.82) / 0.2, 2.0));
-  float wash = exp(-pow(vAcross / 0.38, 2.0)) * (1.0 - smoothstep(0.0, 0.5, vAlong));
+  float arms = exp(-sq((abs(vAcross) - 0.82) / 0.2));
+  float wash = exp(-sq(vAcross / 0.38)) * (1.0 - smoothstep(0.0, 0.5, vAlong));
   float n = vnoise(vWorld.xz * 2.6 + vec2(uTime * 0.4, -uTime * 0.3));
   float foam = (arms * 0.85 + wash * 1.3) * (0.35 + 0.9 * n);
   foam *= (1.0 - vAlong) * smoothstep(0.0, 0.03, vAlong);

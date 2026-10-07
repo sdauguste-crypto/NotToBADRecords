@@ -54,6 +54,8 @@ const vec3 MAGENTA = ${glslColor(HEX.sunsetMagenta)};
 const vec3 GOLD    = ${glslColor(HEX.sunsetGold)};
 const vec3 PINK    = ${glslColor(HEX.sunsetPink)};
 
+// pow(x, 2.0) is undefined for x < 0 in GLSL and NaNs on some GPUs
+float sq(float x) { return x * x; }
 void main() {
   vec3 color = mix(BASE_A, BASE_B, uBlendAB);
 
@@ -71,7 +73,7 @@ void main() {
   color += rip.y * 0.05 * mix(MAGENTA, PINK, uBlendAB);
 
   // Gold sun streak toward the horizon (stage A only), wobbled by ripples.
-  float streak = exp(-pow((vWorld.x + rip.x * 2.2) / (1.5 + n * 1.2), 2.0))
+  float streak = exp(-sq((vWorld.x + rip.x * 2.2) / (1.5 + n * 1.2)))
                * (1.0 - smoothstep(-110.0, 10.0, vWorld.z));
   color += streak * mix(GOLD, PINK, 0.4) * (1.0 - uBlendAB);
 
@@ -98,13 +100,13 @@ void main() {
       if (t <= 0.0 || t >= 1.0) continue;
       float cx = cameraPosition.x + (src.x - cameraPosition.x) * t + rip.x * 1.6;
       float halfW = src.w * 0.16 * t + 0.25;
-      float streak = exp(-pow((vWorld.x - cx) / halfW, 2.0));
+      float streak = exp(-sq((vWorld.x - cx) / halfW));
       color += uReflColor[i] * streak * src.z * (0.3 + 0.7 * t) * (0.35 + 0.65 * chop) * cityLight;
     }
   }
 
   // Neon spill off the promenade lip onto the water (stage B).
-  color += exp(-pow((vWorld.z + 52.5) / 5.0, 2.0)) * mix(PINK, GOLD, 0.55) * 0.22 * uBlendAB;
+  color += exp(-sq((vWorld.z + 52.5) / 5.0)) * mix(PINK, GOLD, 0.55) * 0.22 * uBlendAB;
 
   // Faint retro grid, high tier only, fading near the camera and gone by
   // the city.

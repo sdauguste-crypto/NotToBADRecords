@@ -23,7 +23,9 @@ export function WednesdaySignup({
   early: boolean;
 }) {
   const [email, setEmail] = useState("");
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState<"sent" | "queued" | null>(null);
+  // a field people never see; bots fill it in
+  const [website, setWebsite] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
@@ -37,8 +39,7 @@ export function WednesdaySignup({
     setError("");
     setSending(true);
     try {
-      await joinList(trimmed, tag);
-      setDone(true);
+      setDone(await joinList(trimmed, tag, website));
     } catch {
       setError("SIGNAL LOST — TRANSMISSION FAILED, TRY AGAIN");
     } finally {
@@ -46,10 +47,11 @@ export function WednesdaySignup({
     }
   };
 
-  const success =
-    early && sendsEarlyAccess
-      ? "✓ CHECK YOUR INBOX — YOUR EARLY LISTEN IS ON ITS WAY"
-      : "✓ TRANSMISSION RECEIVED — WELCOME ABOARD, CADET";
+  const success = !(early && sendsEarlyAccess)
+    ? "✓ TRANSMISSION RECEIVED — WELCOME ABOARD, CADET"
+    : done === "queued"
+      ? "✓ YOU'RE ON THE LIST — YOUR EARLY LISTEN LINK FOLLOWS SHORTLY"
+      : "✓ CHECK YOUR INBOX — YOUR EARLY LISTEN IS ON ITS WAY";
 
   return (
     <div className="w-full text-left">
@@ -71,6 +73,16 @@ export function WednesdaySignup({
                   ▊
                 </span>
               </label>
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden
+                value={website}
+                onChange={(event) => setWebsite(event.target.value)}
+                className="absolute -left-[9999px] h-px w-px opacity-0"
+              />
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <input
                   id="wednesday-email"

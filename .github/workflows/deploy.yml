@@ -33,6 +33,10 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # where WEDNESDAY signups go (repo Settings → Variables). Unset, the
+          # form falls back to the label inbox and no early-access email goes out.
+          NEXT_PUBLIC_WEDNESDAY_SIGNUP_URL: ${{ vars.WEDNESDAY_SIGNUP_URL }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

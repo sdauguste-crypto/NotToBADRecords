@@ -9,8 +9,8 @@
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing';
-import type { BloomEffect } from 'postprocessing';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import type { BloomEffect, EffectComposer as ComposerImpl } from 'postprocessing';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 import { journeyState } from '@/lib/journey-state';
@@ -98,8 +98,18 @@ function ShaderWarmup({ offscreen }: { offscreen: boolean }) {
 const THRESHOLD_SUNSET = 0.28;
 const THRESHOLD_CITY = 0.7;
 
-function StageBloom() {
+function StageBloom({ lite }: { lite: boolean }) {
   const bloom = useRef<BloomEffect>(null);
+  const composer = useRef<ComposerImpl>(null);
+  // The composer sizes its buffers from the window size, which doesn't change
+  // when only the pixel ratio does — resize it explicitly, or a lower ratio
+  // shrinks the canvas while the expensive buffers stay full size.
+  const dpr = useThree((s) => s.viewport.dpr);
+  const size = useThree((s) => s.size);
+  useEffect(() => {
+    composer.current?.setSize(size.width, size.height);
+  }, [dpr, size]);
+
   useFrame(() => {
     const sp = journeyState.sectionProgress;
     const city =
@@ -112,8 +122,10 @@ function StageBloom() {
   });
   return (
     // 4x MSAA: the composer's default 8x doubled the cost for edges the eye
-    // cannot tell apart at this resolution
-    <EffectComposer multisampling={4}>
+    // cannot tell apart at this resolution. Lite drops MSAA and shortens the
+    // glow's blur chain but keeps rendering through the composer, so no
+    // scene shader changes variant and the look holds.
+    <EffectComposer ref={composer} multisampling={lite ? 0 : 4}>
       {/* HDR glow: the city's neon strips run past 1.0 and bloom into light */}
       <Bloom
         ref={bloom}
@@ -121,6 +133,7 @@ function StageBloom() {
         luminanceThreshold={THRESHOLD_SUNSET}
         luminanceSmoothing={0.35}
         mipmapBlur
+        levels={lite ? 5 : 8}
       />
       <Vignette eskil={false} offset={0.22} darkness={0.5} />
     </EffectComposer>
@@ -134,38 +147,54 @@ function StageBloom() {
  */
 const MAX_DPR = 1.5;
 
+/**
+ * Steps quality down when the frame rate can't hold, and never back up.
+ *
+ * Every step is visible for a moment, so it must be rare: a governor that
+ * raised quality again on a good sample would oscillate on a borderline
+ * machine, flashing each time (the drei monitor counts every good sample
+ * as a flip, so even a smooth laptop tripped its fallback). Two steps at
+ * most, in order: drop to 1x, then lighten the effects.
+ *
+ * The resolution change goes through R3F's store from inside the frame, so
+ * the canvas is resized and redrawn in the same animation frame — changing
+ * the Canvas prop resized it from React's commit instead, and the browser
+ * showed the blank, freshly cleared canvas for a frame.
+ */
+function QualityGovernor({ sharpest, onLite }: { sharpest: number; onLite: () => void }) {
+  const setDpr = useThree((s) => s.setDpr);
+  const step = useRef(sharpest > 1 ? 0 : 1);
+  const decline = useCallback(() => {
+    if (step.current === 0) {
+      step.current = 1;
+      setDpr(1);
+    } else if (step.current === 1) {
+      step.current = 2;
+      onLite();
+    }
+  }, [setDpr, onLite]);
+  return <PerformanceMonitor onDecline={decline} flipflops={Infinity} />;
+}
+
 export default function JourneyCanvas() {
   const tier = useMemo(() => detectTier(), []);
   const sharpest = useMemo(
     () => (tier === 'high' ? Math.min(window.devicePixelRatio || 1, MAX_DPR) : 1),
     [tier],
   );
-  const [dpr, setDpr] = useState(sharpest);
-  const [effects, setEffects] = useState(tier === 'high');
-
-  // Struggling: shed resolution first, then the post-processing. Recovering:
-  // resolution comes back (effects stay off once dropped, so it can't
-  // oscillate between the two). If it keeps flip-flopping, the sharper
-  // resolution was borderline — settle at 1x and keep the glow.
-  const decline = useCallback(() => {
-    setDpr((current) => {
-      if (current > 1) return 1;
-      setEffects(false);
-      return current;
-    });
-  }, []);
-  const incline = useCallback(() => setDpr(sharpest), [sharpest]);
-  const fallback = useCallback(() => setDpr(1), []);
+  const effects = tier === 'high';
+  const [lite, setLite] = useState(false);
+  const goLite = useCallback(() => setLite(true), []);
 
   return (
     <Canvas
       style={{ position: 'fixed', inset: 0 }}
       frameloop="always"
-      dpr={dpr}
+      dpr={sharpest}
       gl={{
         // the composer renders into its own multisampled target, so an
         // antialiased canvas would only add a second, unseen resolve
-        antialias: false,
+        antialias: !effects,
         alpha: true,
         powerPreference: 'high-performance',
       }}
@@ -174,16 +203,11 @@ export default function JourneyCanvas() {
       {/* scene.background stays null (transparent canvas); fog color is
           re-lerped every frame by JourneyScene. */}
       <fog attach="fog" args={[HEX.fogA, FOG_NEAR, FOG_FAR]} />
-      <PerformanceMonitor
-        onDecline={decline}
-        onIncline={incline}
-        onFallback={fallback}
-        flipflops={3}
-      />
+      {effects && <QualityGovernor sharpest={sharpest} onLite={goLite} />}
       <ReadyFlag />
       <ShaderWarmup offscreen={effects} />
       <JourneyScene tier={tier} />
-      {effects && <StageBloom />}
+      {effects && <StageBloom lite={lite} />}
     </Canvas>
   );
 }

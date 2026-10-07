@@ -104,7 +104,8 @@ vec3 skyReflection(float ry) {
 // one pixel and dims to match, so thin strips far away hold steady instead
 // of crawling; the halo is the soft light around a real tube.
 float neonLine(float d, float halfW) {
-  float aa = fwidth(d);
+  // fwidth is 0 on flat-on surfaces; smoothstep with equal edges is undefined
+  float aa = max(fwidth(d), 1e-4);
   float hw = max(halfW, aa * 0.75);
   float core = (1.0 - smoothstep(hw - aa, hw + aa, abs(d))) * (halfW / hw);
   return core + exp(-abs(d) / (halfW * 3.5)) * 0.1;
@@ -136,7 +137,7 @@ void main() {
   vec2 g = vec2(vUv.x * cols, vWorldPos.y / FLOOR_H);
   vec2 cell = floor(g);
   vec2 f = fract(g);
-  vec2 w = fwidth(g);
+  vec2 w = max(fwidth(g), vec2(1e-4));
   // once a floor is under a pixel the grid can only alias — fade it out and
   // let the facade carry its average brightness instead
   float detail = 1.0 - smoothstep(0.3, 0.75, max(w.x, w.y));
@@ -315,9 +316,11 @@ varying vec2 vUv;
 varying vec3 vColor;
 varying float vFade;
 #include <fog_pars_fragment>
+// pow(x, 2.0) is undefined for x < 0 in GLSL and NaNs on some GPUs
+float sq(float x) { return x * x; }
 void main() {
-  float across = exp(-pow((vUv.y - 0.5) / 0.22, 2.0));
-  float trail = pow(vUv.x, 2.5);
+  float across = exp(-sq((vUv.y - 0.5) / 0.22));
+  float trail = pow(clamp(vUv.x, 0.0, 1.0), 2.5);
   float head = exp(-(1.0 - vUv.x) * 18.0);
   vec3 color = vColor * trail * 1.6 + vec3(1.0) * head * 2.2;
   float a = (trail * 0.8 + head) * across * vFade * uGroupOpacity;

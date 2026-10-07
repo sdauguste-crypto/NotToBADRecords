@@ -12,3 +12,6 @@ tsconfig.tsbuildinfo
 /private/
 *MASTER*.mp3
 *MASTER*.wav
+
+# local Cloudflare dev state
+.wrangler/
