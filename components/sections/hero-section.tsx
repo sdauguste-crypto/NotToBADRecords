@@ -10,7 +10,7 @@ import { useReducedMotion } from "@/components/sections/use-reduced-motion";
 
 // The artist owns this surface — the label name lives on the landing page
 // and in the nav above.
-const TITLE_LINES = ["SIMON DAVE", "AUGUSTE"];
+const TITLE_LINES = ["SIMON", "AUGUSTE"];
 
 export function HeroSection() {
   const reduced = useReducedMotion();
