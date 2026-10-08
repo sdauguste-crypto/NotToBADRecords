@@ -20,8 +20,13 @@ export function ReleasePage({ initiallyReleased }: { initiallyReleased: boolean 
     <div className="relative min-h-[100svh] overflow-hidden bg-obsidian text-chrome">
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[18%] h-[34rem] w-[34rem] -translate-x-1/2 rounded-full opacity-[0.2] blur-[110px]"
-        style={{ background: "radial-gradient(circle, #b41c25 0%, transparent 70%)" }}
+        // a soft gradient, not a blur filter: blurring a large element costs
+        // a lot of memory in the Instagram/TikTok in-app browsers
+        className="pointer-events-none absolute left-1/2 top-[18%] h-[56rem] w-[56rem] -translate-x-1/2 -translate-y-[11rem]"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(180,28,37,0.2) 0%, rgba(180,28,37,0.1) 22%, rgba(180,28,37,0.03) 40%, transparent 58%)",
+        }}
       />
 
       <main className="relative z-10 mx-auto flex w-full max-w-md flex-col items-center px-5 pb-16 pt-8 text-center sm:max-w-lg sm:pt-12">
