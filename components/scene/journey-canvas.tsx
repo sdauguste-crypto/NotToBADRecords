@@ -100,6 +100,13 @@ const THRESHOLD_CITY = 0.7;
 
 function StageBloom({ lite }: { lite: boolean }) {
   const bloom = useRef<BloomEffect>(null);
+  // A callback ref, not the object: the library keys each effect on
+  // JSON.stringify(props), and in React 19 `ref` is a prop — once the object
+  // ref holds the (self-referencing) effect, the next re-render throws and
+  // takes the whole page down. Functions are skipped by JSON.stringify.
+  const setBloom = useCallback((effect: BloomEffect | null) => {
+    bloom.current = effect;
+  }, []);
   const composer = useRef<ComposerImpl>(null);
   // The composer sizes its buffers from the window size, which doesn't change
   // when only the pixel ratio does — resize it explicitly, or a lower ratio
@@ -128,7 +135,7 @@ function StageBloom({ lite }: { lite: boolean }) {
     <EffectComposer ref={composer} multisampling={lite ? 0 : 4}>
       {/* HDR glow: the city's neon strips run past 1.0 and bloom into light */}
       <Bloom
-        ref={bloom}
+        ref={setBloom}
         intensity={0.9}
         luminanceThreshold={THRESHOLD_SUNSET}
         luminanceSmoothing={0.35}

@@ -409,6 +409,30 @@ async function main() {
   check("mobile: zero unexpected errors", mErrors.length === 0, mErrors.slice(0, 5).join(" | "));
   await mCtx.close();
 
+  // ---------- High tier under load ----------
+  // The test machine renders at a few fps, so the quality governor steps the
+  // full-effects scene down. Every step re-renders the post-processing, which
+  // once took the whole page down (a ref serialized into the effect's key).
+  console.log("== High tier quality step-down ==");
+  const gErrors = [];
+  const gCtx = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 2 });
+  const gPage = await gCtx.newPage();
+  collectErrors(gPage, gErrors);
+  await gPage.goto(`${url}?ntb-tier=high`, { waitUntil: "load", timeout: 45000 });
+  await gPage.waitForFunction(() => document.documentElement.dataset.journeyReady, { timeout: 30000 }).catch(() => {});
+  const startWidth = await gPage.evaluate(() => document.querySelector("canvas")?.width ?? 0);
+  let stepped = false;
+  for (let i = 0; i < 12 && !stepped; i++) {
+    await gPage.waitForTimeout(2500);
+    await gPage.mouse.wheel(0, 700);
+    stepped = (await gPage.evaluate(() => document.querySelector("canvas")?.width ?? 0)) < startWidth;
+  }
+  await gPage.waitForTimeout(6000); // past the second step (lighter effects)
+  const survived = await gPage.evaluate(() => !!document.querySelector("canvas") && !document.body.innerText.includes("couldn’t load"));
+  check("high tier: governor steps resolution down", stepped, `start=${startWidth}`);
+  check("high tier: page survives the step-down", survived && gErrors.length === 0, gErrors.slice(0, 3).join(" | "));
+  await gCtx.close();
+
   // ---------- No-WebGL fallback ----------
   console.log("== No-WebGL fallback ==");
   const fCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
