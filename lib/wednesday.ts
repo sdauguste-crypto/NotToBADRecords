@@ -22,8 +22,8 @@ export const wednesday = {
   previewClip: "/wednesday/preview.mp3" as string | undefined, // 0:00–0:15
   /** Streaming links — each button appears once its link is set. */
   links: {
-    spotify: undefined as string | undefined,
-    appleMusic: undefined as string | undefined,
+    spotify: "https://open.spotify.com/track/13isILcElhB9AhP2koPIsN" as string | undefined,
+    appleMusic: "https://music.apple.com/us/album/wednesday-single/6819364693" as string | undefined,
     youtube: undefined as string | undefined,
   },
   /** Mailing-list tags: early-access signups, then the weekly drop list. */

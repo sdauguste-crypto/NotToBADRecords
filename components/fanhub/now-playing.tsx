@@ -16,6 +16,15 @@ function clock(seconds: number): string {
   return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
 }
 
+/** m:ss -> seconds. */
+function seconds(clockText: string): number {
+  const [m, s] = clockText.split(":").map(Number);
+  return m * 60 + s;
+}
+
+// Where the idle bar rests while it isn't mirroring the ambient player.
+const IDLE = 0.37;
+
 export function NowPlaying() {
   const reduced = useReducedMotion();
   const [playerLoaded, setPlayerLoaded] = useState(false);
@@ -35,6 +44,10 @@ export function NowPlaying() {
   }, [release.audioUrl]);
 
   const live = pos.duration > 0;
+  // idle: the playhead reads true to where the bar rests on the real length
+  const idleTimes = release.duration
+    ? [clock(seconds(release.duration) * IDLE), release.duration]
+    : ["1:24", "3:47"];
   const percent = live ? `${Math.min(100, (pos.time / pos.duration) * 100)}%` : "37%";
 
   return (
@@ -86,8 +99,8 @@ export function NowPlaying() {
               />
             </div>
             <div className="mt-2 flex justify-between text-xs tracking-[0.2em] text-foreground/50">
-              <span>{live ? clock(pos.time) : "1:24"}</span>
-              <span>{live ? clock(pos.duration) : "3:47"}</span>
+              <span>{live ? clock(pos.time) : idleTimes[0]}</span>
+              <span>{live ? clock(pos.duration) : idleTimes[1]}</span>
             </div>
           </div>
 

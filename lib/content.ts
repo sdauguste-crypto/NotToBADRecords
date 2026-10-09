@@ -14,6 +14,8 @@ export type Release = {
   spotifyEmbedUrl?: string;
   /** Share link to the song on Apple Music. */
   appleMusicUrl?: string;
+  /** Track length (m:ss), shown on the Now Playing bar. */
+  duration?: string;
   /** Real cover artwork under public/covers (falls back to procedural art). */
   coverImage?: string;
   /**
@@ -89,6 +91,19 @@ export type Social = {
 export const contactEmail = "motivationmusicmgmt@gmail.com";
 
 export const releases: Release[] = [
+  {
+    id: "rel-wednesday",
+    coverImage: "/covers/wednesday.webp",
+    title: "WEDNESDAY",
+    artist: "SIMON AUGUSTE",
+    year: 2026,
+    seed: 26,
+    duration: "2:51",
+    spotifyUrl: "https://open.spotify.com/track/13isILcElhB9AhP2koPIsN",
+    spotifyEmbedUrl: "https://open.spotify.com/embed/track/13isILcElhB9AhP2koPIsN",
+    appleMusicUrl: "https://music.apple.com/us/album/wednesday-single/6819364693",
+    tags: ["hip-hop", "single"],
+  },
   {
     id: "rel-the-princess",
     coverImage: "/covers/the-princess.webp",

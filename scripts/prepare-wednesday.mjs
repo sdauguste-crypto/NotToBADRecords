@@ -27,4 +27,10 @@ await sharp(field)
   .jpeg({ quality: 86, mozjpeg: true })
   .toFile(path.join(out, "og.jpg"));
 
-console.log("wrote public/wednesday/cover.jpg and og.jpg");
+// the catalogue cover, matching the other releases under public/covers
+await sharp(source)
+  .resize(1200, 1200, { fit: "cover" })
+  .webp({ quality: 88 })
+  .toFile(path.join(process.cwd(), "public", "covers", "wednesday.webp"));
+
+console.log("wrote public/wednesday/cover.jpg, og.jpg and public/covers/wednesday.webp");

@@ -265,6 +265,23 @@ async function main() {
   check("seo: JSON-LD graph carries the label and the MusicGroup",
     content.ldTypes.includes("Organization") && content.ldTypes.includes("MusicGroup"), JSON.stringify(content.ldTypes));
 
+  // WEDNESDAY is the featured release: Now Playing, first in the catalogue,
+  // with its real store links (no download link anywhere)
+  const featured = await page.evaluate(() => {
+    const music = document.getElementById("music");
+    const links = [...(music?.querySelectorAll("a") ?? [])].map((a) => a.href);
+    return {
+      nowPlaying: music?.querySelector("h3")?.textContent?.trim(),
+      firstCard: music?.querySelector("article h3")?.textContent?.trim(),
+      spotify: links.includes("https://open.spotify.com/track/13isILcElhB9AhP2koPIsN"),
+      apple: links.includes("https://music.apple.com/us/album/wednesday-single/6819364693"),
+      noDownload: !document.querySelector('a[href*="wednesday"][download], audio[src*="wednesday"]'),
+    };
+  });
+  check("music: WEDNESDAY is Now Playing and first in the catalogue, with Spotify + Apple Music",
+    featured.nowPlaying === "WEDNESDAY" && featured.firstCard === "WEDNESDAY" && featured.spotify && featured.apple && featured.noDownload,
+    JSON.stringify(featured));
+
   const canvasCount = await page.evaluate(() => document.querySelectorAll("canvas").length);
   check("WebGL canvas present", ready !== "true" || canvasCount >= 1);
 
