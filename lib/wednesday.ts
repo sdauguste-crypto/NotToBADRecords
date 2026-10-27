@@ -19,7 +19,13 @@ export const wednesday = {
    * Public 15–30 s preview clip under public/wednesday (never the full song).
    * The player stays hidden until this is set.
    */
-  previewClip: "/wednesday/preview.mp3" as string | undefined, // 0:00–0:15
+  previewClip: "/wednesday/preview.mp3" as string | undefined, // 0:13–0:28
+  /**
+   * The full song, streamed on /wednesday once a visitor joins the list. Its
+   * name is unlisted rather than secret — the site is static, so this is a
+   * soft gate. Both files come from scripts/prepare-wednesday-audio.mjs.
+   */
+  fullSong: "/wednesday/full-e7715d95546f.mp3",
   /**
    * Streaming links — each button appears once its link is set. The Oct 9
    * links went dead when the single was pulled for the re-release; add the
