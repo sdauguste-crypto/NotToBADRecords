@@ -283,8 +283,13 @@
 }
 
 /* Chrome gradient for the label wordmark — steel through white and back,
-   so the type reads as brushed metal rather than flat grey. */
-@utility text-chrome {
+   so the type reads as brushed metal rather than flat grey.
+   Named text-chrome-metal, not text-chrome: --color-chrome already makes
+   text-chrome the plain #ebeef1 colour, and sharing the name put this
+   clip-to-text gradient on every page wrapper. Desktop Chrome then painted
+   it through the text of blurred/animated panels at the top-left corner
+   (ghost text on /wednesday). Use it on a single line of type only. */
+@utility text-chrome-metal {
   background: linear-gradient(
     180deg,
     #ffffff 0%,
