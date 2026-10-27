@@ -1,7 +1,8 @@
 // WEDNESDAY audio for the site, from the master:
 //   - the public preview: 15 s from 0:13 (0:13–0:28), short fades
-//   - the full song, streamed on /wednesday once a visitor joins the list
 // and writes the song's real length into the WEDNESDAY release entry.
+// The full song never goes on the site (the site and the repo are public);
+// this also deletes any old full-song file left in public/wednesday.
 //
 //   node scripts/prepare-wednesday-audio.mjs "C:\path\to\Wednesday Final Master 7.wav"
 //
@@ -33,8 +34,7 @@ if (run(["-version"]).error) {
 const root = process.cwd();
 const config = readFileSync(path.join(root, "lib", "wednesday.ts"), "utf8");
 const previewUrl = /previewClip:\s*"([^"]+)"/.exec(config)?.[1];
-const fullUrl = /fullSong:\s*"([^"]+)"/.exec(config)?.[1];
-if (!previewUrl || !fullUrl) throw new Error("previewClip / fullSong not found in lib/wednesday.ts");
+if (!previewUrl) throw new Error("previewClip not found in lib/wednesday.ts");
 const out = (url) => path.join(root, "public", ...url.split("/").filter(Boolean));
 
 // length of the master
@@ -63,20 +63,14 @@ check(
   "preview",
 );
 
-// full song: replace any older full-song file so only one is ever public
-const dir = path.dirname(out(fullUrl));
+// no full song on the site: remove any old full-song file
+const dir = path.dirname(out(previewUrl));
 for (const f of readdirSync(dir)) {
-  if (/^full-.*\.mp3$/.test(f) && f !== path.basename(fullUrl)) rmSync(path.join(dir, f));
+  if (/^full-.*\.mp3$/.test(f)) {
+    rmSync(path.join(dir, f));
+    console.log(`removed public/wednesday/${f} (the full song never goes on the site)`);
+  }
 }
-check(
-  run([
-    "-i", master, "-map_metadata", "-1", "-vn", "-ac", "2", "-ar", "44100",
-    "-c:a", "libmp3lame", "-b:a", "256k", "-id3v2_version", "3",
-    "-metadata", "title=WEDNESDAY", "-metadata", "artist=Simon Auguste",
-    out(fullUrl),
-  ]),
-  "full song",
-);
 
 // the release entry shows the real length on the Now Playing bar
 const whole = Math.round(seconds);
@@ -90,5 +84,4 @@ writeFileSync(contentPath, content.replace(entry, `$1${length}$3`));
 const size = (url) => `${(statSync(out(url)).size / 1048576).toFixed(1)} MB`;
 console.log(`master: ${path.basename(master)} (${length})`);
 console.log(`preview → public${previewUrl} (0:13–0:28, ${size(previewUrl)})`);
-console.log(`full    → public${fullUrl} (${size(fullUrl)})`);
 console.log(`lib/content.ts: WEDNESDAY duration = ${length}`);

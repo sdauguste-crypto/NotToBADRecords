@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { useReducedMotion } from "@/components/sections/use-reduced-motion";
-import { saveUnlocked } from "@/lib/unlock";
+import { saveJoined } from "@/lib/joined";
 import { joinList } from "@/lib/wednesday-signup";
 
 const STORAGE_KEY = "ntb-newsletter";
@@ -41,7 +41,7 @@ export function NewsletterTerminal() {
     setSending(true);
     try {
       await joinList(trimmed, "mission-control");
-      saveUnlocked();
+      saveJoined();
       setSubscribed(true);
       try {
         window.localStorage.setItem(STORAGE_KEY, "1");
@@ -92,7 +92,7 @@ export function NewsletterTerminal() {
               href="/wednesday/"
               className="mt-4 inline-block text-xs font-bold uppercase tracking-[0.25em] text-blood transition-colors hover:text-oxblood"
             >
-              ▸ WEDNESDAY — FULL SONG UNLOCKED, LISTEN NOW
+              ▸ WEDNESDAY — HEAR THE PREVIEW
             </a>
           ) : (
             <form onSubmit={handleSubmit}>

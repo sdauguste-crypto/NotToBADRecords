@@ -2,27 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/** Seconds -> m:ss. */
-function clock(seconds: number): string {
-  const whole = Math.max(0, Math.floor(seconds || 0));
-  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
-}
-
 /**
- * Stream-only player: play/pause and a progress line (plus seeking and times
- * for the full song). No native controls, so no download menu.
+ * Stream-only player for the public preview: play/pause and a progress line.
+ * No native controls, so no download menu. The site never carries the full
+ * song — only this 15-second clip.
  */
-export function AudioPlayer({
-  src,
-  label,
-  seekable = false,
-  id,
-}: {
-  src: string;
-  label: string;
-  seekable?: boolean;
-  id?: string;
-}) {
+export function AudioPlayer({ src, label }: { src: string; label: string }) {
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState({ now: 0, total: 0 });
@@ -61,11 +46,11 @@ export function AudioPlayer({
   const progress = time.total > 0 ? time.now / time.total : 0;
 
   return (
-    <div id={id} className="glass-panel flex w-full scroll-mt-6 items-center gap-4 px-4 py-3">
+    <div className="glass-panel flex w-full items-center gap-4 px-4 py-3">
       <audio
         ref={audio}
         src={src}
-        preload={seekable ? "metadata" : "none"}
+        preload="none"
         playsInline
         controlsList="nodownload noplaybackrate"
         onContextMenu={(e) => e.preventDefault()}
@@ -82,33 +67,12 @@ export function AudioPlayer({
         <p className="text-left text-[0.65rem] uppercase tracking-[0.3em] text-blood">
           ▸ {label}
         </p>
-        {seekable ? (
-          <>
-            <input
-              type="range"
-              min={0}
-              max={1000}
-              value={Math.round(progress * 1000)}
-              onChange={(e) => {
-                const el = audio.current;
-                if (el && time.total > 0) el.currentTime = (Number(e.target.value) / 1000) * time.total;
-              }}
-              aria-label="Seek"
-              className="mt-2 block w-full accent-[#b41c25]"
-            />
-            <div className="mt-1 flex justify-between text-[0.65rem] tabular-nums tracking-[0.2em] text-foreground/50">
-              <span>{clock(time.now)}</span>
-              <span>{time.total > 0 ? clock(time.total) : "--:--"}</span>
-            </div>
-          </>
-        ) : (
-          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-sunset-orange to-sunset-gold shadow-[0_0_12px_rgba(34,211,238,.7)]"
-              style={{ width: `${progress * 100}%` }}
-            />
-          </div>
-        )}
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-sunset-orange to-sunset-gold shadow-[0_0_12px_rgba(34,211,238,.7)]"
+            style={{ width: `${progress * 100}%` }}
+          />
+        </div>
       </div>
     </div>
   );
