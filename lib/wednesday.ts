@@ -5,14 +5,14 @@
 import { zonedTimeToEpoch } from "@/lib/release-time";
 
 export const RELEASE_ZONE = "America/New_York";
-export const RELEASE_LOCAL = "2026-10-09T00:00";
+export const RELEASE_LOCAL = "2026-10-30T00:00";
 
 export const wednesday = {
   title: "WEDNESDAY",
   artist: "Simon Auguste",
-  /** Friday, October 9, 2026, 12:00 AM Eastern — 04:00 UTC. */
+  /** Friday, October 30, 2026, 12:00 AM Eastern — 04:00 UTC (re-release). */
   releaseAt: zonedTimeToEpoch(RELEASE_LOCAL, RELEASE_ZONE),
-  releaseLabel: "FRI 10.09 · 12AM ET",
+  releaseLabel: "FRI 10.30 · 12AM ET",
   cover: { src: "/wednesday/cover.jpg", width: 1200, height: 1200 },
   og: { src: "/wednesday/og.jpg", width: 1200, height: 630 },
   /**
@@ -20,10 +20,14 @@ export const wednesday = {
    * The player stays hidden until this is set.
    */
   previewClip: "/wednesday/preview.mp3" as string | undefined, // 0:00–0:15
-  /** Streaming links — each button appears once its link is set. */
+  /**
+   * Streaming links — each button appears once its link is set. The Oct 9
+   * links went dead when the single was pulled for the re-release; add the
+   * new ones on release day.
+   */
   links: {
-    spotify: "https://open.spotify.com/track/13isILcElhB9AhP2koPIsN" as string | undefined,
-    appleMusic: "https://music.apple.com/us/album/wednesday-single/6819364693" as string | undefined,
+    spotify: undefined as string | undefined,
+    appleMusic: undefined as string | undefined,
     youtube: undefined as string | undefined,
   },
   /** Mailing-list tags: early-access signups, then the weekly drop list. */

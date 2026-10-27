@@ -5,7 +5,9 @@ import assert from "node:assert/strict";
 import { zonedTimeToEpoch } from "../lib/release-time.ts";
 
 const cases = [
-  // WEDNESDAY: Friday 12AM EDT (UTC-4)
+  // WEDNESDAY re-release: Friday 12AM EDT (UTC-4)
+  ["2026-10-30T00:00", "America/New_York", "2026-10-30T04:00:00.000Z"],
+  // original Oct 9 date, kept as a DST-aware case
   ["2026-10-09T00:00", "America/New_York", "2026-10-09T04:00:00.000Z"],
   // standard time (UTC-5), and either side of the November change
   ["2026-12-04T00:00", "America/New_York", "2026-12-04T05:00:00.000Z"],

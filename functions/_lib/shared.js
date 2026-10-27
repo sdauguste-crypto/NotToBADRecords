@@ -14,9 +14,9 @@
 //   PUBLIC_RELEASE_URL    optional, defaults to https://www.nottobadrecords.com/wednesday/
 //   ALLOWED_ORIGINS       optional, comma-separated
 
-// Friday, October 9, 2026, 12:00 AM Eastern (EDT, UTC−4). The site computes
+// Friday, October 30, 2026, 12:00 AM Eastern (EDT, UTC−4), the re-release. The site computes
 // the same instant from the zone; scripts/test-release-time.mjs pins it.
-export const RELEASE_AT_DEFAULT = "2026-10-09T04:00:00Z";
+export const RELEASE_AT_DEFAULT = "2026-10-30T04:00:00Z";
 
 export function releaseAt(env) {
   const t = Date.parse(env.RELEASE_AT || RELEASE_AT_DEFAULT);
