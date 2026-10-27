@@ -3,11 +3,10 @@
 import Link from "next/link";
 
 import { useReleaseClock } from "@/lib/release-clock";
-import { useUnlocked } from "@/lib/unlock";
 import { streamingLinks, wednesday } from "@/lib/wednesday";
 
 import { Countdown } from "./countdown";
-import { AudioPlayer, PreviewPlayer } from "./preview-player";
+import { PreviewPlayer } from "./preview-player";
 import { PreviewTag } from "./preview-tag";
 import { WednesdaySignup } from "./signup";
 
@@ -16,13 +15,6 @@ export function ReleasePage({ initiallyReleased }: { initiallyReleased: boolean 
   const clock = useReleaseClock(wednesday.releaseAt, initiallyReleased);
   const out = clock.released;
   const links = streamingLinks();
-  // signed up on this device: the full song streams here instead of the preview
-  const unlocked = useUnlocked();
-  const fullSong = unlocked ? (
-    <div className="mt-6 w-full">
-      <AudioPlayer id="full-song" src={wednesday.fullSong} label="FULL SONG — UNLOCKED" seekable />
-    </div>
-  ) : null;
 
   return (
     <div className="relative min-h-[100svh] overflow-hidden bg-obsidian text-chrome">
@@ -96,14 +88,13 @@ export function ReleasePage({ initiallyReleased }: { initiallyReleased: boolean 
         ) : (
           <>
             <Countdown remaining={clock.now === null ? null : clock.remaining} className="mt-8 w-full" />
-            {!unlocked && wednesday.previewClip ? (
+            {wednesday.previewClip ? (
               <div className="mt-6 w-full">
                 <PreviewPlayer src={wednesday.previewClip} />
               </div>
             ) : null}
           </>
         )}
-        {fullSong}
 
         <div className="mt-12 w-full">
           {out ? (
@@ -111,12 +102,16 @@ export function ReleasePage({ initiallyReleased }: { initiallyReleased: boolean 
               key="weekly"
               label="Take Off Thursdays — new drops every Thursday."
               tag={wednesday.tags.weekly}
+              success="You're in, Cadet. New drops hit your inbox every Thursday."
+              pitch="Join for new drops every Thursday."
             />
           ) : (
             <WednesdaySignup
               key="early"
               label="Space Cadets hear it first."
               tag={wednesday.tags.early}
+              success="You're in, Cadet. Your early listen hits your inbox Wednesday night."
+              pitch="Join for an early listen, straight to your inbox."
             />
           )}
         </div>

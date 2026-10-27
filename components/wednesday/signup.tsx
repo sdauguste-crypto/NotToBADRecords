@@ -3,18 +3,29 @@
 import { useState, type FormEvent } from "react";
 
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
-import { saveUnlocked, useUnlocked } from "@/lib/unlock";
+import { saveJoined, useJoined } from "@/lib/joined";
 import { joinList } from "@/lib/wednesday-signup";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /**
  * The JOIN MISSION CONTROL terminal, relabeled for the release: before it,
- * "Space Cadets hear it first."; after it, the weekly drop list. Either way,
- * joining unlocks the full song on this page.
+ * "Space Cadets hear it first."; after it, the weekly drop list. Joining
+ * shows the `success` line (and keeps showing it on this device). Nothing
+ * plays beyond the public preview — the early listen goes out by email.
  */
-export function WednesdaySignup({ label, tag }: { label: string; tag: string }) {
-  const unlocked = useUnlocked();
+export function WednesdaySignup({
+  label,
+  tag,
+  success,
+  pitch,
+}: {
+  label: string;
+  tag: string;
+  success: string;
+  pitch: string;
+}) {
+  const joined = useJoined();
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   // a field people never see; bots fill it in
@@ -33,12 +44,8 @@ export function WednesdaySignup({ label, tag }: { label: string; tag: string }) 
     setSending(true);
     try {
       await joinList(trimmed, tag, website);
-      saveUnlocked();
+      saveJoined();
       setDone(true);
-      // the full-song player replaces the preview further up the page
-      window.requestAnimationFrame(() =>
-        document.getElementById("full-song")?.scrollIntoView({ behavior: "smooth", block: "center" }),
-      );
     } catch {
       setError("SIGNAL LOST — TRANSMISSION FAILED, TRY AGAIN");
     } finally {
@@ -46,7 +53,7 @@ export function WednesdaySignup({ label, tag }: { label: string; tag: string }) 
     }
   };
 
-  const success = "✓ WELCOME ABOARD, CADET — THE FULL SONG IS UNLOCKED ▲";
+  const signedUp = done || joined;
 
   return (
     <div className="w-full text-left">
@@ -56,9 +63,9 @@ export function WednesdaySignup({ label, tag }: { label: string; tag: string }) 
 
       <div className="glass-panel p-3 sm:p-4">
         <div className="scanlines rounded-lg border border-blood/40 bg-void-deep p-5 sm:p-6">
-          {done ? (
-            <p className="text-sm tracking-[0.15em] text-[#ebeef1]" role="status">
-              {success}
+          {signedUp ? (
+            <p className="text-sm leading-relaxed tracking-[0.15em] text-[#ebeef1]" role="status">
+              ✓ {success}
             </p>
           ) : (
             <form onSubmit={handleSubmit} noValidate>
@@ -113,9 +120,7 @@ export function WednesdaySignup({ label, tag }: { label: string; tag: string }) 
           )}
         </div>
         <p className="mt-3 text-xs text-foreground/40">
-          {unlocked
-            ? "Full song unlocked on this device. "
-            : "Join to unlock the full song right now. "}
+          {signedUp ? "" : `${pitch} `}
           No spam — launch alerts and new drops only. Unsubscribe anytime.
         </p>
       </div>
