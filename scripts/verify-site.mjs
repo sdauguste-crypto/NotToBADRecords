@@ -273,8 +273,8 @@ async function main() {
     return {
       nowPlaying: music?.querySelector("h3")?.textContent?.trim(),
       firstCard: music?.querySelector("article h3")?.textContent?.trim(),
-      spotify: links.includes("https://open.spotify.com/track/13isILcElhB9AhP2koPIsN"),
-      apple: links.includes("https://music.apple.com/us/album/wednesday-single/6819364693"),
+      spotify: links.some((l) => l.startsWith("https://open.spotify.com/")),
+      apple: links.some((l) => l.startsWith("https://music.apple.com/")),
       noDownload: !document.querySelector('a[href*="wednesday"][download], audio[src*="wednesday"]'),
     };
   });
