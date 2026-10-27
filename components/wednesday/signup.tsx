@@ -3,27 +3,20 @@
 import { useState, type FormEvent } from "react";
 
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
-import { joinList, sendsEarlyAccess } from "@/lib/wednesday-signup";
+import { saveUnlocked, useUnlocked } from "@/lib/unlock";
+import { joinList } from "@/lib/wednesday-signup";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /**
  * The JOIN MISSION CONTROL terminal, relabeled for the release: before it,
- * "Space Cadets hear it first." (tagged for early access); after it, the
- * weekly drop list.
+ * "Space Cadets hear it first."; after it, the weekly drop list. Either way,
+ * joining unlocks the full song on this page.
  */
-export function WednesdaySignup({
-  label,
-  tag,
-  early,
-}: {
-  label: string;
-  tag: string;
-  /** Before release: a successful signup means an early-access email. */
-  early: boolean;
-}) {
+export function WednesdaySignup({ label, tag }: { label: string; tag: string }) {
+  const unlocked = useUnlocked();
   const [email, setEmail] = useState("");
-  const [done, setDone] = useState<"sent" | "queued" | null>(null);
+  const [done, setDone] = useState(false);
   // a field people never see; bots fill it in
   const [website, setWebsite] = useState("");
   const [sending, setSending] = useState(false);
@@ -39,7 +32,13 @@ export function WednesdaySignup({
     setError("");
     setSending(true);
     try {
-      setDone(await joinList(trimmed, tag, website));
+      await joinList(trimmed, tag, website);
+      saveUnlocked();
+      setDone(true);
+      // the full-song player replaces the preview further up the page
+      window.requestAnimationFrame(() =>
+        document.getElementById("full-song")?.scrollIntoView({ behavior: "smooth", block: "center" }),
+      );
     } catch {
       setError("SIGNAL LOST — TRANSMISSION FAILED, TRY AGAIN");
     } finally {
@@ -47,11 +46,7 @@ export function WednesdaySignup({
     }
   };
 
-  const success = !(early && sendsEarlyAccess)
-    ? "✓ TRANSMISSION RECEIVED — WELCOME ABOARD, CADET"
-    : done === "queued"
-      ? "✓ YOU'RE ON THE LIST — YOUR EARLY LISTEN LINK FOLLOWS SHORTLY"
-      : "✓ CHECK YOUR INBOX — YOUR EARLY LISTEN IS ON ITS WAY";
+  const success = "✓ WELCOME ABOARD, CADET — THE FULL SONG IS UNLOCKED ▲";
 
   return (
     <div className="w-full text-left">
@@ -118,6 +113,9 @@ export function WednesdaySignup({
           )}
         </div>
         <p className="mt-3 text-xs text-foreground/40">
+          {unlocked
+            ? "Full song unlocked on this device. "
+            : "Join to unlock the full song right now. "}
           No spam — launch alerts and new drops only. Unsubscribe anytime.
         </p>
       </div>

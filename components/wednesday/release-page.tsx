@@ -3,10 +3,11 @@
 import Link from "next/link";
 
 import { useReleaseClock } from "@/lib/release-clock";
+import { useUnlocked } from "@/lib/unlock";
 import { streamingLinks, wednesday } from "@/lib/wednesday";
 
 import { Countdown } from "./countdown";
-import { PreviewPlayer } from "./preview-player";
+import { AudioPlayer, PreviewPlayer } from "./preview-player";
 import { PreviewTag } from "./preview-tag";
 import { WednesdaySignup } from "./signup";
 
@@ -15,6 +16,13 @@ export function ReleasePage({ initiallyReleased }: { initiallyReleased: boolean 
   const clock = useReleaseClock(wednesday.releaseAt, initiallyReleased);
   const out = clock.released;
   const links = streamingLinks();
+  // signed up on this device: the full song streams here instead of the preview
+  const unlocked = useUnlocked();
+  const fullSong = unlocked ? (
+    <div className="mt-6 w-full">
+      <AudioPlayer id="full-song" src={wednesday.fullSong} label="FULL SONG — UNLOCKED" seekable />
+    </div>
+  ) : null;
 
   return (
     <div className="relative min-h-[100svh] overflow-hidden bg-obsidian text-chrome">
@@ -88,13 +96,14 @@ export function ReleasePage({ initiallyReleased }: { initiallyReleased: boolean 
         ) : (
           <>
             <Countdown remaining={clock.now === null ? null : clock.remaining} className="mt-8 w-full" />
-            {wednesday.previewClip ? (
+            {!unlocked && wednesday.previewClip ? (
               <div className="mt-6 w-full">
                 <PreviewPlayer src={wednesday.previewClip} />
               </div>
             ) : null}
           </>
         )}
+        {fullSong}
 
         <div className="mt-12 w-full">
           {out ? (
@@ -102,14 +111,12 @@ export function ReleasePage({ initiallyReleased }: { initiallyReleased: boolean 
               key="weekly"
               label="Take Off Thursdays — new drops every Thursday."
               tag={wednesday.tags.weekly}
-              early={false}
             />
           ) : (
             <WednesdaySignup
               key="early"
               label="Space Cadets hear it first."
               tag={wednesday.tags.early}
-              early
             />
           )}
         </div>

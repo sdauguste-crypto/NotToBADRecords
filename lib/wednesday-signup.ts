@@ -1,37 +1,35 @@
-// Where a WEDNESDAY signup goes. Once the mailing-list backend exists, its
-// URL is set as NEXT_PUBLIC_WEDNESDAY_SIGNUP_URL at build time and every
-// signup lands on the real list (tagged), which emails the early-access link.
-// Until then signups fall back to the label inbox through the contact relay,
-// so nobody who signs up is lost — but no early-access email goes out.
+// Where a signup goes: the Kit list, through the public endpoint of the
+// "Newsletter site" form. It takes a plain POST from any site, so nothing
+// secret lives in the page. Kit applies the form's own settings (tags,
+// confirmation email) on its side. If Kit can't be reached, the signup falls
+// back to the label inbox through the contact relay, so nobody is lost.
 
 import { relayToGroundControl } from "@/lib/relay";
 
-const ENDPOINT = process.env.NEXT_PUBLIC_WEDNESDAY_SIGNUP_URL;
+export const KIT_FORM_ID = 10052240;
+export const KIT_ENDPOINT = `https://app.kit.com/forms/${KIT_FORM_ID}/subscriptions`;
 
-/** True when signups reach the list that sends the early-access email. */
-export const sendsEarlyAccess = !!ENDPOINT;
+/** Resolves once the signup is kept somewhere; throws if it wasn't. */
+export async function joinList(email: string, tag: string, website = ""): Promise<void> {
+  if (website) return; // a bot filled the hidden field: drop it quietly
 
-/** Resolves to "queued" when the list kept the signup but the email is delayed. */
-export async function joinList(
-  email: string,
-  tag: string,
-  website = "",
-): Promise<"sent" | "queued"> {
-  if (ENDPOINT) {
-    const res = await fetch(ENDPOINT, {
+  try {
+    const body = new FormData();
+    body.append("email_address", email);
+    const res = await fetch(KIT_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, tag, website }),
+      body,
+      headers: { Accept: "application/json" },
     });
-    if (!res.ok) throw new Error(`signup responded ${res.status}`);
-    const data = (await res.json().catch(() => ({}))) as { queued?: boolean };
-    return data.queued ? "queued" : "sent";
+    const data = (await res.json().catch(() => null)) as { status?: string } | null;
+    if (res.ok && data?.status !== "failed") return;
+    throw new Error(`kit responded ${res.status} ${data?.status ?? ""}`);
+  } catch (err) {
+    console.warn("Kit signup failed; sending it to the label inbox instead", err);
+    await relayToGroundControl({
+      email,
+      tag,
+      _subject: `NTB Mission Control — signup (${tag}) — Kit was unreachable, add by hand`,
+    });
   }
-  if (website) return "sent"; // a bot: drop it quietly
-  await relayToGroundControl({
-    email,
-    tag,
-    _subject: `NTB Mission Control — WEDNESDAY signup (${tag})`,
-  });
-  return "sent";
 }
