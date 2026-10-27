@@ -1,16 +1,16 @@
 "use client";
 
-// "Signed up on this device": joining the list unlocks the full WEDNESDAY
-// stream on /wednesday, and the browser remembers it so returning Cadets
-// don't have to sign up again. A soft gate by design — the site is static,
-// so it hides the song from casual visitors rather than locking the file.
+// "Signed up on this device": after joining the list, the browser remembers
+// it so returning Cadets see "You're in" instead of the form again. Nothing
+// is unlocked — the site only ever carries the 15-second preview.
 
 import { useSyncExternalStore } from "react";
 
+// the old key name, so people who signed up before still count as joined
 const KEY = "ntb-wednesday-unlocked";
-const EVENT = "ntb-unlocked";
-// when storage is blocked (private browsing), unlocked for this visit only
-let unlockedThisVisit = false;
+const EVENT = "ntb-joined";
+// when storage is blocked (private browsing), joined for this visit only
+let joinedThisVisit = false;
 
 function read(): boolean {
   try {
@@ -20,11 +20,11 @@ function read(): boolean {
   }
 }
 
-export function saveUnlocked() {
+export function saveJoined() {
   try {
     window.localStorage.setItem(KEY, "1");
   } catch {
-    unlockedThisVisit = true;
+    joinedThisVisit = true;
   }
   window.dispatchEvent(new Event(EVENT));
 }
@@ -39,10 +39,10 @@ function subscribe(onChange: () => void) {
 }
 
 /** True once this browser has signed up. False in the static HTML. */
-export function useUnlocked(): boolean {
+export function useJoined(): boolean {
   return useSyncExternalStore(
     subscribe,
-    () => unlockedThisVisit || read(),
+    () => joinedThisVisit || read(),
     () => false,
   );
 }

@@ -391,20 +391,33 @@ async function main() {
   check("secondary pages: zero unexpected errors", secErrors.length === 0, secErrors.slice(0, 5).join(" | "));
   await secPage.close();
 
-  // ---------- WEDNESDAY: sign up to unlock the full song ----------
-  // The real Kit endpoint is replaced by a stand-in that answers like Kit, so
-  // this checks the whole flow offline: preview first, Kit gets the email,
-  // the full-song player appears and stays unlocked on return.
-  console.log("== WEDNESDAY unlock ==");
+  // ---------- WEDNESDAY: preview only; signing up joins the list ----------
+  // The site and the repo are public, so the full song must never be in the
+  // export. The real Kit endpoint is replaced by a stand-in that answers like
+  // Kit, so this checks the signup offline: Kit gets the email, the page says
+  // "You're in", the preview stays the only audio, and that holds on return.
+  console.log("== WEDNESDAY preview + signup ==");
   const wedConfig = readFileSync(path.resolve("lib/wednesday.ts"), "utf8");
   const previewUrl = /previewClip:\s*"([^"]+)"/.exec(wedConfig)?.[1];
-  const fullUrl = /fullSong:\s*"([^"]+)"/.exec(wedConfig)?.[1];
   const builtSize = (u) => (u && existsSync(path.join(ROOT, u)) ? statSync(path.join(ROOT, u)).size : 0);
-  check("wednesday: preview clip and full song are built into the site",
-    builtSize(previewUrl) > 50_000 && builtSize(fullUrl) > 1_000_000,
-    `preview=${builtSize(previewUrl)}B full=${builtSize(fullUrl)}B — run scripts/prepare-wednesday-audio.mjs on the master`);
-  const wedHtml = readFileSync(path.join(ROOT, "wednesday", "index.html"), "utf8");
-  check("wednesday: the full song isn't named in the page's HTML", !!fullUrl && !wedHtml.includes(path.basename(fullUrl)));
+  check("wednesday: the 15-second preview is built into the site",
+    builtSize(previewUrl) > 50_000 && builtSize(previewUrl) < 600_000,
+    `preview=${builtSize(previewUrl)}B — run scripts/prepare-wednesday-audio.mjs on the master`);
+  const audioFiles = [];
+  const walk = async (dir) => {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) await walk(full);
+      else if (/\.(mp3|wav|m4a|aac|flac|ogg|opus)$/i.test(entry.name)) audioFiles.push(path.relative(ROOT, full).split(path.sep).join("/"));
+    }
+  };
+  await walk(path.join(ROOT, "wednesday"));
+  check("wednesday: the preview is the only audio file under /wednesday (no full song)",
+    audioFiles.length === 1 && "/" + audioFiles[0] === previewUrl, JSON.stringify(audioFiles));
+  const fullRefs = (await exportedText())
+    .filter(([, text]) => /full-[0-9a-f]{6,}\.mp3|fullSong/.test(text))
+    .map(([file]) => path.relative(ROOT, file));
+  check("wednesday: nothing in the built site points to a full-song file", fullRefs.length === 0, fullRefs.join(", "));
 
   const uErrors = [];
   const uCtx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
@@ -419,21 +432,24 @@ async function main() {
   const srcs = () => uPage.evaluate(() => [...document.querySelectorAll("audio")].map((a) => ({
     src: a.getAttribute("src"), controls: a.controls, download: a.hasAttribute("download"),
   })));
+  const previewOnly = (list) => list.length === 1 && list[0].src === previewUrl && !list[0].controls && !list[0].download;
   const before = await srcs();
-  check("wednesday: visitors get the preview only, until they sign up",
-    before.length === 1 && before[0].src === previewUrl && !before[0].controls, JSON.stringify(before));
+  check("wednesday: visitors get the preview only", previewOnly(before), JSON.stringify(before));
+  const YOURE_IN = "You're in, Cadet. Your early listen hits your inbox Wednesday night.";
   await uPage.fill("#wednesday-email", "cadet.check@example.com");
   await uPage.click('form button[type="submit"]');
-  await uPage.waitForSelector(`audio[src="${fullUrl}"]`, { timeout: 10000 }).catch(() => {});
+  await uPage.waitForSelector("[role=status]", { timeout: 10000 }).catch(() => {});
   const after = await srcs();
-  const unlockedText = await uPage.evaluate(() => /FULL SONG IS UNLOCKED/.test(document.body.innerText));
-  check("wednesday: signing up sends the email to Kit and unlocks the full song",
-    kitPosts.some((b) => b.includes("cadet.check@example.com")) && unlockedText &&
-      after.some((a) => a.src === fullUrl && !a.controls && !a.download) && !after.some((a) => a.src === previewUrl),
-    JSON.stringify({ kitPosts: kitPosts.length, unlockedText, after }));
+  const status = await uPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
+  check("wednesday: signing up sends the email to Kit and says \"You're in\" (no full song)",
+    kitPosts.some((b) => b.includes("cadet.check@example.com")) && status.includes(YOURE_IN) &&
+      !/unlock/i.test(await uPage.evaluate(() => document.body.innerText)) && previewOnly(after),
+    JSON.stringify({ kitPosts: kitPosts.length, status, after }));
   await uPage.reload({ waitUntil: "networkidle" });
   const again = await srcs();
-  check("wednesday: the unlock is remembered on return", again.some((a) => a.src === fullUrl), JSON.stringify(again));
+  const statusAgain = await uPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
+  check("wednesday: \"You're in\" is remembered on return, still preview only",
+    statusAgain.includes(YOURE_IN) && previewOnly(again), JSON.stringify({ statusAgain, again }));
   check("wednesday: zero unexpected errors", uErrors.length === 0, uErrors.slice(0, 5).join(" | "));
   // A clip-to-text background on anything that wraps the blurred/animated
   // panels makes desktop Chrome paint ghost text in the top-left corner.
@@ -441,7 +457,7 @@ async function main() {
     .filter((el) => getComputedStyle(el).backgroundClip === "text" && el.querySelector(".glass-panel, button, audio"))
     .map((el) => `${el.tagName}.${el.className}`.slice(0, 80)));
   check("wednesday: no clip-to-text background around the panels (desktop ghost text)", clipped.length === 0, JSON.stringify(clipped));
-  await uPage.screenshot({ path: path.join(SHOT_DIR, "wednesday-unlocked.png"), fullPage: true });
+  await uPage.screenshot({ path: path.join(SHOT_DIR, "wednesday-signed-up.png"), fullPage: true });
   await uCtx.close();
 
   // ---------- Reduced motion ----------
