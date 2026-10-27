@@ -5,7 +5,8 @@ import { motion } from "motion/react";
 
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { useReducedMotion } from "@/components/sections/use-reduced-motion";
-import { relayToGroundControl } from "@/lib/relay";
+import { saveUnlocked } from "@/lib/unlock";
+import { joinList } from "@/lib/wednesday-signup";
 
 const STORAGE_KEY = "ntb-newsletter";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -39,10 +40,8 @@ export function NewsletterTerminal() {
     setError("");
     setSending(true);
     try {
-      await relayToGroundControl({
-        email: trimmed,
-        _subject: "NTB Mission Control — new newsletter signup",
-      });
+      await joinList(trimmed, "mission-control");
+      saveUnlocked();
       setSubscribed(true);
       try {
         window.localStorage.setItem(STORAGE_KEY, "1");
@@ -87,6 +86,14 @@ export function NewsletterTerminal() {
                 </span>
               )}
             </p>
+          ) : null}
+          {subscribed ? (
+            <a
+              href="/wednesday/"
+              className="mt-4 inline-block text-xs font-bold uppercase tracking-[0.25em] text-blood transition-colors hover:text-oxblood"
+            >
+              ▸ WEDNESDAY — FULL SONG UNLOCKED, LISTEN NOW
+            </a>
           ) : (
             <form onSubmit={handleSubmit}>
               <p className="text-sm tracking-[0.15em] text-blood">

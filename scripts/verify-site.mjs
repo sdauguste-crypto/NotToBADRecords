@@ -4,10 +4,12 @@
  * Usage: npm run build && npm run verify
  * Env:   SHOT_DIR  where screenshots go (default ./verify-shots)
  *        PORT      server port (default 4173)
+ *        CHROMIUM  browser to drive (default: Playwright's Chromium, else
+ *                  Chrome or Edge on Windows/macOS)
  */
 import { createServer } from "node:http";
 import { readFile, mkdir, readdir } from "node:fs/promises";
-import { existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { chromium } from "playwright-core";
 
@@ -32,7 +34,14 @@ const IGNORABLE = [
 ];
 
 function findChromium() {
+  if (process.env.CHROMIUM) return process.env.CHROMIUM;
+  const installed = [
+    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  ].find((p) => existsSync(p));
   const base = "/opt/pw-browsers";
+  if (!existsSync(base) && installed) return installed;
   if (existsSync(`${base}/chromium`)) return `${base}/chromium`;
   for (const d of (existsSync(base) ? require("node:fs").readdirSync(base) : [])) {
     const p = `${base}/${d}/chrome-linux/chrome`;
@@ -381,6 +390,53 @@ async function main() {
   check("seo: sitemap.xml lists every page", sitemapOk);
   check("secondary pages: zero unexpected errors", secErrors.length === 0, secErrors.slice(0, 5).join(" | "));
   await secPage.close();
+
+  // ---------- WEDNESDAY: sign up to unlock the full song ----------
+  // The real Kit endpoint is replaced by a stand-in that answers like Kit, so
+  // this checks the whole flow offline: preview first, Kit gets the email,
+  // the full-song player appears and stays unlocked on return.
+  console.log("== WEDNESDAY unlock ==");
+  const wedConfig = readFileSync(path.resolve("lib/wednesday.ts"), "utf8");
+  const previewUrl = /previewClip:\s*"([^"]+)"/.exec(wedConfig)?.[1];
+  const fullUrl = /fullSong:\s*"([^"]+)"/.exec(wedConfig)?.[1];
+  const builtSize = (u) => (u && existsSync(path.join(ROOT, u)) ? statSync(path.join(ROOT, u)).size : 0);
+  check("wednesday: preview clip and full song are built into the site",
+    builtSize(previewUrl) > 50_000 && builtSize(fullUrl) > 1_000_000,
+    `preview=${builtSize(previewUrl)}B full=${builtSize(fullUrl)}B — run scripts/prepare-wednesday-audio.mjs on the master`);
+  const wedHtml = readFileSync(path.join(ROOT, "wednesday", "index.html"), "utf8");
+  check("wednesday: the full song isn't named in the page's HTML", !!fullUrl && !wedHtml.includes(path.basename(fullUrl)));
+
+  const uErrors = [];
+  const uCtx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  const kitPosts = [];
+  await uCtx.route("https://app.kit.com/forms/**", async (route) => {
+    kitPosts.push(route.request().postData() ?? "");
+    await route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"status":"success"}' });
+  });
+  const uPage = await uCtx.newPage();
+  collectErrors(uPage, uErrors);
+  await uPage.goto(`http://localhost:${PORT}${BASE_PATH}/wednesday/`, { waitUntil: "networkidle", timeout: 45000 });
+  const srcs = () => uPage.evaluate(() => [...document.querySelectorAll("audio")].map((a) => ({
+    src: a.getAttribute("src"), controls: a.controls, download: a.hasAttribute("download"),
+  })));
+  const before = await srcs();
+  check("wednesday: visitors get the preview only, until they sign up",
+    before.length === 1 && before[0].src === previewUrl && !before[0].controls, JSON.stringify(before));
+  await uPage.fill("#wednesday-email", "cadet.check@example.com");
+  await uPage.click('form button[type="submit"]');
+  await uPage.waitForSelector(`audio[src="${fullUrl}"]`, { timeout: 10000 }).catch(() => {});
+  const after = await srcs();
+  const unlockedText = await uPage.evaluate(() => /FULL SONG IS UNLOCKED/.test(document.body.innerText));
+  check("wednesday: signing up sends the email to Kit and unlocks the full song",
+    kitPosts.some((b) => b.includes("cadet.check@example.com")) && unlockedText &&
+      after.some((a) => a.src === fullUrl && !a.controls && !a.download) && !after.some((a) => a.src === previewUrl),
+    JSON.stringify({ kitPosts: kitPosts.length, unlockedText, after }));
+  await uPage.reload({ waitUntil: "networkidle" });
+  const again = await srcs();
+  check("wednesday: the unlock is remembered on return", again.some((a) => a.src === fullUrl), JSON.stringify(again));
+  check("wednesday: zero unexpected errors", uErrors.length === 0, uErrors.slice(0, 5).join(" | "));
+  await uPage.screenshot({ path: path.join(SHOT_DIR, "wednesday-unlocked.png"), fullPage: true });
+  await uCtx.close();
 
   // ---------- Reduced motion ----------
   console.log("== Reduced motion ==");
