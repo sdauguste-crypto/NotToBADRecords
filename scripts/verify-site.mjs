@@ -435,6 +435,12 @@ async function main() {
   const again = await srcs();
   check("wednesday: the unlock is remembered on return", again.some((a) => a.src === fullUrl), JSON.stringify(again));
   check("wednesday: zero unexpected errors", uErrors.length === 0, uErrors.slice(0, 5).join(" | "));
+  // A clip-to-text background on anything that wraps the blurred/animated
+  // panels makes desktop Chrome paint ghost text in the top-left corner.
+  const clipped = await uPage.evaluate(() => [...document.querySelectorAll("body *")]
+    .filter((el) => getComputedStyle(el).backgroundClip === "text" && el.querySelector(".glass-panel, button, audio"))
+    .map((el) => `${el.tagName}.${el.className}`.slice(0, 80)));
+  check("wednesday: no clip-to-text background around the panels (desktop ghost text)", clipped.length === 0, JSON.stringify(clipped));
   await uPage.screenshot({ path: path.join(SHOT_DIR, "wednesday-unlocked.png"), fullPage: true });
   await uCtx.close();
 
