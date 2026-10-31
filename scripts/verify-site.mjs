@@ -282,8 +282,8 @@ async function main() {
     return {
       nowPlaying: music?.querySelector("h3")?.textContent?.trim(),
       firstCard: music?.querySelector("article h3")?.textContent?.trim(),
-      spotify: links.some((l) => l.startsWith("https://open.spotify.com/")),
-      apple: links.some((l) => l.startsWith("https://music.apple.com/")),
+      spotify: links.includes("https://open.spotify.com/track/13isILcElhB9AhP2koPIsN"),
+      apple: links.includes("https://music.apple.com/us/album/wednesday-single/6826547891"),
       noDownload: !document.querySelector('a[href*="wednesday"][download], audio[src*="wednesday"]'),
     };
   });
@@ -419,46 +419,72 @@ async function main() {
     .map(([file]) => path.relative(ROOT, file));
   check("wednesday: nothing in the built site points to a full-song file", fullRefs.length === 0, fullRefs.join(", "));
 
-  const uErrors = [];
-  const uCtx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
-  const kitPosts = [];
-  await uCtx.route("https://app.kit.com/forms/**", async (route) => {
-    kitPosts.push(route.request().postData() ?? "");
-    await route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"status":"success"}' });
-  });
-  const uPage = await uCtx.newPage();
-  collectErrors(uPage, uErrors);
-  await uPage.goto(`http://localhost:${PORT}${BASE_PATH}/wednesday/`, { waitUntil: "networkidle", timeout: 45000 });
-  const srcs = () => uPage.evaluate(() => [...document.querySelectorAll("audio")].map((a) => ({
-    src: a.getAttribute("src"), controls: a.controls, download: a.hasAttribute("download"),
-  })));
-  const previewOnly = (list) => list.length === 1 && list[0].src === previewUrl && !list[0].controls && !list[0].download;
-  const before = await srcs();
-  check("wednesday: visitors get the preview only", previewOnly(before), JSON.stringify(before));
-  const YOURE_IN = "You're in, Cadet. Your early listen hits your inbox Wednesday night.";
-  await uPage.fill("#wednesday-email", "cadet.check@example.com");
-  await uPage.click('form button[type="submit"]');
-  await uPage.waitForSelector("[role=status]", { timeout: 10000 }).catch(() => {});
-  const after = await srcs();
-  const status = await uPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
-  check("wednesday: signing up sends the email to Kit and says \"You're in\" (no full song)",
-    kitPosts.some((b) => b.includes("cadet.check@example.com")) && status.includes(YOURE_IN) &&
-      !/unlock/i.test(await uPage.evaluate(() => document.body.innerText)) && previewOnly(after),
-    JSON.stringify({ kitPosts: kitPosts.length, status, after }));
-  await uPage.reload({ waitUntil: "networkidle" });
-  const again = await srcs();
-  const statusAgain = await uPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
-  check("wednesday: \"You're in\" is remembered on return, still preview only",
-    statusAgain.includes(YOURE_IN) && previewOnly(again), JSON.stringify({ statusAgain, again }));
-  check("wednesday: zero unexpected errors", uErrors.length === 0, uErrors.slice(0, 5).join(" | "));
-  // A clip-to-text background on anything that wraps the blurred/animated
-  // panels makes desktop Chrome paint ghost text in the top-left corner.
-  const clipped = await uPage.evaluate(() => [...document.querySelectorAll("body *")]
-    .filter((el) => getComputedStyle(el).backgroundClip === "text" && el.querySelector(".glass-panel, button, audio"))
-    .map((el) => `${el.tagName}.${el.className}`.slice(0, 80)));
-  check("wednesday: no clip-to-text background around the panels (desktop ghost text)", clipped.length === 0, JSON.stringify(clipped));
-  await uPage.screenshot({ path: path.join(SHOT_DIR, "wednesday-signed-up.png"), fullPage: true });
-  await uCtx.close();
+  // Both sides of the release, whatever today's date: the page's own test
+  // switch (?preview=before|after) pins the state. Before: countdown, preview
+  // only. After: OUT NOW, the store buttons, no audio on the page at all.
+  const storeLinks = {
+    spotify: /spotify:\s*"([^"]+)"/.exec(wedConfig)?.[1],
+    apple: /appleMusic:\s*"([^"]+)"/.exec(wedConfig)?.[1],
+  };
+  const STATES = [
+    { name: "before release", query: "?preview=before", youreIn: "You're in, Cadet. Your early listen hits your inbox Wednesday night." },
+    { name: "after release", query: "?preview=after", youreIn: "You're in, Cadet. New drops hit your inbox every Thursday." },
+  ];
+  for (const state of STATES) {
+    const uErrors = [];
+    const uCtx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+    const kitPosts = [];
+    await uCtx.route("https://app.kit.com/forms/**", async (route) => {
+      kitPosts.push(route.request().postData() ?? "");
+      await route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"status":"success"}' });
+    });
+    const uPage = await uCtx.newPage();
+    collectErrors(uPage, uErrors);
+    await uPage.goto(`http://localhost:${PORT}${BASE_PATH}/wednesday/${state.query}`, { waitUntil: "networkidle", timeout: 45000 });
+    const srcs = () => uPage.evaluate(() => [...document.querySelectorAll("audio")].map((a) => ({
+      src: a.getAttribute("src"), controls: a.controls, download: a.hasAttribute("download"),
+    })));
+    const expectedAudio = (list) => state.query === "?preview=before"
+      ? list.length === 1 && list[0].src === previewUrl && !list[0].controls && !list[0].download
+      : list.length === 0;
+    const before = await srcs();
+    if (state.query === "?preview=before") {
+      check(`wednesday (${state.name}): countdown and the preview only`,
+        expectedAudio(before) && (await uPage.locator('[role="timer"]').count()) === 1, JSON.stringify(before));
+    } else {
+      const page = await uPage.evaluate(() => ({
+        outNow: /OUT NOW/.test(document.body.innerText),
+        hrefs: [...document.querySelectorAll("main a")].map((a) => a.href),
+      }));
+      check(`wednesday (${state.name}): OUT NOW with the Spotify + Apple Music buttons, no audio`,
+        page.outNow && !!storeLinks.spotify && !!storeLinks.apple &&
+          page.hrefs.includes(storeLinks.spotify) && page.hrefs.includes(storeLinks.apple) && expectedAudio(before),
+        JSON.stringify({ ...page, before }));
+    }
+    await uPage.fill("#wednesday-email", "cadet.check@example.com");
+    await uPage.click('form button[type="submit"]');
+    await uPage.waitForSelector("[role=status]", { timeout: 10000 }).catch(() => {});
+    const after = await srcs();
+    const status = await uPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
+    check(`wednesday (${state.name}): signing up sends the email to Kit and says "You're in" (no full song)`,
+      kitPosts.some((b) => b.includes("cadet.check@example.com")) && status.includes(state.youreIn) &&
+        !/unlock/i.test(await uPage.evaluate(() => document.body.innerText)) && expectedAudio(after),
+      JSON.stringify({ kitPosts: kitPosts.length, status, after }));
+    await uPage.reload({ waitUntil: "networkidle" });
+    const again = await srcs();
+    const statusAgain = await uPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
+    check(`wednesday (${state.name}): "You're in" is remembered on return`,
+      statusAgain.includes(state.youreIn) && expectedAudio(again), JSON.stringify({ statusAgain, again }));
+    check(`wednesday (${state.name}): zero unexpected errors`, uErrors.length === 0, uErrors.slice(0, 5).join(" | "));
+    // A clip-to-text background on anything that wraps the blurred/animated
+    // panels makes desktop Chrome paint ghost text in the top-left corner.
+    const clipped = await uPage.evaluate(() => [...document.querySelectorAll("body *")]
+      .filter((el) => getComputedStyle(el).backgroundClip === "text" && el.querySelector(".glass-panel, button, audio"))
+      .map((el) => `${el.tagName}.${el.className}`.slice(0, 80)));
+    check(`wednesday (${state.name}): no clip-to-text background around the panels (desktop ghost text)`, clipped.length === 0, JSON.stringify(clipped));
+    await uPage.screenshot({ path: path.join(SHOT_DIR, `wednesday-${state.query === "?preview=before" ? "before" : "after"}-release.png`), fullPage: true });
+    await uCtx.close();
+  }
 
   // ---------- Reduced motion ----------
   console.log("== Reduced motion ==");

@@ -22,14 +22,10 @@ export const wednesday = {
   previewClip: "/wednesday/preview.mp3" as string | undefined, // 0:13–0:28
   // The full song is never on the site: the site and the repo are public, so
   // any file here can be downloaded. Signups get the early listen by email.
-  /**
-   * Streaming links — each button appears once its link is set. The Oct 9
-   * links went dead when the single was pulled for the re-release; add the
-   * new ones on release day.
-   */
+  /** Streaming links (Oct 30 re-release) — each button appears once its link is set. */
   links: {
-    spotify: undefined as string | undefined,
-    appleMusic: undefined as string | undefined,
+    spotify: "https://open.spotify.com/track/13isILcElhB9AhP2koPIsN" as string | undefined,
+    appleMusic: "https://music.apple.com/us/album/wednesday-single/6826547891" as string | undefined,
     youtube: undefined as string | undefined,
   },
   /** Mailing-list tags: early-access signups, then the weekly drop list. */
