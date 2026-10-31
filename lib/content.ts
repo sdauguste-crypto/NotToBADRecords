@@ -99,10 +99,9 @@ export const releases: Release[] = [
     year: 2026,
     seed: 26,
     duration: "2:51",
-    // Until the Oct 30 re-release the Oct 9 store links are dead, so these point
-    // to the artist pages. Swap in the new track links on release day.
-    spotifyUrl: "https://open.spotify.com/artist/1zAgIkurm4hqFL1hf1lg8q",
-    appleMusicUrl: "https://music.apple.com/us/artist/simon-auguste/1528473465",
+    spotifyUrl: "https://open.spotify.com/track/13isILcElhB9AhP2koPIsN",
+    spotifyEmbedUrl: "https://open.spotify.com/embed/track/13isILcElhB9AhP2koPIsN",
+    appleMusicUrl: "https://music.apple.com/us/album/wednesday-single/6826547891",
     tags: ["hip-hop", "single"],
   },
   {
