@@ -47,6 +47,8 @@ export function SingleCard({
   const arc = useRef<SVGCircleElement>(null);
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState({ now: 0, total: 0 });
+  // the preview failed to load (a dropped signal): the label asks for a retap
+  const [failed, setFailed] = useState(false);
   // the Spotify player for the whole song, mounted only after the tap
   const [embedOpen, setEmbedOpen] = useState(false);
 
@@ -83,11 +85,13 @@ export function SingleCard({
       el.currentTime = 0;
       stop();
     };
+    const fail = () => setFailed(true);
     el.addEventListener("play", start);
     el.addEventListener("pause", stop);
     el.addEventListener("ended", ended);
     el.addEventListener("timeupdate", update);
     el.addEventListener("loadedmetadata", update);
+    el.addEventListener("error", fail);
     return () => {
       cancelAnimationFrame(frame);
       el.removeEventListener("play", start);
@@ -95,6 +99,7 @@ export function SingleCard({
       el.removeEventListener("ended", ended);
       el.removeEventListener("timeupdate", update);
       el.removeEventListener("loadedmetadata", update);
+      el.removeEventListener("error", fail);
     };
   }, []);
 
@@ -136,9 +141,16 @@ export function SingleCard({
   const toggle = () => {
     const el = audio.current;
     if (!el) return;
-    if (el.paused) {
+    // A failed load (a dropped signal, a fetch the in-app browser gave up
+    // on) leaves the element with no source, and play() then rejects at once
+    // on every tap: fetch the preview again first. Checked ahead of paused,
+    // since a failed element is not always marked paused.
+    const stuck = !!el.error || el.networkState === HTMLMediaElement.NETWORK_NO_SOURCE;
+    if (el.paused || stuck) {
       announceMediaOpen(SOURCE);
       setEmbedOpen(false);
+      setFailed(false);
+      if (stuck) el.load();
       void el.play().catch(() => setPlaying(false));
     } else {
       el.pause();
@@ -159,6 +171,7 @@ export function SingleCard({
       if (el.currentTime > 0) el.currentTime = 0;
     }
     setTime((t) => ({ ...t, now: 0 }));
+    setFailed(false);
     setEmbedOpen(true);
   };
 
@@ -174,7 +187,13 @@ export function SingleCard({
           onClick={toggle}
           disabled={!previewSrc}
           // one state mechanism: the label says Play or Pause (no aria-pressed)
-          aria-label={playing ? `Pause the ${title} preview` : `Play a 15-second preview of ${title}`}
+          aria-label={
+            failed
+              ? `The ${title} preview didn't load. Play it again`
+              : playing
+                ? `Pause the ${title} preview`
+                : `Play a 15-second preview of ${title}`
+          }
           data-preview-toggle=""
           className="group relative size-24 shrink-0 rounded-full transition-transform duration-300 active:scale-[0.97] min-[380px]:size-28 sm:size-32"
         >
@@ -230,10 +249,14 @@ export function SingleCard({
         <div className="min-w-0">
           {/* the same words on a phone and a laptop: what it is and how long */}
           <p
-            data-preview-state={busy ? "progress" : "idle"}
+            data-preview-state={failed ? "failed" : busy ? "progress" : "idle"}
             className="whitespace-nowrap text-[0.65rem] font-medium uppercase tabular-nums tracking-[0.2em] text-steel min-[380px]:tracking-[0.28em]"
           >
-            {busy ? `Preview · ${clock(time.now)} / ${clock(clipLength)}` : `Preview · ${clock(clipLength)}`}
+            {failed
+              ? "Tap to retry"
+              : busy
+                ? `Preview · ${clock(time.now)} / ${clock(clipLength)}`
+                : `Preview · ${clock(clipLength)}`}
           </p>
           {/* the serif belongs to the hero wordmark; the card reads as UI */}
           <h3 className="mt-2 text-lg font-semibold uppercase leading-none tracking-[0.14em] text-chrome sm:text-xl">

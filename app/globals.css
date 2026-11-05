@@ -351,11 +351,10 @@
    full-viewport fixed layers — the Instagram/TikTok in-app browsers on
    iPhone run out of memory on those. Entrance animations fill backwards
    only, so once they finish nothing stays composited. Everything settles
-   instantly under prefers-reduced-motion. */
+   instantly under prefers-reduced-motion. No scroll-behavior on the root:
+   it would animate the jump to the top when another page opens this one
+   (and Back/Forward); the in-page links glide from smooth-anchors.tsx. */
 
-:root:has(.wed-landing) {
-  scroll-behavior: smooth;
-}
 /* the canvas under the page (overscroll, unpainted tiles) is obsidian too,
    matching the theme-color, not the site's navy */
 :root:has(.wed-landing),
@@ -484,9 +483,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root:has(.wed-landing) {
-    scroll-behavior: auto;
-  }
   .wed-rise,
   .wed-fade,
   .wed-draw,

@@ -565,6 +565,37 @@ async function main() {
   check("wednesday: no composited layer but the page taller than 1.3 screens (top and mid-page)",
     atTop.read && midPage.read && atTop.tall.length === 0 && midPage.tall.length === 0, JSON.stringify({ atTop, midPage }));
 
+  // The page's own links glide to their section, but the document's scroll
+  // is never smoothed: the router's jump to the top when another page opens
+  // this one (the artist page's banner), and Back/Forward, would otherwise
+  // land on the footer and roll the whole page up.
+  const rootScroll = await wPage.evaluate(async () => {
+    const root = document.documentElement;
+    window.scrollTo({ top: root.scrollHeight, behavior: "instant" });
+    await new Promise((r) => requestAnimationFrame(() => r()));
+    const from = window.scrollY;
+    root.scrollTop = 0; // what the router does on arrival
+    return { css: getComputedStyle(root).scrollBehavior, from, after: window.scrollY };
+  });
+  await wPage.evaluate(() => {
+    window.__ys = [];
+    window.addEventListener("scroll", () => window.__ys.push(Math.round(window.scrollY)), { passive: true });
+  });
+  await wPage.click('header nav a[href="#shows"]');
+  await wPage.waitForTimeout(1500);
+  const glide = await wPage.evaluate(() => ({
+    hash: location.hash,
+    top: Math.round(document.getElementById("shows").getBoundingClientRect().top),
+    steps: new Set(window.__ys).size,
+  }));
+  check("wednesday: in-page links glide to their section; arriving from another page jumps (no smooth scroll on <html>)",
+    rootScroll.css === "auto" && rootScroll.from > 500 && rootScroll.after === 0 &&
+      // 24px is the section's scroll margin, less up to 28px when the section
+      // was still waiting to fade up (its offset counts where the glide aims)
+      glide.hash === "#shows" && glide.top >= -8 && glide.top <= 28 && glide.steps >= 3,
+    JSON.stringify({ rootScroll, glide }));
+  await wPage.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+
   // the full page at phone size: scroll through so every section has faded
   // in, then settle the entrance animations for the still (the full-page
   // capture resizes the viewport, which restarts them)
@@ -681,6 +712,34 @@ async function main() {
     layerRuns.every((r) => [r.top, r.mid, r.playing].every((m) => m.read && m.tall.length === 0) && r.playing.spinning),
     JSON.stringify(layerRuns));
 
+  // One failed fetch of the preview (a dropped signal in the Instagram
+  // browser) must not leave the play circle dead for the visit: the card
+  // says so, and the next tap fetches the preview again and plays it.
+  const rCtx = await browser.newContext({
+    viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: IG_UA,
+  });
+  await rCtx.route((u) => !u.href.startsWith(`http://localhost:${PORT}`), (route) => route.abort());
+  let previewHits = 0;
+  await rCtx.route(`**${previewUrl}`, (route) => (++previewHits === 1 ? route.abort("internetdisconnected") : route.continue()));
+  const rPage = await rCtx.newPage();
+  await rPage.goto(wedUrl, { waitUntil: "networkidle", timeout: 45000 });
+  const previewState = () => rPage.evaluate(() => {
+    const label = document.querySelector("#listen [data-preview-state]");
+    return { state: label?.getAttribute("data-preview-state"), text: label?.textContent };
+  });
+  await rPage.tap("#listen button[data-preview-toggle]");
+  await rPage.waitForFunction(() => document.querySelector("#listen [data-preview-state]")?.getAttribute("data-preview-state") === "failed", null, { timeout: 10000 }).catch(() => {});
+  const dropped = await previewState();
+  await rPage.tap("#listen button[data-preview-toggle]");
+  const retried = await rPage
+    .waitForFunction(() => { const a = document.querySelector("audio"); return a && !a.paused && a.currentTime > 0.4; }, null, { timeout: 15000 })
+    .then(() => true).catch(() => false);
+  const afterRetry = await previewState();
+  check("wednesday: a failed preview load says so, and the next tap fetches it again and plays",
+    dropped.state === "failed" && retried && previewHits >= 2 && afterRetry.state === "progress",
+    JSON.stringify({ dropped, retried, previewHits, afterRetry }));
+  await rCtx.close();
+
   // ---------- The release clock still drives the story card + banner ----------
   console.log("== WEDNESDAY story card ==");
   const sErrors = [];
@@ -741,6 +800,23 @@ async function main() {
   check("reduced-motion: /wednesday has no animation, every block shown, ring and record still",
     rmwLoad.length === 0 && rmw.running.length === 0 && rmw.dim.length === 0 && rmw.disc === "none" && rmw.orbit === "none",
     JSON.stringify({ atLoad: rmwLoad, ...rmw }));
+  // and the page's own links jump straight to their section
+  await rmwPage.evaluate(async () => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+    // let that scroll's own event go by before listening
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    window.__ys = [];
+    window.addEventListener("scroll", () => window.__ys.push(Math.round(window.scrollY)), { passive: true });
+  });
+  await rmwPage.click('header nav a[href="#music"]');
+  await rmwPage.waitForTimeout(800);
+  const rmJump = await rmwPage.evaluate(() => ({
+    hash: location.hash,
+    top: Math.round(document.getElementById("music").getBoundingClientRect().top),
+    steps: new Set(window.__ys).size,
+  }));
+  check("reduced-motion: /wednesday's in-page links jump without a glide",
+    rmJump.hash === "#music" && Math.abs(rmJump.top - 24) <= 4 && rmJump.steps === 1, JSON.stringify(rmJump));
 
   // Keyboard focus on a video tile must show. The tile (and its scroller)
   // clips anything drawn outside it, so the page's outer ring would vanish:

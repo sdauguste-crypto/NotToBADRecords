@@ -16,6 +16,7 @@ import { RevealOnScroll } from "./reveal-on-scroll";
 import { HeroDisc } from "./ring";
 import { WednesdaySignup } from "./signup";
 import { SingleCard } from "./single-card";
+import { SmoothAnchors } from "./smooth-anchors";
 import { VideoCarousel } from "./video-carousel";
 
 // /wednesday — the link in Simon's Instagram and TikTok bios, so it is built
@@ -399,6 +400,7 @@ export function WednesdayLanding() {
       </footer>
 
       <RevealOnScroll />
+      <SmoothAnchors />
     </div>
   );
 }
