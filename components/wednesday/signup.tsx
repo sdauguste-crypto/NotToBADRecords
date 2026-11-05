@@ -2,17 +2,17 @@
 
 import { useState, type FormEvent } from "react";
 
-import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { saveJoined, useJoined } from "@/lib/joined";
 import { joinList } from "@/lib/wednesday-signup";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/** The field's error line, so a screen reader hears it on refocus too. */
+const ERROR_ID = "wednesday-email-error";
 
 /**
- * The JOIN MISSION CONTROL terminal, relabeled for the release: before it,
- * "Space Cadets hear it first."; after it, the weekly drop list. Joining
- * shows the `success` line (and keeps showing it on this device). Nothing
- * plays beyond the public preview — the early listen goes out by email.
+ * The list signup on /wednesday ("Stay in the loop"): the weekly drop list.
+ * Joining shows the `success` line (and keeps showing it on this device).
+ * Nothing plays beyond the public preview.
  */
 export function WednesdaySignup({
   label,
@@ -23,7 +23,8 @@ export function WednesdaySignup({
   label: string;
   tag: string;
   success: string;
-  pitch: string;
+  /** An optional lead-in before the small print; the label may say it already. */
+  pitch?: string;
 }) {
   const joined = useJoined();
   const [email, setEmail] = useState("");
@@ -56,74 +57,76 @@ export function WednesdaySignup({
   const signedUp = done || joined;
 
   return (
-    <div className="w-full text-left">
-      <p className="mb-4 text-xs font-bold uppercase tracking-[0.3em] text-blood">
-        ▚ {label}
-      </p>
+    <div className="wed-glass w-full p-5 text-left sm:p-7">
+      <p className="text-lg font-semibold leading-snug text-chrome sm:text-xl">{label}</p>
 
-      <div className="glass-panel p-3 sm:p-4">
-        <div className="scanlines rounded-lg border border-blood/40 bg-void-deep p-5 sm:p-6">
-          {signedUp ? (
-            <p className="text-sm leading-relaxed tracking-[0.15em] text-[#ebeef1]" role="status">
-              ✓ {success}
-            </p>
-          ) : (
-            <form onSubmit={handleSubmit} noValidate>
-              <label htmlFor="wednesday-email" className="text-sm tracking-[0.15em] text-blood">
-                NTB:// awaiting-recruit &gt;
-                <span className="animate-blink motion-reduce:animate-none ml-1 inline-block">
-                  ▊
-                </span>
-              </label>
-              <input
-                type="text"
-                name="website"
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden
-                value={website}
-                onChange={(event) => setWebsite(event.target.value)}
-                className="absolute -left-[9999px] h-px w-px opacity-0"
-              />
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <input
-                  id="wednesday-email"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  enterKeyHint="send"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="cadet@frequency.fm"
-                  aria-label="Email address"
-                  // 16px keeps iOS from zooming the page on focus
-                  className="min-w-0 flex-1 rounded-md border border-blood/40 bg-void/70 px-3 py-3 text-base text-foreground caret-blood transition-colors placeholder:text-foreground/30 hover:border-blood/70 focus:border-blood focus:bg-void focus:outline-none focus:ring-2 focus:ring-blood/30 sm:text-sm"
-                />
-                <ShimmerButton
-                  type="submit"
-                  disabled={sending}
-                  shimmerColor="#ebeef1"
-                  background="linear-gradient(180deg, rgba(180,28,37,.30), rgba(180,28,37,.14))"
-                  className="border border-blood px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] text-[#ebeef1] disabled:opacity-60 hover:border-oxblood"
-                >
-                  {sending ? "TRANSMITTING…" : "TRANSMIT"}
-                </ShimmerButton>
-              </div>
-              {error ? (
-                <p className="mt-3 text-xs font-bold tracking-[0.15em] text-blood" role="alert">
-                  {error}
-                </p>
-              ) : null}
-            </form>
-          )}
-        </div>
-        <p className="mt-3 text-xs text-foreground/40">
-          {signedUp ? "" : `${pitch} `}
-          No spam — launch alerts and new drops only. Unsubscribe anytime.
+      {signedUp ? (
+        <p
+          className="mt-5 flex items-start gap-3 rounded-2xl border border-blood/50 bg-blood/10 p-4 text-sm leading-relaxed text-chrome"
+          role="status"
+        >
+          <span aria-hidden className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-blood text-[0.7rem]">
+            ✓
+          </span>
+          <span>{success}</span>
         </p>
-      </div>
+      ) : (
+        <form onSubmit={handleSubmit} noValidate className="mt-5">
+          {/* the field's name starts with the words on screen (label in
+              name), then says what goes in it; the cursor is decoration */}
+          <label htmlFor="wednesday-email" className="text-[0.68rem] tracking-[0.2em] text-steel">
+            NTB:// awaiting-recruit &gt;
+            <span className="sr-only"> Email address</span>
+            <span aria-hidden className="animate-blink motion-reduce:animate-none ml-1 inline-block text-blood">
+              ▊
+            </span>
+          </label>
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden
+            value={website}
+            onChange={(event) => setWebsite(event.target.value)}
+            className="absolute -left-[9999px] h-px w-px opacity-0"
+          />
+          <div className="mt-2.5 flex flex-col gap-2.5 sm:flex-row">
+            <input
+              id="wednesday-email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              enterKeyHint="send"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="cadet@frequency.fm"
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? ERROR_ID : undefined}
+              // 16px keeps iOS from zooming the page on focus
+              className="h-12 w-full min-w-0 rounded-full sm:flex-1 border border-white/12 bg-obsidian/70 px-5 text-base text-chrome caret-blood transition-colors placeholder:text-steel hover:border-white/25 focus:border-blood focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-blood/40"
+            />
+            <button
+              type="submit"
+              disabled={sending}
+              className="h-12 shrink-0 rounded-full bg-blood px-7 text-xs font-semibold tracking-[0.24em] text-chrome transition-[background-color,transform] duration-300 hover:bg-oxblood active:scale-[0.98] disabled:opacity-60"
+            >
+              {sending ? "TRANSMITTING…" : "TRANSMIT"}
+            </button>
+          </div>
+          {error ? (
+            <p id={ERROR_ID} className="mt-3 border-l-2 border-blood pl-3 text-xs font-semibold tracking-[0.12em] text-chrome" role="alert">
+              {error}
+            </p>
+          ) : null}
+        </form>
+      )}
+
+      <p className="mt-4 text-xs leading-relaxed text-steel">
+        {!signedUp && pitch ? `${pitch} ` : ""}No spam — launch alerts and new drops only. Unsubscribe anytime.
+      </p>
     </div>
   );
 }

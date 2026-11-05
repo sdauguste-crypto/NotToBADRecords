@@ -126,6 +126,38 @@ function collectErrors(page, bucket) {
   });
 }
 
+// Composited layers (other than the document) taller than 1.3 viewports, read
+// from Chromium's layer tree. `read` is false when no tree arrived.
+async function tallLayers(ctx, page) {
+  const cdp = await ctx.newCDPSession(page);
+  let tree = null;
+  cdp.on("LayerTree.layerTreeDidChange", (e) => { if (e.layers) tree = e.layers; });
+  await cdp.send("DOM.enable");
+  await cdp.send("LayerTree.enable");
+  // a nudge makes the compositor commit, which sends the tree
+  for (let i = 0; i < 20 && !tree; i++) {
+    await page.evaluate((dy) => window.scrollBy(0, dy), i % 2 ? -1 : 1);
+    await page.waitForTimeout(150);
+  }
+  const limit = (await page.evaluate(() => window.innerHeight)) * 1.3;
+  const tall = [];
+  for (const layer of tree ?? []) {
+    if (!layer.drawsContent || layer.height <= limit) continue;
+    let name = "(no node)";
+    if (layer.backendNodeId) {
+      const { node } = await cdp.send("DOM.describeNode", { backendNodeId: layer.backendNodeId }).catch(() => ({ node: null }));
+      if (node?.nodeName === "#document") continue;
+      if (node) {
+        const attrs = Object.fromEntries((node.attributes ?? []).reduce((pairs, v, i, all) => (i % 2 ? pairs : [...pairs, [v, all[i + 1]]]), []));
+        name = `${node.nodeName}${attrs.id ? `#${attrs.id}` : ""}.${(attrs.class ?? "").slice(0, 50)}`;
+      }
+    }
+    tall.push(`${name} ${Math.round(layer.width)}x${Math.round(layer.height)}`);
+  }
+  await cdp.detach();
+  return { read: !!tree, tall };
+}
+
 // The WebGL canvas can't be read back after present (preserveDrawingBuffer is
 // off), so stage distinctness is judged from the screenshot files instead:
 // the sunset stage carries far more color entropy than near-black space, so
@@ -291,6 +323,15 @@ async function main() {
     featured.nowPlaying === "WEDNESDAY" && featured.firstCard === "WEDNESDAY" && featured.spotify && featured.apple && featured.noDownload,
     JSON.stringify(featured));
 
+  const banner = await page
+    .waitForFunction(() => {
+      const a = [...document.querySelectorAll('a[href="/wednesday/"]')].find((l) => /WEDNESDAY/.test(l.textContent ?? ""));
+      return a ? a.textContent.trim() : false;
+    }, null, { timeout: 10000 })
+    .then((h) => h.jsonValue())
+    .catch(() => "");
+  check("artist page: the WEDNESDAY banner links to the landing and reads OUT NOW", /OUT NOW/.test(banner), JSON.stringify(banner));
+
   const canvasCount = await page.evaluate(() => document.querySelectorAll("canvas").length);
   check("WebGL canvas present", ready !== "true" || canvasCount >= 1);
 
@@ -391,12 +432,14 @@ async function main() {
   check("secondary pages: zero unexpected errors", secErrors.length === 0, secErrors.slice(0, 5).join(" | "));
   await secPage.close();
 
-  // ---------- WEDNESDAY: preview only; signing up joins the list ----------
+  // ---------- WEDNESDAY: the post-release landing ----------
   // The site and the repo are public, so the full song must never be in the
-  // export. The real Kit endpoint is replaced by a stand-in that answers like
-  // Kit, so this checks the signup offline: Kit gets the email, the page says
-  // "You're in", the preview stays the only audio, and that holds on return.
-  console.log("== WEDNESDAY preview + signup ==");
+  // export: the page carries the 15-second preview, and full listening is
+  // Spotify / Apple Music (their players mount only after a tap). The real
+  // Kit endpoint is replaced by a stand-in that answers like Kit, so the
+  // signup is checked offline: Kit gets the email, the page says "You're in",
+  // and that holds on return.
+  console.log("== WEDNESDAY landing ==");
   const wedConfig = readFileSync(path.resolve("lib/wednesday.ts"), "utf8");
   const previewUrl = /previewClip:\s*"([^"]+)"/.exec(wedConfig)?.[1];
   const builtSize = (u) => (u && existsSync(path.join(ROOT, u)) ? statSync(path.join(ROOT, u)).size : 0);
@@ -418,73 +461,240 @@ async function main() {
     .filter(([, text]) => /full-[0-9a-f]{6,}\.mp3|fullSong/.test(text))
     .map(([file]) => path.relative(ROOT, file));
   check("wednesday: nothing in the built site points to a full-song file", fullRefs.length === 0, fullRefs.join(", "));
+  // the page and its RSC payloads name no audio but the preview: props handed
+  // to client components are serialized whole, so a full Release object would
+  // carry the artist page's ambient master along with it
+  const wedPayloads = (await readdir(path.join(ROOT, "wednesday")))
+    .filter((name) => name === "index.html" || name.endsWith(".txt"));
+  const otherAudio = [];
+  for (const name of wedPayloads) {
+    const text = await readFile(path.join(ROOT, "wednesday", name), "utf8");
+    for (const [ref] of text.matchAll(/[\w./-]+\.(?:mp3|m4a|wav|aac|flac|ogg|opus)\b/gi)) {
+      if (ref !== previewUrl) otherAudio.push(`${name}: ${ref}`);
+    }
+  }
+  check("wednesday: the page and its payloads name no audio file but the preview",
+    wedPayloads.includes("index.html") && otherAudio.length === 0, JSON.stringify({ files: wedPayloads.length, otherAudio }));
 
-  // Both sides of the release, whatever today's date: the page's own test
-  // switch (?preview=before|after) pins the state. Before: countdown, preview
-  // only. After: OUT NOW, the store buttons, no audio on the page at all.
   const storeLinks = {
     spotify: /spotify:\s*"([^"]+)"/.exec(wedConfig)?.[1],
     apple: /appleMusic:\s*"([^"]+)"/.exec(wedConfig)?.[1],
   };
-  const STATES = [
-    { name: "before release", query: "?preview=before", youreIn: "You're in, Cadet. Your early listen hits your inbox Wednesday night." },
-    { name: "after release", query: "?preview=after", youreIn: "You're in, Cadet. New drops hit your inbox every Thursday." },
-  ];
-  for (const state of STATES) {
-    const uErrors = [];
-    const uCtx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
-    const kitPosts = [];
-    await uCtx.route("https://app.kit.com/forms/**", async (route) => {
-      kitPosts.push(route.request().postData() ?? "");
-      await route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"status":"success"}' });
-    });
-    const uPage = await uCtx.newPage();
-    collectErrors(uPage, uErrors);
-    await uPage.goto(`http://localhost:${PORT}${BASE_PATH}/wednesday/${state.query}`, { waitUntil: "networkidle", timeout: 45000 });
-    const srcs = () => uPage.evaluate(() => [...document.querySelectorAll("audio")].map((a) => ({
-      src: a.getAttribute("src"), controls: a.controls, download: a.hasAttribute("download"),
-    })));
-    const expectedAudio = (list) => state.query === "?preview=before"
-      ? list.length === 1 && list[0].src === previewUrl && !list[0].controls && !list[0].download
-      : list.length === 0;
-    const before = await srcs();
-    if (state.query === "?preview=before") {
-      check(`wednesday (${state.name}): countdown and the preview only`,
-        expectedAudio(before) && (await uPage.locator('[role="timer"]').count()) === 1, JSON.stringify(before));
-    } else {
-      const page = await uPage.evaluate(() => ({
-        outNow: /OUT NOW/.test(document.body.innerText),
-        hrefs: [...document.querySelectorAll("main a")].map((a) => a.href),
-      }));
-      check(`wednesday (${state.name}): OUT NOW with the Spotify + Apple Music buttons, no audio`,
-        page.outNow && !!storeLinks.spotify && !!storeLinks.apple &&
-          page.hrefs.includes(storeLinks.spotify) && page.hrefs.includes(storeLinks.apple) && expectedAudio(before),
-        JSON.stringify({ ...page, before }));
-    }
-    await uPage.fill("#wednesday-email", "cadet.check@example.com");
-    await uPage.click('form button[type="submit"]');
-    await uPage.waitForSelector("[role=status]", { timeout: 10000 }).catch(() => {});
-    const after = await srcs();
-    const status = await uPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
-    check(`wednesday (${state.name}): signing up sends the email to Kit and says "You're in" (no full song)`,
-      kitPosts.some((b) => b.includes("cadet.check@example.com")) && status.includes(state.youreIn) &&
-        !/unlock/i.test(await uPage.evaluate(() => document.body.innerText)) && expectedAudio(after),
-      JSON.stringify({ kitPosts: kitPosts.length, status, after }));
-    await uPage.reload({ waitUntil: "networkidle" });
-    const again = await srcs();
-    const statusAgain = await uPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
-    check(`wednesday (${state.name}): "You're in" is remembered on return`,
-      statusAgain.includes(state.youreIn) && expectedAudio(again), JSON.stringify({ statusAgain, again }));
-    check(`wednesday (${state.name}): zero unexpected errors`, uErrors.length === 0, uErrors.slice(0, 5).join(" | "));
-    // A clip-to-text background on anything that wraps the blurred/animated
-    // panels makes desktop Chrome paint ghost text in the top-left corner.
-    const clipped = await uPage.evaluate(() => [...document.querySelectorAll("body *")]
-      .filter((el) => getComputedStyle(el).backgroundClip === "text" && el.querySelector(".glass-panel, button, audio"))
-      .map((el) => `${el.tagName}.${el.className}`.slice(0, 80)));
-    check(`wednesday (${state.name}): no clip-to-text background around the panels (desktop ghost text)`, clipped.length === 0, JSON.stringify(clipped));
-    await uPage.screenshot({ path: path.join(SHOT_DIR, `wednesday-${state.query === "?preview=before" ? "before" : "after"}-release.png`), fullPage: true });
-    await uCtx.close();
+  const wedTrackId = /track\/(\w+)/.exec(storeLinks.spotify ?? "")?.[1] ?? "(none)";
+  const youreIn = "You're in, Cadet. New drops hit your inbox every Thursday.";
+  const wedUrl = `http://localhost:${PORT}${BASE_PATH}/wednesday/`;
+
+  const wErrors = [];
+  const wCtx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  const kitPosts = [];
+  await wCtx.route("https://app.kit.com/forms/**", async (route) => {
+    kitPosts.push(route.request().postData() ?? "");
+    await route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: '{"status":"success"}' });
+  });
+  const wPage = await wCtx.newPage();
+  collectErrors(wPage, wErrors);
+  await wPage.goto(wedUrl, { waitUntil: "networkidle", timeout: 45000 });
+  await wPage.waitForTimeout(1200);
+  const audioList = () => wPage.evaluate(() => [...document.querySelectorAll("audio")].map((a) => ({
+    src: a.getAttribute("src"), controls: a.controls, download: a.hasAttribute("download"),
+  })));
+  const onlyPreview = (list) => list.length === 1 && list[0].src === previewUrl && !list[0].controls && !list[0].download;
+  const frames = () => wPage.evaluate(() => [...document.querySelectorAll("iframe")].map((f) => f.src));
+
+  const wed = await wPage.evaluate(() => {
+    const text = document.body.innerText;
+    const hrefs = (sel) => [...document.querySelectorAll(sel)].map((a) => a.href);
+    return {
+      h1: document.querySelector("h1")?.textContent?.trim(),
+      outNow: /OUT NOW/.test(text),
+      sections: ["listen", "music", "videos", "shows", "loop"].filter((id) => !document.getElementById(id)),
+      single: hrefs("#listen a"),
+      hero: hrefs('section[aria-labelledby="wed-title"] a'),
+      listenCta: !!document.querySelector('header a[href="#listen"]'),
+      // the countdown era is over: no timer, no test-view tag
+      noCountdown: !document.querySelector('[role="timer"]') && !/TEST VIEW/.test(text),
+      showRows: document.querySelectorAll("#shows li").length,
+      emptyShows: /No dates on the board right now/i.test(document.getElementById("shows")?.innerText ?? ""),
+      noPostponed: !/delancey/i.test(text) && !/SEP 19/i.test(text),
+    };
+  });
+  check("wednesday: OUT NOW landing with the single, more music, videos, shows and the signup",
+    wed.h1 === "WEDNESDAY" && wed.outNow && wed.sections.length === 0 && wed.listenCta && wed.noCountdown,
+    JSON.stringify(wed));
+  check("wednesday: Spotify + Apple Music carry the exact store links (single card and hero)",
+    !!storeLinks.spotify && !!storeLinks.apple &&
+      wed.single.includes(storeLinks.spotify) && wed.single.includes(storeLinks.apple) &&
+      wed.hero.includes(storeLinks.spotify) && wed.hero.includes(storeLinks.apple),
+    JSON.stringify({ single: wed.single, hero: wed.hero }));
+  check("wednesday: shows lists only real dates (none postponed), else the honest empty state",
+    wed.noPostponed && (wed.showRows > 0 || wed.emptyShows), JSON.stringify({ rows: wed.showRows, empty: wed.emptyShows }));
+  const firstAudio = await audioList();
+  check("wednesday: the preview is the only <audio> on the page, no controls or download",
+    onlyPreview(firstAudio), JSON.stringify(firstAudio));
+  check("wednesday: no third-party player (iframe) before any tap", (await frames()).length === 0, JSON.stringify(await frames()));
+
+  // In-app browsers on iPhone crashed on big blur filters; none on this page.
+  const heavy = await wPage.evaluate(() => [...document.querySelectorAll("body *")].filter((el) => {
+    const cs = getComputedStyle(el);
+    const backdrop = cs.backdropFilter || cs.webkitBackdropFilter || "none";
+    return /blur/.test(cs.filter) || (backdrop !== "none" && backdrop !== "");
+  }).map((el) => `${el.tagName}.${String(el.className).slice(0, 60)}`));
+  check("wednesday: no blur or backdrop filters (in-app browser memory)", heavy.length === 0, JSON.stringify(heavy));
+  const wOverflow = await wPage.evaluate(() => document.documentElement.scrollWidth);
+  check("wednesday: no horizontal overflow on mobile", wOverflow <= 390 + 1, `scrollWidth=${wOverflow}`);
+
+  // A clip-to-text background on anything that wraps the animated panels
+  // makes desktop Chrome paint ghost text in the top-left corner.
+  const clipped = await wPage.evaluate(() => [...document.querySelectorAll("body *")]
+    .filter((el) => getComputedStyle(el).backgroundClip === "text" && el.querySelector(".glass-panel, .wed-glass, button, audio, iframe"))
+    .map((el) => `${el.tagName}.${el.className}`.slice(0, 80)));
+  check("wednesday: no clip-to-text background around the panels (desktop ghost text)", clipped.length === 0, JSON.stringify(clipped));
+
+  // Once the entrance has played, nothing but the document itself may be
+  // composited taller than about a screen, at the top or mid-page: big
+  // layers are what run the iPhone in-app browsers out of memory (an
+  // entrance animation that holds its last frame keeps its element
+  // composited for good; a composited scroller can push everything after it
+  // into one page-tall layer).
+  await wPage.waitForTimeout(2500);
+  const atTop = await tallLayers(wCtx, wPage);
+  await wPage.evaluate(() => document.getElementById("videos")?.scrollIntoView({ block: "center", behavior: "instant" }));
+  await wPage.waitForTimeout(1500);
+  const midPage = await tallLayers(wCtx, wPage);
+  await wPage.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  check("wednesday: no composited layer but the page taller than 1.3 screens (top and mid-page)",
+    atTop.read && midPage.read && atTop.tall.length === 0 && midPage.tall.length === 0, JSON.stringify({ atTop, midPage }));
+
+  // the full page at phone size: scroll through so every section has faded
+  // in, then settle the entrance animations for the still (the full-page
+  // capture resizes the viewport, which restarts them)
+  const wHeight = await wPage.evaluate(() => document.documentElement.scrollHeight);
+  for (let y = 0; y <= wHeight; y += 400) {
+    await wPage.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
+    await wPage.waitForTimeout(80);
   }
+  await wPage.waitForTimeout(1000);
+  await wPage.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  const imgs = await wPage.evaluate(() => [...document.querySelectorAll("img")]
+    .filter((i) => !/ytimg/.test(i.src) && !(i.complete && i.naturalWidth > 0)).map((i) => i.getAttribute("src")));
+  check("wednesday: every local image loads (covers, ambient, seal)", imgs.length === 0, JSON.stringify(imgs));
+  await wPage.addStyleTag({ content: ".wed-rise,.wed-fade{animation:none!important}" });
+  await wPage.screenshot({ path: path.join(SHOT_DIR, "wednesday-landing.png"), fullPage: true, animations: "disabled" });
+
+  // the preview plays inline: the ring fills and the hero cover turns
+  await wPage.click("#listen button[data-preview-toggle]");
+  const played = await wPage
+    .waitForFunction(() => { const a = document.querySelector("audio"); return a && !a.paused && a.currentTime > 0.4; }, null, { timeout: 15000 })
+    .then(() => true).catch(() => false);
+  const ring = await wPage.evaluate(() => ({
+    spinning: document.documentElement.hasAttribute("data-wed-playing") &&
+      getComputedStyle(document.querySelector(".wed-disc")).animationName === "wed-spin",
+    offset: Number(document.querySelector("#listen svg circle[stroke-dasharray]")?.getAttribute("stroke-dashoffset")),
+    dash: Number(document.querySelector("#listen svg circle[stroke-dasharray]")?.getAttribute("stroke-dasharray")),
+  }));
+  check("wednesday: tapping the cover plays the preview inline (ring fills, record turns)",
+    played && ring.spinning && ring.offset < ring.dash && onlyPreview(await audioList()), JSON.stringify({ played, ring }));
+
+  // PLAY FULL SONG mounts the WEDNESDAY Spotify player — and stops the preview
+  await wPage.click("#listen button[aria-controls='wed-full-song']");
+  await wPage.waitForSelector("#wed-full-song iframe", { timeout: 5000 }).catch(() => {});
+  await wPage.waitForTimeout(300);
+  // the preview stops and rewinds: one player on the card, in one state
+  const embed = {
+    frames: await frames(),
+    ...(await wPage.evaluate(() => {
+      const arc = document.querySelector("#listen svg circle[stroke-dasharray]");
+      return {
+        paused: document.querySelector("audio")?.paused,
+        at: document.querySelector("audio")?.currentTime,
+        ringEmpty: Number(arc?.getAttribute("stroke-dashoffset")) >= Number(arc?.getAttribute("stroke-dasharray")) - 0.5,
+        // at rest the record has no animation at all (one left attached, even
+        // paused, keeps it composited); the angle it reached stays put
+        discAtRest: getComputedStyle(document.querySelector(".wed-disc")).animationName === "none",
+        label: document.querySelector("#listen [data-preview-state]")?.getAttribute("data-preview-state") === "idle",
+      };
+    })),
+  };
+  check("wednesday: PLAY FULL SONG loads the WEDNESDAY Spotify embed after the tap (preview stops and resets)",
+    embed.frames.length === 1 && embed.frames[0].startsWith(`https://open.spotify.com/embed/track/${wedTrackId}`) &&
+      embed.paused && embed.at === 0 && embed.ringEmpty && embed.label && embed.discAtRest,
+    JSON.stringify(embed));
+
+  // songs play right on the page, one player at a time
+  await wPage.click("#music li button");
+  await wPage.waitForSelector("#wed-more-player iframe", { timeout: 5000 }).catch(() => {});
+  const moreFrames = await frames();
+  check("wednesday: a MORE MUSIC tap plays that song on the page, one player at a time",
+    moreFrames.length === 1 && /^https:\/\/open\.spotify\.com\/embed\/track\//.test(moreFrames[0]) && !moreFrames[0].includes(wedTrackId),
+    JSON.stringify(moreFrames));
+  await wPage.click("#videos li button");
+  await wPage.waitForSelector("#videos iframe", { timeout: 5000 }).catch(() => {});
+  const videoFrames = await frames();
+  check("wednesday: a video tap mounts youtube-nocookie in place of the song player",
+    videoFrames.length === 1 && videoFrames[0].startsWith("https://www.youtube-nocookie.com/embed/"), JSON.stringify(videoFrames));
+
+  await wPage.fill("#wednesday-email", "cadet.check@example.com");
+  await wPage.click('#loop form button[type="submit"]');
+  await wPage.waitForSelector("[role=status]", { timeout: 10000 }).catch(() => {});
+  const status = await wPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
+  check(`wednesday: signing up sends the email to Kit and says "You're in" (no full song)`,
+    kitPosts.some((b) => b.includes("cadet.check@example.com")) && status.includes(youreIn) &&
+      !/unlock/i.test(await wPage.evaluate(() => document.body.innerText)) && onlyPreview(await audioList()),
+    JSON.stringify({ kitPosts: kitPosts.length, status }));
+  await wPage.reload({ waitUntil: "networkidle" });
+  const statusAgain = await wPage.evaluate(() => document.querySelector("[role=status]")?.textContent ?? "");
+  check(`wednesday: "You're in" is remembered on return`,
+    statusAgain.includes(youreIn) && onlyPreview(await audioList()) && (await frames()).length === 0,
+    JSON.stringify({ statusAgain }));
+  check("wednesday: zero unexpected errors", wErrors.length === 0, wErrors.slice(0, 5).join(" | "));
+  await wCtx.close();
+
+  // Layer size depends on the screen: what fits at 390x844@2 can merge into a
+  // two-screen overlap layer on the most common Android width at 3x or 4x
+  // (an animation left attached at rest did exactly that). So the same check
+  // runs as the Instagram in-app browser on a 360x740 phone, at both scales.
+  const IG_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 334.0.4.32.98 (iPhone15,3; iOS 17_5; en_US; en; scale=3.00; 1290x2796; 604349315)";
+  const layerRuns = [];
+  for (const dsf of [3, 4]) {
+    const lCtx = await browser.newContext({
+      viewport: { width: 360, height: 740 }, deviceScaleFactor: dsf, isMobile: true, hasTouch: true, userAgent: IG_UA,
+    });
+    // only the site itself: thumbnails and players are not what is measured
+    await lCtx.route((u) => !u.href.startsWith(`http://localhost:${PORT}`), (route) => route.abort());
+    const lPage = await lCtx.newPage();
+    await lPage.goto(wedUrl, { waitUntil: "networkidle", timeout: 45000 });
+    await lPage.waitForTimeout(4000); // ring draw-in and head dot settle
+    const top = await tallLayers(lCtx, lPage);
+    await lPage.evaluate(() => document.getElementById("videos")?.scrollIntoView({ block: "center", behavior: "instant" }));
+    await lPage.waitForTimeout(1500);
+    const mid = await tallLayers(lCtx, lPage);
+    // and while the preview plays, when the record turns
+    await lPage.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    await lPage.tap("#listen button[data-preview-toggle]");
+    await lPage.waitForFunction(() => document.documentElement.hasAttribute("data-wed-playing"), null, { timeout: 10000 }).catch(() => {});
+    await lPage.waitForTimeout(1500);
+    const playing = { spinning: await lPage.evaluate(() => document.documentElement.hasAttribute("data-wed-playing")), ...(await tallLayers(lCtx, lPage)) };
+    layerRuns.push({ at: `360x740@${dsf}`, top, mid, playing });
+    await lCtx.close();
+  }
+  check("wednesday: no tall composited layer on a 360x740 phone at 3x and 4x (Instagram browser: top, mid-page, playing)",
+    layerRuns.every((r) => [r.top, r.mid, r.playing].every((m) => m.read && m.tall.length === 0) && r.playing.spinning),
+    JSON.stringify(layerRuns));
+
+  // ---------- The release clock still drives the story card + banner ----------
+  console.log("== WEDNESDAY story card ==");
+  const sErrors = [];
+  const sPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  collectErrors(sPage, sErrors);
+  await sPage.goto(`${wedUrl}story/?preview=before`, { waitUntil: "networkidle", timeout: 45000 });
+  const storyBefore = await sPage.waitForSelector('[role="timer"]', { timeout: 10000 }).then(() => true).catch(() => false);
+  await sPage.goto(`${wedUrl}story/?preview=after`, { waitUntil: "networkidle", timeout: 45000 });
+  const storyAfter = await sPage
+    .waitForFunction(() => document.querySelector("h1")?.textContent?.trim() === "OUT NOW", null, { timeout: 10000 })
+    .then(() => true).catch(() => false);
+  check("story card: countdown before release, OUT NOW after (?preview switch)", storyBefore && storyAfter, JSON.stringify({ storyBefore, storyAfter }));
+  check("story card: zero unexpected errors", sErrors.length === 0, sErrors.slice(0, 5).join(" | "));
+  await sPage.close();
 
   // ---------- Reduced motion ----------
   console.log("== Reduced motion ==");
@@ -505,6 +715,72 @@ async function main() {
   await rmPage.waitForTimeout(800);
   check("reduced-motion: zero unexpected errors", rmErrors.length === 0, rmErrors.slice(0, 5).join(" | "));
   await rmCtx.close();
+
+  // /wednesday promises everything is off or instant under reduced motion:
+  // nothing animates at load, every block is shown once scrolled, and the
+  // ring and record stay still.
+  const rmwErrors = [];
+  const rmwCtx = await browser.newContext({
+    reducedMotion: "reduce", viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true,
+  });
+  const rmwPage = await rmwCtx.newPage();
+  collectErrors(rmwPage, rmwErrors);
+  await rmwPage.goto(wedUrl, { waitUntil: "networkidle", timeout: 45000 });
+  const rmwLoad = await rmwPage.evaluate(() => document.getAnimations().map((a) => a.animationName || a.transitionProperty));
+  const rmwHeight = await rmwPage.evaluate(() => document.documentElement.scrollHeight);
+  for (let y = 0; y <= rmwHeight; y += 500) {
+    await rmwPage.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
+    await rmwPage.waitForTimeout(60);
+  }
+  const rmw = await rmwPage.evaluate(() => ({
+    running: document.getAnimations().map((a) => a.animationName || a.transitionProperty),
+    dim: [...document.querySelectorAll(".wed-landing [data-reveal]")].filter((el) => getComputedStyle(el).opacity !== "1").map((el) => el.id || el.tagName),
+    disc: getComputedStyle(document.querySelector(".wed-disc")).animationName,
+    orbit: getComputedStyle(document.querySelector(".wed-orbit")).animationName,
+  }));
+  check("reduced-motion: /wednesday has no animation, every block shown, ring and record still",
+    rmwLoad.length === 0 && rmw.running.length === 0 && rmw.dim.length === 0 && rmw.disc === "none" && rmw.orbit === "none",
+    JSON.stringify({ atLoad: rmwLoad, ...rmw }));
+
+  // Keyboard focus on a video tile must show. The tile (and its scroller)
+  // clips anything drawn outside it, so the page's outer ring would vanish:
+  // tab in from MORE MUSIC and compare the tile's pixels at rest and focused.
+  await rmwPage.evaluate(() => document.getElementById("videos")?.scrollIntoView({ block: "center", behavior: "instant" }));
+  await rmwPage.waitForFunction(() => [...document.querySelectorAll("#videos img")].every((i) => i.complete), null, { timeout: 10000 }).catch(() => {});
+  await rmwPage.waitForTimeout(400);
+  const firstTile = rmwPage.locator("#videos li").first();
+  const tileShot = () => firstTile.screenshot({ animations: "disabled" });
+  const restA = await tileShot();
+  const restB = await tileShot();
+  await rmwPage.locator("#music li button").last().focus();
+  await rmwPage.keyboard.press("Tab");
+  await rmwPage.waitForTimeout(500);
+  const tileFocus = await rmwPage.evaluate(() => {
+    const el = document.activeElement;
+    return { onTile: !!el?.closest("#videos li"), focusVisible: !!el?.matches(":focus-visible"), label: el?.getAttribute("aria-label") };
+  });
+  const focusedTile = await tileShot();
+  check("wednesday: keyboard focus on a video tile is visible (the tile's pixels change)",
+    tileFocus.onTile && tileFocus.focusVisible && restA.equals(restB) && !focusedTile.equals(restA),
+    JSON.stringify({ ...tileFocus, stableAtRest: restA.equals(restB), changed: !focusedTile.equals(restA) }));
+  await rmwPage.evaluate(() => document.activeElement instanceof HTMLElement && document.activeElement.blur());
+
+  // the first screen inside the Instagram/TikTok browsers (about 390x700 on
+  // an iPhone, 375x667 on the small ones) reaches the single's play circle
+  const fold = [];
+  for (const [width, height] of [[390, 700], [375, 667]]) {
+    await rmwPage.setViewportSize({ width, height });
+    await rmwPage.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    await rmwPage.waitForTimeout(200);
+    fold.push(await rmwPage.evaluate(([w, h]) => {
+      const r = document.querySelector("#listen button[data-preview-toggle]").getBoundingClientRect();
+      return { size: `${w}x${h}`, shown: Math.round((Math.min(h, r.bottom) - r.top) / r.height * 100) / 100 };
+    }, [width, height]));
+  }
+  check("wednesday: the single's play circle is at least half on the first screen (390x700, 375x667)",
+    fold.every((f) => f.shown >= 0.5), JSON.stringify(fold));
+  check("reduced-motion: /wednesday zero unexpected errors", rmwErrors.length === 0, rmwErrors.slice(0, 5).join(" | "));
+  await rmwCtx.close();
 
   // ---------- Mobile ----------
   console.log("== Mobile (390x844) ==");

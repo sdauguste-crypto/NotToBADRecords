@@ -344,3 +344,164 @@
     border-color: #a0171d;
   }
 }
+
+/* ---- /wednesday landing ----------------------------------------------
+   One dark field (obsidian), one accent (blood). Motion is transform and
+   opacity only, on small layers: no blur filters, no backdrop filters, no
+   full-viewport fixed layers — the Instagram/TikTok in-app browsers on
+   iPhone run out of memory on those. Entrance animations fill backwards
+   only, so once they finish nothing stays composited. Everything settles
+   instantly under prefers-reduced-motion. */
+
+:root:has(.wed-landing) {
+  scroll-behavior: smooth;
+}
+/* the canvas under the page (overscroll, unpainted tiles) is obsidian too,
+   matching the theme-color, not the site's navy */
+:root:has(.wed-landing),
+:root:has(.wed-landing) body {
+  background-color: #09080d;
+}
+
+/* the page's default focus ring; in the base layer so a control's own focus
+   utilities (the email field's blood border, the video tile's inner ring)
+   take over where they are set */
+@layer base {
+  .wed-landing :focus-visible {
+    outline: 2px solid #ebeef1;
+    outline-offset: 3px;
+  }
+}
+
+/* the glass card: a lighter wash of the field, no backdrop filter */
+@utility wed-glass {
+  background: linear-gradient(180deg, rgba(235, 238, 241, 0.065), rgba(235, 238, 241, 0.025));
+  border: 1px solid rgba(235, 238, 241, 0.1);
+  border-radius: 1.25rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 24px 60px -30px rgba(0, 0, 0, 0.8);
+}
+
+/* from-only keyframes: each element lands on its own computed style */
+@keyframes wed-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+@keyframes wed-fade {
+  from {
+    opacity: 0;
+  }
+}
+/* rings live in a 200-unit viewBox at r=94: circumference 590.6 */
+@keyframes wed-draw {
+  from {
+    stroke-dashoffset: 590.6;
+  }
+}
+/* an explicit start: the record resumes from an angle pinned inline (with a
+   matching negative delay), which must not become the first keyframe */
+@keyframes wed-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* on load: staggered by --d. `backwards` holds the first frame through the
+   delay; after the last frame the animation is gone, and so is its layer
+   (`both` kept every element it touched composited for good). */
+.wed-rise {
+  animation: wed-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) backwards;
+}
+.wed-fade {
+  animation: wed-fade 1.2s ease-out var(--d, 0ms) backwards;
+}
+.wed-draw {
+  stroke-dasharray: 590.6;
+  animation: wed-draw 2s cubic-bezier(0.65, 0, 0.35, 1) var(--d, 250ms) backwards;
+}
+/* the accent ring travels slowly round the cover */
+.wed-orbit {
+  animation: wed-spin 60s linear infinite;
+}
+/* the cover turns like a record while the preview plays. Only then: an
+   animation attached at rest (even paused) keeps the disc composited, and
+   everything painted over it (sheen, header, the single's circle) is merged
+   into one overlap layer that runs past two screens on 360px phones at 4x.
+   On pause SingleCard pins the angle inline (a still transform, no layer). */
+:root[data-wed-playing] .wed-disc {
+  animation: wed-spin 14s linear infinite;
+}
+/* While it turns, the static art drawn over it (sheen, rings) must sit in a
+   layer above it, and Chromium keeps merging what follows on the page into
+   that layer (past two screens at 360px 4x). Giving the hero its own
+   transform for those 15 seconds closes the group: nothing outside it can
+   merge in, and the largest layer stays the hero itself, under a screen. */
+:root[data-wed-playing] .wed-hero {
+  will-change: transform;
+}
+
+/* on scroll: RevealOnScroll marks what starts below the fold */
+[data-reveal].wed-pending {
+  opacity: 0;
+  transform: translateY(28px);
+}
+[data-reveal].wed-in {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms);
+}
+
+.wed-noscrollbar {
+  scrollbar-width: none;
+}
+.wed-noscrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* the video row on wider screens: the next tile fades out at the column
+   edge instead of being cut (a mask on one small scroller) */
+@media (min-width: 40rem) {
+  .wed-peek-end {
+    -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent);
+    mask-image: linear-gradient(90deg, #000 86%, transparent);
+  }
+  .wed-peek-start {
+    -webkit-mask-image: linear-gradient(270deg, #000 86%, transparent);
+    mask-image: linear-gradient(270deg, #000 86%, transparent);
+  }
+  .wed-peek-start.wed-peek-end {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:has(.wed-landing) {
+    scroll-behavior: auto;
+  }
+  .wed-rise,
+  .wed-fade,
+  .wed-draw,
+  .wed-orbit,
+  .wed-disc {
+    animation: none !important;
+  }
+  /* nothing turns, so nothing needs isolating */
+  :root[data-wed-playing] .wed-hero {
+    will-change: auto;
+  }
+  [data-reveal].wed-pending,
+  [data-reveal].wed-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

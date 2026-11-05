@@ -3,10 +3,22 @@
 
 export const MEDIA_OPEN_EVENT = "ntb:media-open";
 
-/** Call right before mounting a video/track embed. */
-export function announceMediaOpen(): void {
+/**
+ * Call right before mounting a video/track embed. `source` names who opened
+ * it, so other players on the page can stand down (one thing plays at a time).
+ */
+export function announceMediaOpen(source?: string): void {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new CustomEvent(MEDIA_OPEN_EVENT));
+  window.dispatchEvent(new CustomEvent(MEDIA_OPEN_EVENT, { detail: { source } }));
+}
+
+/** Runs `onOther` whenever media other than `source` opens. Returns the unsubscribe. */
+export function onOtherMediaOpen(source: string, onOther: () => void): () => void {
+  const listener = (event: Event) => {
+    if ((event as CustomEvent<{ source?: string }>).detail?.source !== source) onOther();
+  };
+  window.addEventListener(MEDIA_OPEN_EVENT, listener);
+  return () => window.removeEventListener(MEDIA_OPEN_EVENT, listener);
 }
 
 // The ambient player owns the only <audio> element; the Music section reads

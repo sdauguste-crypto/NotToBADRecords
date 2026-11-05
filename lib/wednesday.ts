@@ -14,6 +14,12 @@ export const wednesday = {
   releaseAt: zonedTimeToEpoch(RELEASE_LOCAL, RELEASE_ZONE),
   releaseLabel: "FRI 10.30 · 12AM ET",
   cover: { src: "/wednesday/cover.jpg", width: 1200, height: 1200 },
+  /** The cover at 960px: the hero disc on phones (about 900 device px at 3x). */
+  coverMedium: { src: "/wednesday/cover-960.jpg", width: 960, height: 960 },
+  /** The release cover at 480px, for the small circle on the single card. */
+  thumb: { src: "/covers/wednesday-480.webp", width: 480, height: 480 },
+  /** The cover at 40px: the browser stretches it into the hero's soft backdrop. */
+  ambient: "/wednesday/ambient.jpg",
   og: { src: "/wednesday/og.jpg", width: 1200, height: 630 },
   /**
    * Public 15–30 s preview clip under public/wednesday (never the full song).
@@ -21,25 +27,17 @@ export const wednesday = {
    */
   previewClip: "/wednesday/preview.mp3" as string | undefined, // 0:13–0:28
   // The full song is never on the site: the site and the repo are public, so
-  // any file here can be downloaded. Signups get the early listen by email.
+  // any file here can be downloaded. Full listening is the Spotify and Apple
+  // Music links below and the Spotify player that mounts on /wednesday.
   /** Streaming links (Oct 30 re-release) — each button appears once its link is set. */
   links: {
     spotify: "https://open.spotify.com/track/13isILcElhB9AhP2koPIsN" as string | undefined,
     appleMusic: "https://music.apple.com/us/album/wednesday-single/6826547891" as string | undefined,
     youtube: undefined as string | undefined,
   },
-  /** Mailing-list tags: early-access signups, then the weekly drop list. */
-  tags: { early: "wednesday-early", weekly: "take-off-thursdays" },
+  /** Mailing-list tag: the weekly drop list (Take Off Thursdays). */
+  tags: { weekly: "take-off-thursdays" },
 } as const;
 
 export const WEDNESDAY_PATH = "/wednesday/";
 export const WEDNESDAY_URL_TEXT = "nottobadrecords.com/wednesday";
-
-export function streamingLinks() {
-  const { spotify, appleMusic, youtube } = wednesday.links;
-  return [
-    { label: "SPOTIFY", href: spotify },
-    { label: "APPLE MUSIC", href: appleMusic },
-    { label: "YOUTUBE", href: youtube },
-  ].filter((l): l is { label: string; href: string } => !!l.href);
-}

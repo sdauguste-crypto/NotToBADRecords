@@ -1,16 +1,15 @@
 import type { Metadata, Viewport } from "next";
 
-import { ReleasePage } from "@/components/wednesday/release-page";
+import { WednesdayLanding } from "@/components/wednesday/landing";
 import { WEDNESDAY_PATH, wednesday } from "@/lib/wednesday";
 
 // Standalone like /listen: no scene, no motion library — it opens from
 // Instagram and TikTok bios, inside their in-app browsers.
 
-// Time-neutral copy: share cards are cached for days, so they mustn't say
-// "out Friday" after Friday.
+// Time-neutral copy: share cards are cached for days.
 const TITLE = "WEDNESDAY — Simon Auguste";
 const DESCRIPTION =
-  "The new single from Simon Auguste. Space Cadets hear it first. Not To B.A.D Records.";
+  "WEDNESDAY — the new single from Simon Auguste. Listen on Spotify and Apple Music. Not To B.A.D Records.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -37,6 +36,5 @@ export const viewport: Viewport = {
 };
 
 export default function WednesdayPage() {
-  // built after release? then the static HTML already reads OUT NOW
-  return <ReleasePage initiallyReleased={Date.now() >= wednesday.releaseAt} />;
+  return <WednesdayLanding />;
 }
